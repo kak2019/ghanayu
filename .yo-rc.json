@@ -1,0 +1,21 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "18.17.1",
+    "sdksVersions": {
+      "@microsoft/microsoft-graph-client": "3.0.2",
+      "@microsoft/teams-js": "2.12.0"
+    },
+    "version": "1.18.0",
+    "libraryName": "hanyu-frontend",
+    "libraryId": "83ac98cd-cfcf-4342-a00c-e680a52e66e8",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "hanyu-frontend",
+    "solutionShortDescription": "hanyu-frontend description",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}

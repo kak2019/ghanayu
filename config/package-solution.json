@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "hanyu-frontend-client-side-solution",
+    "id": "83ac98cd-cfcf-4342-a00c-e680a52e66e8",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.18.0"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "hanyu-frontend description"
+      },
+      "longDescription": {
+        "default": "hanyu-frontend description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "hanyu-frontend Feature",
+        "description": "The feature that activates elements of the hanyu-frontend solution.",
+        "id": "038521fb-08e1-4940-9942-d604dc7aabf5",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/hanyu-frontend.sppkg"
+  }
+}
