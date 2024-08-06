@@ -15,7 +15,9 @@ import AppComponent from './app.vue'
 
 import styles from './HanyuAppWebPart.module.scss';
 import * as strings from 'HanyuAppWebPartStrings';
-
+// import '../hanyuApp/components/ShippingRecordPage/CustomStyles.css'; // Import the custom CSS
+import 'element-plus/dist/index.css';
+import ElementPlus from 'element-plus';
 export interface IHanyuAppWebPartProps {
   description: string;
 }
@@ -32,6 +34,7 @@ export default class HanyuAppWebPart extends BaseClientSideWebPart<IHanyuAppWebP
     const pinia = createPinia();
     const app = createApp(AppComponent);
     app.use(pinia);
+    app.use(ElementPlus);
     app.use(router);
     app.mount(`#app-${this.context.instanceId}`);
   }

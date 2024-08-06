@@ -2,6 +2,7 @@
     <div class="nav">
         <router-link class="tab" to="/home" replace>Home</router-link>
         <router-link class="tab" to="/about" replace>About</router-link>
+        <router-link class="tab" to="/shippingrecord" replace>Shipping Record</router-link>
     </div>
     <router-view></router-view>
 </template>
@@ -21,6 +22,7 @@ export default {
     margin-right: 8px;
     padding: 2px 20px;
     text-decoration: none;
+
 }
 
 .tab:hover {

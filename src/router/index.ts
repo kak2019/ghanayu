@@ -17,6 +17,12 @@ const routes: RouteRecordRaw[] = [
             '../webparts/hanyuApp/components/RouterComponents/About.vue')
     },
     {
+        path: '/shippingrecord',
+        //component: shippingRecord
+        component: () => import(/* webpackChunkName: "about-chunk" */
+            '../webparts/hanyuApp/components/ShippingRecordPage/ShippingRecoed.vue')
+    },
+    {
         path: '/:patchMatch(.*)',
         component: () => import(/* webpackChunkName: "notfound-chunk" */
             '../webparts/hanyuApp/components/RouterComponents/NotFound.vue')
