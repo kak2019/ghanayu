@@ -7,6 +7,7 @@
         placeholder="选择日期"
         class="custom-date-picker"
         @change="handleChange"
+        style="max-width: 130px"
     ></el-date-picker>
   </div>
 </template>
@@ -51,19 +52,22 @@ export default {
   flex-direction: column;
   align-items: flex-start;
   border: 1px;
+  margin-right: 10px;
 
 }
 
 .custom-label {
-  margin-bottom: 5px;
   font-size: 14px;
   font-weight: bold;
-  padding-left: 10px; /* 调整label文字位置 */
+  padding-left: 25px; /* 调整label文字位置 */
+  padding-right: 30px;
   border: 1px solid #000; /* 添加边框 */
   background-color: orange;
 }
 
 .custom-date-picker {
-  width: 100px; /* 调整日期选择器的宽度 */
+  width: 30px; /* 调整日期选择器的宽度 */
+  min-width: 30px;
+  max-width: 30px;
 }
 </style>
