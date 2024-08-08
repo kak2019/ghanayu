@@ -1,5 +1,5 @@
 <template>
-  <el-table :data="tableData" stripe style="width: 100%">
+  <el-table :data="tableData" stripe style="width: 100%" :header-cell-style="{backgroundColor: '#3f51b5',color: 'white'}">
     <el-table-column prop="date" label="出荷実績日" width="180" />
     <el-table-column prop="name" label="出荷先" width="180" />
     <el-table-column prop="callOffId" label="Call off id" />
@@ -11,7 +11,7 @@
   </el-table>
 </template>
 
-<script  setup>
+<script setup>
 const tableData = [
   {
     date: '2016-05-03',
@@ -55,3 +55,6 @@ const tableData = [
   }
 ]
 </script>
+
+<style>
+</style>
