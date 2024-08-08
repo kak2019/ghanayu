@@ -11,7 +11,7 @@
   </el-table>
 </template>
 
-<script lang="ts" setup>
+<script  setup>
 const tableData = [
   {
     date: '2016-05-03',
