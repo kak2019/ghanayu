@@ -4,7 +4,7 @@
     <el-input
         v-model="innerValue"
         clearable
-        style="width: 120px;"
+        style="width: 120px; border: 1px solid #000;"
         placeholder="Please Input"
         @input="handleChange"
     />

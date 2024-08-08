@@ -7,7 +7,7 @@
         placeholder="选择日期"
         class="custom-date-picker"
         @change="handleChange"
-        style="max-width: 130px"
+        style="max-width: 127px ; border: 1px solid #000;"
     ></el-date-picker>
   </div>
 </template>

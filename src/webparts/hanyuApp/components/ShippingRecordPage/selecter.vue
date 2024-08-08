@@ -6,7 +6,7 @@
         type="date"
         placeholder="请选择"
         @change="handleChange"
-        style="max-width: 130px"
+        style="max-width: 130px ; border: 1px solid #000;"
     >
       <el-option
         v-for="item in options"
@@ -36,24 +36,16 @@ export default {
       innerValue: this.modelValue,
       options: [
   {
-    value: 'Option1',
-    label: 'Option1',
+    value: '2921',
+    label: '2921',
   },
   {
-    value: 'Option2',
-    label: 'Option2',
+    value: '2922',
+    label: '2922',
   },
   {
-    value: 'Option3',
-    label: 'Option3',
-  },
-  {
-    value: 'Option4',
-    label: 'Option4',
-  },
-  {
-    value: 'Option5',
-    label: 'Option5',
+    value: '2924',
+    label: '2924',
   },
 ]
     };
