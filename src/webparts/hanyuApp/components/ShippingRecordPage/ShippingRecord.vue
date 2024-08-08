@@ -26,12 +26,13 @@
     <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-bottom: 10px;">登录</el-button>
     <el-button style="width: 100px; height: 50px; margin-top: 1px">キャンセル</el-button>
     <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-right: 10px;margin-bottom: 10px;">ダウンロード</el-button>
-    <el-row style="margin-bottom: 10px;">
+  </el-row> <!-- 关闭第二个 el-row 标签 -->
+    <el-row style="margin-bottom: 10px; display: flex;flex-wrap: wrap">
       <label style="border: 1px solid black; background-color: orange; margin: 2px 0 2px 0;">メッセージ</label>
       <label style="border: 1px solid black; margin: 2px 20px 2px 0; width: 500px; display: inline-block;"></label>
     </el-row>
     <TableShipping></TableShipping>
-  </el-row> <!-- 关闭第二个 el-row 标签 -->
+
 </template>
 
 <script>

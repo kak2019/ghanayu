@@ -17,10 +17,10 @@ div[data-automation-id="CanvasControl"] {
     padding: 0;
 }
 
-/*remove聽left聽navigation聽box聽from聽the聽SharePoint聽page*/
-#spLeftNav {
-    display: none !important;
-}
+/*!*remove聽left聽navigation聽box聽from聽the聽SharePoint聽page*!*/
+/*#spLeftNav {*/
+/*    display: none !important;*/
+/*}*/
 
 #sideNavBox {
     display: none !important;
@@ -33,17 +33,17 @@ div[data-automation-id="CanvasControl"] {
     display: none !important;
 }
 
-#SuiteNavWrapper {
-    display: none !important;
-}
+/*#SuiteNavWrapper {*/
+/*    display: none !important;*/
+/*}*/
 
-#spCommandBar {
-    display: none !important;
-}
+/*#spCommandBar {*/
+/*    display: none !important;*/
+/*}*/
 
-#spSiteHeader {
-    display: none !important;
-}
+/*#spSiteHeader {*/
+/*    display: none !important;*/
+/*}*/
 #CommentsWrapper {
     display: none !important;
 }
