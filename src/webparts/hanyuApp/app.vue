@@ -3,6 +3,7 @@
         <router-link class="tab" to="/home" replace>Home</router-link>
         <router-link class="tab" to="/about" replace>About</router-link>
         <router-link class="tab" to="/shippingrecord" replace>Shipping Record</router-link>
+        <router-link class="tab" to="/goodsInventory" replace>Goods Inventory</router-link>
     </div>
     <router-view></router-view>
 </template>
