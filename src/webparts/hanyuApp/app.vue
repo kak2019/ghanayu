@@ -1,9 +1,13 @@
 <template>
     <div class="nav">
-        <router-link class="tab" to="/home" replace>Home</router-link>
-        <router-link class="tab" to="/about" replace>About</router-link>
-        <router-link class="tab" to="/shippingrecord" replace>Shipping Record</router-link>
-        <router-link class="tab" to="/goodsInventory" replace>Goods Inventory</router-link>
+        <router-link class="tab" to="/home" replace>ホームページ</router-link>
+        <router-link class="tab" to="/stockreport" replace>在庫管理表(支給品)</router-link>
+        <router-link class="tab" to="/goodsInventory" replace>在庫管理表(工程別)</router-link>
+        <router-link class="tab" to="/shippingrecord" replace>出荷実績入力</router-link>
+        <router-link class="tab" to="/processcompletion" replace>内製工程完了実績入力</router-link>
+        <router-link class="tab" to="/partsmaster" replace>部品マスター</router-link>
+        <router-link class="tab" to="/goodsreceive" replace>支給品検収実績入力</router-link>
+        <router-link class="tab" to="/billofmaterials" replace>部品表</router-link>
     </div>
     <router-view></router-view>
 </template>
@@ -14,24 +18,32 @@ export default {
 </script>
 <style>
 .nav {
-    margin: 20px 20px;
+    display: flex;
+    justify-content: space-around;
+    background-color: #f0f0f0;
+    padding: 10px;
+    white-space: nowrap;
 }
 
 .tab {
-    border: 1px solid #ccc;
-    box-shadow: 8px 5px 5px -5px #ccc;
-    margin-right: 8px;
-    padding: 2px 20px;
+    color: black;
     text-decoration: none;
-
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    white-space: nowrap;
 }
 
 .tab:hover {
-    border-bottom: 3px solid #ccc;
+    background-color: #e0e0e0;
 }
 
-.router-link-active {
+.tab.router-link-exact-active {
+    background-color: black;
+    color: white !important;
+}
 
-    border-bottom: 3px solid #00809d !important;
+.tab:visited {
+    color: black;
 }
 </style>

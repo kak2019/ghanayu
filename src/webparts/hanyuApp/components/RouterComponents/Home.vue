@@ -5,7 +5,7 @@
     </div>
 </template>
 <script>
-import App from '../AppComponents/Func1.vue';
+import App from '../AppComponents/Home.vue';
 
 export default {
     components: {
