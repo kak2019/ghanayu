@@ -51,10 +51,12 @@ export default {
         const isEditing = ref(false);
         const isInserting = ref(false);
         const tableRef = ref();
-        const minHeight = 400;
-        const spcHeight = 389;
+
+
         const windowHeight = ref(window.innerHeight);
         const tableHeight = computed(() => {
+            const spcHeight = (windowHeight.value < 640) ? 500 : 389;
+            const minHeight = (windowHeight.value < 640) ? 200 : 400;
             return windowHeight.value > minHeight + spcHeight ? windowHeight.value - spcHeight : minHeight;
         });
         const handleResize = (): void => {

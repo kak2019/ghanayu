@@ -29,7 +29,7 @@
     </el-header>
     <el-main :style="{paddingLeft:0,paddingRight:0}">
         <el-form size="small" @submit="onPartFormSubmit" :inline-message="false" :status-icon="true" :scroll-to-error="true">
-            <el-table :header-cell-style="{ backgroundColor: '#366093', color: '#fff', textAlign: 'center' }" :data="isFiltered?filteredData:tableData" :highlight-current-row="!isEditing" @current-change="handleRowClick" v-loading="loading" ref="tableRef"  :height="tableHeight">
+            <el-table :header-cell-style="{ backgroundColor: '#366093', color: '#fff', textAlign: 'center' }" :data="isFiltered?filteredData:tableData" :highlight-current-row="!isEditing" @current-change="handleRowClick" v-loading="loading" ref="tableRef" :height="tableHeight">
                 <el-table-column fixed prop="MLNPartNo" label="MLN部品番号" width="140">
                     <template #default="scope">
                         <el-form-item v-if="isInserting && currentRowIndex === scope.$index" v-bind="partFormMLNPartNoProps">
