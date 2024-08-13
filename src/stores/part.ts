@@ -17,7 +17,7 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 const sp = spfi(getSP());
                 const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/PartsMaster`).items.orderBy("UDPartNo", true)();
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/PartsMaster`).items.orderBy("MLNPartNo", true)();
                 this.parts = items;
             }
             catch (error) {
@@ -29,22 +29,29 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
-                await sp.web.getList(`${web.ServerRelativeUrl}/Lists/PartsMaster`).items.add(item);
-                return 'データは正常に挿入されました。';
+                await sp.web.getList(`${web.ServerRelativeUrl}/Lists/PartsMaster`).items.add({
+                    MLNPartNo: item.MLNPartNo,
+                    UDPartNo: item.UDPartNo,
+                    Registered: new Date()
+                });
+                return '登録完了。';
             }
             catch (error) {
-                throw new Error(`データの挿入中にエラーが発生しました: ${error.message}`);
+                throw new Error(`データの登録中にエラーが発生しました: ${error.message}`);
             }
         },
         async updateListItem(itemId: number, item: IPartMasterItem): Promise<string> {
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
-                await sp.web.getList(`${web.ServerRelativeUrl}/Lists/PartsMaster`).items.getById(itemId).update(item);
-                return 'データが正常に更新されました。';
+                await sp.web.getList(`${web.ServerRelativeUrl}/Lists/PartsMaster`).items.getById(itemId).update({
+                    // MLNPartNo: item.MLNPartNo,
+                    UDPartNo: item.UDPartNo
+                });
+                return '登録完了。';
             }
             catch (error) {
-                throw new Error(`データの更新中にエラーが発生しました: ${error.message}`);
+                throw new Error(`データの登録中にエラーが発生しました: ${error.message}`);
             }
 
 
@@ -54,7 +61,7 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 const sp = spfi(getSP());
                 const web = await sp.web();
                 await sp.web.getList(`${web.ServerRelativeUrl}/Lists/PartsMaster`).items.getById(itemId).delete();
-                return 'データは正常に消去されました。';
+                return '消去完了。';
             }
             catch (error) {
                 throw new Error(`データの削除中にエラーが発生しました: ${error.message}`);

@@ -1,5 +1,5 @@
 import { IPartMasterItem } from './../../../../model/partitem';
-import { onMounted, ref } from 'vue';
+import { nextTick, onMounted, ref } from 'vue';
 import { usePartMasterStore } from '../../../../stores/part';
 import { useForm } from 'vee-validate';
 import * as yup from 'yup';
@@ -14,7 +14,7 @@ export default {
     setup() {
         yup.setLocale({
             mixed: {
-                required: ({ path }) => `${path} は必須フィールドです。`
+                required: ({ path }) => `フィールド ${path} は空白です。入力してください。`
             },
             string: {
                 min: ({ path, min }) => `${path} は少なくとも ${min} 文字である必要があります。`
@@ -57,19 +57,17 @@ export default {
                 yup.object({
                     MLNPartNo: yup.string().required().min(5).label('MLN部品番号'),
                     UDPartNo: yup.string().required().min(5).label('UD部品番号'),
-                    Message: yup.string().label('メッセージ'),
                 })
             ,
             initialValues: {
                 MLNPartNo: '',
                 UDPartNo: '',
-                Message: ''
             },
         });
         const { errors } = partForm;
         const [partFormMLNPartNo, partFormMLNPartNoProps] = partForm.defineField('MLNPartNo', config);
         const [partFormUDPartNo, partFormUDPartNoProps] = partForm.defineField('UDPartNo', config);
-        const [partFormMessage, partFormMessageProps] = partForm.defineField('Message', config);
+
         const refreshFilteredData = (): void => {
             currentRowIndex.value = -1;
             tableRef.value?.setCurrentRow(undefined);
@@ -88,7 +86,11 @@ export default {
                     }
                     else {
                         isFiltered.value = true;
-                        if (!isEmpty1 && !isEmpty2) { return filterByMLNPartNo && filterByUDPartNo; }
+                        if (!isEmpty1 && !isEmpty2) {
+                            // If both the MLN part number and the UD part number are entered, search by the MLN part number.
+                            // return filterByMLNPartNo && filterByUDPartNo; 
+                            return filterByMLNPartNo;
+                        }
                         else {
                             return filterByMLNPartNo || filterByUDPartNo;
                         }
@@ -105,7 +107,7 @@ export default {
                 refreshFilteredData();
             }).catch(error => {
                 loading.value = false;
-                ElMessage.error(error);
+                ElMessage.error(error.message);
             });
         };
         onMounted(fetchData);
@@ -115,7 +117,6 @@ export default {
             }
 
         };
-
         const onSubmit = queryForm.handleSubmit((_) => {
             if (isEditing.value) {
                 ElMessage.error('無効な操作です。編集モードを終了して再試行してください。');
@@ -148,15 +149,18 @@ export default {
                 data.value.push({
                     MLNPartNo: "",
                     UDPartNo: "",
-                    Message: ""
                 });
                 currentRowIndex.value = data.value.length - 1;
+                nextTick(() => {
+                    const tableElement = tableRef.value?.$el.querySelector('.el-scrollbar__wrap');
+                    tableElement.scrollTop = tableElement.scrollHeight;
+                }).then(undefined).catch(undefined);
+
             }
             else {
                 data.value.splice(currentRowIndex.value, 0, {
                     MLNPartNo: "",
                     UDPartNo: "",
-                    Message: ""
                 });
             }
             isEditing.value = true;
@@ -167,7 +171,7 @@ export default {
             partMasterStore.deleteListItem(+data.value[currentRowIndex.value].ID).then((data) => {
                 ElMessage.success(data);
                 fetchData();
-            }).catch(error => ElMessage.error(error));
+            }).catch(error => ElMessage.error(error.message));
 
         }
         const onPartFormSubmit = partForm.handleSubmit((item): void => {
@@ -178,7 +182,7 @@ export default {
                     isInserting.value = false;
                     partForm.resetForm();
                     fetchData();
-                }).catch(error => ElMessage.error(error));
+                }).catch(error => ElMessage.error(error.message));
             }
             else {
                 const data = (isFiltered.value) ? filteredData : tableData;
@@ -188,11 +192,12 @@ export default {
                     isInserting.value = false;
                     partForm.resetForm();
                     fetchData();
-                }).catch(error => ElMessage.error(error));
+                }).catch(error => ElMessage.error(error.message));
             }
 
         });
         const cancelRow = (): void => {
+            partForm.resetForm();
             const data = (isFiltered.value) ? filteredData : tableData;
             if (isInserting.value) {
                 if (currentRowIndex.value === -1) {
@@ -201,15 +206,20 @@ export default {
                 else {
                     data.value.splice(currentRowIndex.value, 1);
                 }
-                partForm.resetForm();
-            }
-            else {
-                partForm.setValues({
-                    ...data.value[currentRowIndex.value]
-                });
+
             }
             isEditing.value = false;
             isInserting.value = false;
+        }
+        const onDownloadClick = (): void => {
+            import( /* webpackChunkName: 'xlsx_chunk' */
+                'xlsx').then(XLSX => {
+                    const data = (isFiltered.value) ? filteredData : tableData;
+                    const ws = XLSX.utils.json_to_sheet(data.value.map(({ MLNPartNo, UDPartNo }) => ({ MLNPartNo, UDPartNo })));
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+                    XLSX.writeFile(wb, 'part_mater_data.xlsx');
+                }).catch(error => ElMessage.error(error.message));
         }
         return {
             isFiltered,
@@ -217,6 +227,7 @@ export default {
             Check,
             Close,
             isEditing,
+            isInserting,
             currentRowIndex,
             MLNPartNo,
             MLNPartNoProps,
@@ -238,9 +249,8 @@ export default {
             partFormMLNPartNoProps,
             partFormUDPartNo,
             partFormUDPartNoProps,
-            partFormMessage,
-            partFormMessageProps,
             tableRef,
+            onDownloadClick,
         }
     }
 }

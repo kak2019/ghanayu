@@ -19,7 +19,7 @@
                 <el-col :span="12">
                     <el-button plain size="large" type="primary" native-type="submit">検索</el-button>
                     <el-button plain size="large" @click="onResetQuery">キャンセル</el-button>
-                    <el-button plain size="large">ダウンロード</el-button>
+                    <el-button plain size="large" @click="onDownloadClick">ダウンロード</el-button>
                 </el-col>
                 <el-col :span="2">
 
@@ -28,48 +28,42 @@
         </el-form>
     </el-header>
     <el-main>
-        <div v-if="Object.keys(errors).length>0">
-            <el-alert v-for="(value,key) in errors" :title="value" :key="key" type="error" show-icon :closable="false" />
-        </div>
-        <el-scrollbar height="400px">
-            <el-form size="small" @submit="onPartFormSubmit" :inline-message="false" :status-icon="true" :scroll-to-error="true">
-                <el-table :header-cell-style="{ backgroundColor: '#366093', color: '#fff', textAlign: 'center' }" :data="isFiltered?filteredData:tableData" :highlight-current-row="!isEditing" @current-change="handleRowClick" v-loading="loading" ref="tableRef">
-                    <el-table-column prop="MLNPartNo" label="MLN部品番号" width="140">
-                        <template #default="scope">
-                            <el-form-item v-if="isEditing && currentRowIndex === scope.$index" v-bind="partFormMLNPartNoProps">
-                                <el-input v-model="partFormMLNPartNo" />
-                            </el-form-item>
-                            <span v-else>{{ scope.row.MLNPartNo }}</span>
-                        </template>
-                    </el-table-column>
-                    <el-table-column prop="UDPartNo" label="UD部品番号" width="120">
-                        <template #default="scope">
-                            <el-form-item v-if="isEditing && currentRowIndex === scope.$index" v-bind="partFormUDPartNoProps">
-                                <el-input v-model="partFormUDPartNo" />
-                            </el-form-item>
-                            <span v-else>{{ scope.row.UDPartNo }}</span>
-                        </template>
-                    </el-table-column>
-                    <el-table-column prop="Message" label="メッセージ">
-                        <template #default="scope">
-                            <el-form-item v-if="isEditing && currentRowIndex === scope.$index" v-bind="partFormMessageProps">
-                                <el-input v-model="partFormMessage" />
-                            </el-form-item>
-                            <span v-else>{{ scope.row.Message }}</span>
-                        </template>
-                    </el-table-column>
-                    <el-table-column label="" width="135">
-                        <template #default="scope">
-                            <el-button v-if="isEditing && currentRowIndex === scope.$index" title="保存" type="primary" native-type="submit" :icon="Check" />
-                            <el-button v-if="isEditing && currentRowIndex === scope.$index" @click="cancelRow" title="キャンセル" :icon="Close" />
-                        </template>
-                    </el-table-column>
-                    <template #empty>
-                        <el-empty description="データなし"></el-empty>
+        <el-form size="small" @submit="onPartFormSubmit" :inline-message="false" :status-icon="true" :scroll-to-error="true">
+            <el-table :header-cell-style="{ backgroundColor: '#366093', color: '#fff', textAlign: 'center' }" :data="isFiltered?filteredData:tableData" :highlight-current-row="!isEditing" @current-change="handleRowClick" v-loading="loading" ref="tableRef"  height="400">
+                <el-table-column fixed prop="MLNPartNo" label="MLN部品番号" width="140">
+                    <template #default="scope">
+                        <el-form-item v-if="isInserting && currentRowIndex === scope.$index" v-bind="partFormMLNPartNoProps">
+                            <el-input v-model="partFormMLNPartNo" />
+                        </el-form-item>
+                        <span v-else>{{ scope.row.MLNPartNo }}</span>
                     </template>
-                </el-table>
-            </el-form>
-        </el-scrollbar>
+                </el-table-column>
+                <el-table-column prop="UDPartNo" label="UD部品番号" width="120">
+                    <template #default="scope">
+                        <el-form-item v-if="isEditing && currentRowIndex === scope.$index" v-bind="partFormUDPartNoProps">
+                            <el-input v-model="partFormUDPartNo" />
+                        </el-form-item>
+                        <span v-else>{{ scope.row.UDPartNo }}</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="" width="108">
+                    <template #default="scope">
+                        <el-button v-if="isEditing && currentRowIndex === scope.$index" title="保存" type="primary" native-type="submit" :icon="Check" />
+                        <el-button v-if="isEditing && currentRowIndex === scope.$index" @click="cancelRow" title="キャンセル" :icon="Close" />
+                    </template>
+                </el-table-column>
+                <el-table-column prop="Message" label="メッセージ">
+                    <template #default="scope">
+                        <div v-if="scope.$index == currentRowIndex && Object.keys(errors).length>0">
+                            <el-tag v-for="(value,key) in errors" :key="key" type="danger" closable effect="plain">{{ value }}</el-tag>
+                        </div>
+                    </template>
+                </el-table-column>
+                <template #empty>
+                    <el-empty description="データなし"></el-empty>
+                </template>
+            </el-table>
+        </el-form>
     </el-main>
     <el-footer>
         <el-row class="row-bg" justify="space-evenly" :gutter="20">

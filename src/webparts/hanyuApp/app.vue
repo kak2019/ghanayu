@@ -19,7 +19,7 @@ export default {
 <style>
 .nav {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     background-color: #f0f0f0;
     padding: 10px;
     white-space: nowrap;
@@ -32,6 +32,8 @@ export default {
     border-radius: 5px;
     transition: background-color 0.3s ease;
     white-space: nowrap;
+    flex: 1 1 auto;
+    text-align: center;
 }
 
 .tab:hover {
