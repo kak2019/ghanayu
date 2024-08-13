@@ -14,7 +14,5 @@ export default {
 };
 </script>
 <style scoped>
-.PartsMaster {
-    margin-top: 8px;
-}
+
 </style>

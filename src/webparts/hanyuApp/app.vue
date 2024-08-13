@@ -17,11 +17,13 @@ export default {
 }
 </script>
 <style>
+div[data-automation-id="contentScrollRegion"] {
+    overflow: hidden;
+}
 .nav {
     display: flex;
     justify-content: space-between;
     background-color: #f0f0f0;
-    padding: 10px;
     white-space: nowrap;
 }
 

@@ -1,6 +1,6 @@
 <template>
 <el-container>
-    <el-header height="36px">
+    <el-header height="36px" :style="{padding:0}">
         <el-form label-position="top" label-width="auto" size="small" @submit="onSubmit">
             <el-row class="row-bg" justify="space-evenly" :gutter="8">
                 <el-col :span="4">
@@ -27,7 +27,7 @@
             </el-row>
         </el-form>
     </el-header>
-    <el-main>
+    <el-main :style="{paddingLeft:0,paddingRight:0}">
         <el-form size="small" @submit="onPartFormSubmit" :inline-message="false" :status-icon="true" :scroll-to-error="true">
             <el-table :header-cell-style="{ backgroundColor: '#366093', color: '#fff', textAlign: 'center' }" :data="isFiltered?filteredData:tableData" :highlight-current-row="!isEditing" @current-change="handleRowClick" v-loading="loading" ref="tableRef"  :height="tableHeight">
                 <el-table-column fixed prop="MLNPartNo" label="MLN部品番号" width="140">
