@@ -1,5 +1,5 @@
 import { IPartMasterItem } from './../../../../model/partitem';
-import { nextTick, onMounted, ref } from 'vue';
+import { nextTick, computed, onMounted, onBeforeUnmount, ref } from 'vue';
 import { usePartMasterStore } from '../../../../stores/part';
 import { useForm } from 'vee-validate';
 import * as yup from 'yup';
@@ -51,7 +51,14 @@ export default {
         const isEditing = ref(false);
         const isInserting = ref(false);
         const tableRef = ref();
-
+        const minHeight = 400;
+        const windowHeight = ref(window.innerHeight);
+        const tableHeight = computed(() => {
+            return windowHeight.value > minHeight + 350 ? windowHeight.value - 350 : minHeight;
+        });
+        const handleResize = (): void => {
+            windowHeight.value = window.innerHeight;
+        }
         const partForm = useForm({
             validationSchema:
                 yup.object({
@@ -110,7 +117,14 @@ export default {
                 ElMessage.error(error.message);
             });
         };
-        onMounted(fetchData);
+        onMounted((): void => {
+            window.addEventListener('resize', handleResize);
+            fetchData();
+
+        });
+        onBeforeUnmount((): void => {
+            window.removeEventListener('resize', handleResize);
+        });
         const handleRowClick = (row: IPartMasterItem | undefined): void => {
             if (!isEditing.value) {
                 currentRowIndex.value = isFiltered.value ? filteredData.value.indexOf(row) : tableData.value.indexOf(row);
@@ -233,6 +247,7 @@ export default {
             MLNPartNoProps,
             UDPartNo,
             UDPartNoProps,
+            tableHeight,
             tableData,
             filteredData,
             loading,
