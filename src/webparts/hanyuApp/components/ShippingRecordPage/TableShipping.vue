@@ -1,59 +1,51 @@
 <template>
-  <el-table :data="tableData" stripe style="width: 100%" :header-cell-style="{backgroundColor: '#3f51b5',color: 'white'}">
-    <el-table-column prop="date" label="出荷実績日" width="180" />
-    <el-table-column prop="name" label="出荷先" width="180" />
-    <el-table-column prop="callOffId" label="Call off id" />
-    <el-table-column prop="despatchNote" label="Despatch note" />
-    <el-table-column prop="mlnPartNumber" label="MLN部品番号" />
-    <el-table-column prop="udPartNumber" label="UD部品番号" />
-    <el-table-column prop="outNum" label="出荷数" />
-    <el-table-column prop="registrationDate" label="実績登録日" />
+  <el-table
+      :data="shippingResultStore.shippingResultItems"
+      stripe
+      style="width: 100%"
+      :header-cell-style="{ backgroundColor: '#3f51b5', color: 'white' }"
+  >
+    <el-table-column prop="ShippingResultDate" label="出荷実績日" width="180" :formatter="formatDate" />
+    <el-table-column prop="ShipTo" label="出荷先" width="180" />
+    <el-table-column prop="Calloffid" label="Call off id" />
+    <el-table-column prop="Despatchnote" label="Despatch note" />
+    <el-table-column prop="MLNPartNo" label="MLN部品番号" />
+    <el-table-column prop="UDPartNo" label="UD部品番号" />
+    <el-table-column prop="ShipQty" label="出荷数" />
+    <el-table-column prop="Created" label="実績登録日"  :formatter="formatDate" />
   </el-table>
 </template>
 
 <script setup>
-const tableData = [
-  {
-    date: '2016-05-03',
-    name: 'Tom',
-    callOffId: 'CO12345',
-    despatchNote: 'DN67890',
-    mlnPartNumber: 'MLN-001',
-    udPartNumber: 'UD-001',
-    outNum: 100,
-    registrationDate: '2016-05-04'
-  },
-  {
-    date: '2016-05-02',
-    name: 'John',
-    callOffId: 'CO12346',
-    despatchNote: 'DN67891',
-    mlnPartNumber: 'MLN-002',
-    udPartNumber: 'UD-002',
-    outNum: 150,
-    registrationDate: '2016-05-03'
-  },
-  {
-    date: '2016-05-04',
-    name: 'Alice',
-    callOffId: 'CO12347',
-    despatchNote: 'DN67892',
-    mlnPartNumber: 'MLN-003',
-    udPartNumber: 'UD-003',
-    outNum: 200,
-    registrationDate: '2016-05-05'
-  },
-  {
-    date: '2016-05-01',
-    name: 'Bob',
-    callOffId: 'CO12348',
-    despatchNote: 'DN67893',
-    mlnPartNumber: 'MLN-004',
-    udPartNumber: 'UD-004',
-    outNum: 250,
-    registrationDate: '2016-05-02'
+import { onMounted, ref } from 'vue';
+import { useShippingResultStore } from '../../../../stores/shippingresult'; // 更新为你的实际路径
+
+
+// 获取 Pinia store 实例
+const shippingResultStore = useShippingResultStore();
+
+onMounted(async () => {
+  try {
+    // 调用 store 的方法获取数据
+    await shippingResultStore.getListItems();
+    // 将获取到的数据绑定到 tableData
+    // console.log(tableData.value,"table",shippingResultStore.shippingResultItems);
+    // tableData.value = shippingResultStore.shippingResultItems;
+  } catch (error) {
+    console.error('Error fetching shipping results:', error);
   }
-]
+});
+
+
+
+// 定义日期格式化函数
+const formatDate = (row, column) => {
+  const date = new Date(row[column.property]);
+  const month = String(date.getMonth() + 1).padStart(1, '0'); // 月份从0开始
+  const day = String(date.getDate()).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${month}/${day}/${year}`;
+};
 </script>
 
 <style>

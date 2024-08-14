@@ -13,12 +13,12 @@
         label: 'text'
       }"
     />
-<!--    &lt;!&ndash; 添加一个额外的显示元素来查看选中的值 &ndash;&gt;-->
-<!--    <span>{{ selectedText }}</span>-->
   </div>
 </template>
 
 <script>
+import { usePartMasterStore } from '../../../../stores/part'; // 更新为你的实际路径
+
 export default {
   name: 'DatePickerWithLabel',
   props: {
@@ -34,7 +34,8 @@ export default {
   data() {
     return {
       innerValue: this.modelValue,
-      selectedText: '' // 添加一个用于显示选中文本的数据属性
+      selectedText: '', // 用于显示选中文本的数据属性
+      parts: [] // 用于存储从store中获取的parts数据
     };
   },
   watch: {
@@ -52,22 +53,27 @@ export default {
       this.$emit('update:modelValue', value.value);
     },
     querySearch(queryString, cb) {
-      const value = [
-        {value: '32606NA042', text: 'https://github.com/32606NA042'},
-        {value: '32603NA040', text: 'https://github.com/32603NA040'},
-        {value: '3228290447', text: 'https://github.com/3228290447'},
-        {value: '32211NA045', text: 'https://github.com/32211NA045'},
-        {value: '32243NA04H', text: 'https://github.com/32243NA04H'},
-        {value: '32264NA04H', text: 'https://github.com/32264NA04H'},
-        {value: '32282NA040', text: 'https://github.com/32282NA040'},
-        {value: '35208NA02H', text: 'https://github.com/35208NA02H'}
-      ];
       let results = [];
       if (queryString) {
-        results = value.filter(val => val.value.indexOf(queryString) >= 0);
+        results = this.parts.filter(part => part.MLNPartNo.indexOf(queryString) >= 0).map(part => ({
+          value: part.MLNPartNo,
+          text: part.MLNPartNo
+        }));
       }
       cb(results);
+    },
+    async fetchParts() {
+      const partMasterStore = usePartMasterStore();
+      try {
+        await partMasterStore.getListItems(); // 获取parts数据
+        this.parts = partMasterStore.partMasterItems; // 存储到本地数据中
+      } catch (error) {
+        console.error('Error fetching parts:', error);
+      }
     }
+  },
+  mounted() {
+    this.fetchParts(); // 在组件挂载时获取parts数据
   }
 };
 </script>
