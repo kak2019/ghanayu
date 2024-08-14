@@ -1,8 +1,8 @@
 <template>
     <div class="nav">
         <router-link class="tab" to="/home" replace>ホームページ</router-link>
-        <router-link class="tab" to="/stockreport" replace>在庫管理表(支給品)</router-link>
-        <router-link class="tab" to="/goodsInventory" replace>在庫管理表(工程別)</router-link>
+        <router-link class="tab" to="/goodsInventory" replace>在庫管理表(支給品)</router-link>
+        <router-link class="tab" to="/stockreport" replace>在庫管理表(工程別)</router-link>
         <router-link class="tab" to="/shippingrecord" replace>出荷実績入力</router-link>
         <router-link class="tab" to="/processcompletion" replace>内製工程完了実績入力</router-link>
         <router-link class="tab" to="/partsmaster" replace>部品マスター</router-link>

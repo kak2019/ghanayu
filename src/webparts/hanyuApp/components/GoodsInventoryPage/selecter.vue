@@ -3,22 +3,23 @@
     <label class="custom-label">{{ label }}</label>
     <el-select
         v-model="innerValue"
-        type="date"
         placeholder="请选择"
         @change="handleChange"
-        style="max-width: 130px ; border: 1px solid #000;"
+        style="max-width: 130px; border: 1px solid #000;"
     >
       <el-option
-        v-for="item in options"
-        :key="item.value"
-        :label="item.label"
-        :value="item.value"
+          v-for="item in options"
+          :key="item.Id"
+          :label="item.ProcessName"
+          :value="item.ProcessName"
       />
     </el-select>
   </div>
 </template>
 
 <script>
+import { useProcessMasterStore } from '../../../../stores/process'; // 更新为你的实际路径
+
 export default {
   name: 'DatePickerWithLabel',
   props: {
@@ -34,20 +35,7 @@ export default {
   data() {
     return {
       innerValue: this.modelValue,
-      options: [
-  {
-    value: '2921',
-    label: '2921',
-  },
-  {
-    value: '2922',
-    label: '2922',
-  },
-  {
-    value: '2924',
-    label: '2924',
-  },
-]
+      options: [] // 用于存储从Pinia store中获取的选项数据
     };
   },
   watch: {
@@ -62,6 +50,18 @@ export default {
     handleChange(value) {
       this.$emit('update:modelValue', value);
     }
+  },
+  async mounted() {
+    const processMasterStore = useProcessMasterStore();
+    try {
+      await processMasterStore.getListItems(); // 获取数据
+      this.options = processMasterStore.processMasterItems.map(item => ({
+        Id: item.Id,           // 保留Id用于key
+        ProcessName: item.ProcessName // 用于显示的名称
+      }));
+    } catch (error) {
+      console.error('Failed to load process master items:', error);
+    }
   }
 };
 </script>
@@ -73,19 +73,18 @@ export default {
   align-items: flex-start;
   border: 1px;
   margin-right: 10px;
-
 }
 
 .custom-label {
   font-size: 14px;
   font-weight: bold;
-  padding-left: 25px; /* 调整label文字位置 */
+  padding-left: 25px;
   padding-right: 30px;
-  border: 1px solid #000; /* 添加边框 */
+  border: 1px solid #000;
   background-color: orange;
 }
 
 .custom-date-picker {
-  width: 130px; /* 调整日期选择器的宽度 */
+  width: 130px;
 }
 </style>
