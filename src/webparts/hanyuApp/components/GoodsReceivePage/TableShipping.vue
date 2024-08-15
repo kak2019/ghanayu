@@ -1,0 +1,52 @@
+<template>
+  <el-table
+      :data="shippingResultStore.shippingResultItems"
+      stripe
+      style="width: 100%"
+      :header-cell-style="{ backgroundColor: '#3f51b5', color: 'white' }"
+  >
+    <el-table-column prop="ShippingResultDate" label="検収実績日" width="180" :formatter="formatDate" />
+    <el-table-column prop="ShipTo" label="支給元" width="180" />
+    <el-table-column prop="Calloffid" label="Call off id" />
+    <el-table-column prop="Despatchnote" label="Despatch note" />
+    <el-table-column prop="MLNPartNo" label="MLN部品番号" />
+    <el-table-column prop="UDPartNo" label="UD部品番号" />
+    <el-table-column prop="ShipQty" label="受入数" />
+    <el-table-column prop="Created" label="実績登録日"  :formatter="formatDate" />
+  </el-table>
+</template>
+
+<script setup>
+import { onMounted, ref } from 'vue';
+import { useShippingResultStore } from '../../../../stores/shippingresult'; // 更新为你的实际路径
+
+
+// 获取 Pinia store 实例
+const shippingResultStore = useShippingResultStore();
+
+onMounted(async () => {
+  try {
+    // 调用 store 的方法获取数据
+    await shippingResultStore.getListItems();
+    // 将获取到的数据绑定到 tableData
+    // console.log(tableData.value,"table",shippingResultStore.shippingResultItems);
+    // tableData.value = shippingResultStore.shippingResultItems;
+  } catch (error) {
+    console.error('Error fetching shipping results:', error);
+  }
+});
+
+
+
+// 定义日期格式化函数
+const formatDate = (row, column) => {
+  const date = new Date(row[column.property]);
+  const month = String(date.getMonth() + 1).padStart(1, '0'); // 月份从0开始
+  const day = String(date.getDate()).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${month}/${day}/${year}`;
+};
+</script>
+
+<style>
+</style>

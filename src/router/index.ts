@@ -39,7 +39,7 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/goodsreceive',
         component: () => import(/* webpackChunkName: "about-chunk" */
-            '../webparts/hanyuApp/components/RouterComponents/GoodsReceive.vue')
+            '../webparts/hanyuApp/components/GoodsReceivePage/GoodsReceive.vue')
     },
     {
         path: '/billofmaterials',
