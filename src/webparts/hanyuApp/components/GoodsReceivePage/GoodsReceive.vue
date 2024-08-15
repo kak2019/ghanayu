@@ -60,7 +60,7 @@ import {ElMessage} from "element-plus"; // 更新为你的实际路径
 
 // 获取 Pinia store 实例
 const shiKYUGoodsReceiveStore = useSHIKYUGoodsReceiveStore();
-
+const defaultShikyufrom = "2922";
 export default {
   components: {
     TableShipping,
@@ -87,7 +87,7 @@ export default {
       try {
         const newItem = {
           MLNPartNo: this.form.num,
-          UDPartNo: this.form.count,
+          UDPartNo: "",
           SHIKYUFrom: this.form.select,
           GoodsReceiveQty: parseInt(this.form.count, 10),
           Calloffid: this.form.id,
@@ -107,8 +107,8 @@ export default {
 
     cancel() {
       this.form = {
-        date: '',
-        select: '',
+        date: new Date(),
+        select: defaultShikyufrom,
         id: '',
         note: '',
         num: '',
