@@ -94,7 +94,7 @@ export default {
           Despatchnote: this.form.note,
           GoodsReceiveDate: this.form.date,
         };
-        console.log(newItem.GoodsReceiveDate)
+        console.log(this.form.date);
         const message = await shiKYUGoodsReceiveStore.addListItem(newItem);
         this.$message.success(message);
         await shiKYUGoodsReceiveStore.getListItems();
@@ -117,8 +117,8 @@ export default {
     },
 
     downloadExcel() {
-      const data = shiKYUGoodsReceiveStore.ISHIKYUGoodsReceiveItems.map(item => ({
-        '出荷実績日': item.GoodsReceiveDate,
+      const data = shiKYUGoodsReceiveStore.shikyuGoodsReceiveItems.map(item => ({
+        '出荷実績日': this.formatDate({GoodsReceiveDate: item.GoodsReceiveDate}, { property: 'GoodsReceiveDate' }),
         '出荷先': item.SHIKYUFrom,
         'Call off id': item.Calloffid,
         'Despatch note': item.Despatchnote,
@@ -127,10 +127,10 @@ export default {
         '出荷数': item.GoodsReceiveQty,
         '実績登録日': this.formatDate({ Created: item.Created }, { property: 'Created' }),
       }));
-
+      
       const worksheet = XLSX.utils.json_to_sheet(data);
       const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Goods Receive');
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Goods Receive');
 
       XLSX.writeFile(workbook, 'good_receive.xlsx');
     },
