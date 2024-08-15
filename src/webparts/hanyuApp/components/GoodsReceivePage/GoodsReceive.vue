@@ -118,16 +118,16 @@ export default {
 
     downloadExcel() {
       const data = shiKYUGoodsReceiveStore.shikyuGoodsReceiveItems.map(item => ({
-        '出荷実績日': this.formatDate({GoodsReceiveDate: item.GoodsReceiveDate}, { property: 'GoodsReceiveDate' }),
-        '出荷先': item.SHIKYUFrom,
+        '検収実績日': this.formatDate({GoodsReceiveDate: item.GoodsReceiveDate}, { property: 'GoodsReceiveDate' }),
+        '支給元': item.SHIKYUFrom,
         'Call off id': item.Calloffid,
         'Despatch note': item.Despatchnote,
         'MLN部品番号': item.MLNPartNo,
         'UD部品番号': item.UDPartNo,
-        '出荷数': item.GoodsReceiveQty,
+        '受入数': item.GoodsReceiveQty,
         '実績登録日': this.formatDate({ Created: item.Created }, { property: 'Created' }),
       }));
-      
+
       const worksheet = XLSX.utils.json_to_sheet(data);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Goods Receive');
