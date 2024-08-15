@@ -23,7 +23,7 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/processcompletion',
         component: () => import(/* webpackChunkName: "about-chunk" */
-            '../webparts/hanyuApp/components/RouterComponents/ProcessCompletion.vue')
+            '../webparts/hanyuApp/components/ProcessCompletePage/ProcessComplete.vue')
     },
     {
         path: '/shippingrecord',
