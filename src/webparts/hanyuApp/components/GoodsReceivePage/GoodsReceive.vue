@@ -53,14 +53,14 @@ import TableShipping from './TableShipping.vue';
 import Selecter from './selecter.vue';
 import InputRemoteData from './inputRemoteData.vue';
 import Input from './input.vue';
-import {useShippingResultStore} from '../../../../stores/shippingresult';
+import {useSHIKYUGoodsReceiveStore} from '../../../../stores/shikyugoodsreceive';
 import * as XLSX from 'xlsx';
 import {ElMessage} from "element-plus"; // 更新为你的实际路径
 
 
 // 获取 Pinia store 实例
-const shippingResultStore = useShippingResultStore();
-
+const shiKYUGoodsReceiveStore = useSHIKYUGoodsReceiveStore();
+const defaultShikyufrom = "2922";
 export default {
   components: {
     TableShipping,
@@ -87,17 +87,17 @@ export default {
       try {
         const newItem = {
           MLNPartNo: this.form.num,
-          UDPartNo: this.form.count,
-          ShipTo: this.form.select,
-          ShipQty: parseInt(this.form.count, 10),
+          UDPartNo: "",
+          SHIKYUFrom: this.form.select,
+          GoodsReceiveQty: parseInt(this.form.count, 10),
           Calloffid: this.form.id,
           Despatchnote: this.form.note,
-          ShippingResultDate: this.form.date,
+          GoodsReceiveDate: this.form.date,
         };
-
-        const message = await shippingResultStore.addListItem(newItem);
+        console.log(newItem.GoodsReceiveDate)
+        const message = await shiKYUGoodsReceiveStore.addListItem(newItem);
         this.$message.success(message);
-        await shippingResultStore.getListItems();
+        await shiKYUGoodsReceiveStore.getListItems();
 
         this.cancel(); // 调用 cancel 方法重置表单
       } catch (error) {
@@ -107,8 +107,8 @@ export default {
 
     cancel() {
       this.form = {
-        date: '',
-        select: '',
+        date: new Date(),
+        select: defaultShikyufrom,
         id: '',
         note: '',
         num: '',
@@ -117,22 +117,22 @@ export default {
     },
 
     downloadExcel() {
-      const data = shippingResultStore.shippingResultItems.map(item => ({
-        '出荷実績日': item.ShippingResultDate,
-        '出荷先': item.ShipTo,
+      const data = shiKYUGoodsReceiveStore.ISHIKYUGoodsReceiveItems.map(item => ({
+        '出荷実績日': item.GoodsReceiveDate,
+        '出荷先': item.SHIKYUFrom,
         'Call off id': item.Calloffid,
         'Despatch note': item.Despatchnote,
         'MLN部品番号': item.MLNPartNo,
         'UD部品番号': item.UDPartNo,
-        '出荷数': item.ShipQty,
+        '出荷数': item.GoodsReceiveQty,
         '実績登録日': this.formatDate({ Created: item.Created }, { property: 'Created' }),
       }));
 
       const worksheet = XLSX.utils.json_to_sheet(data);
       const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Shipping Results');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Goods Receive');
 
-      XLSX.writeFile(workbook, 'shipping_results.xlsx');
+      XLSX.writeFile(workbook, 'good_receive.xlsx');
     },
 
     formatDate(row, column) {

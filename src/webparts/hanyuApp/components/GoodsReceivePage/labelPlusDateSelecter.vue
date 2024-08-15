@@ -8,6 +8,8 @@
         class="custom-date-picker"
         @change="handleChange"
         style="max-width: 127px ; border: 1px solid #000;"
+        :editable="false"
+        :clearable="false"
     ></el-date-picker>
   </div>
 </template>
@@ -27,7 +29,7 @@ export default {
   },
   data() {
     return {
-      innerValue: this.modelValue
+      innerValue: new Date()
     };
   },
   watch: {
