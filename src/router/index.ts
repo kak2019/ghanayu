@@ -13,7 +13,7 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/stockreport',
         component: () => import(/* webpackChunkName: "about-chunk" */
-            '../webparts/hanyuApp/components/RouterComponents/Stockreport.vue')
+            '../webparts/hanyuApp/components/StockReportPage/Stockreport.vue')
     },
     {
         path: '/goodsInventory',
