@@ -17,7 +17,7 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
                 const sp = spfi(getSP());
                 const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/SHIKYUGoodsReceive`).items.orderBy("Registered", false)();
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/SHIKYUGoodsReceive`).items.orderBy("GoodsReceiveDate", false)();
                 this.shikyuGoodsReceives = items;
             }
             catch (error) {

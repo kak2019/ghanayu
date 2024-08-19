@@ -29,7 +29,7 @@ export default {
   },
   data() {
     return {
-      innerValue: new Date()
+      innerValue: this.modelValue
     };
   },
   watch: {

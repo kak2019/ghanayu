@@ -1,6 +1,6 @@
 <template>
   <el-table
-      :data="shiKYUGoodsReceiveStore.shikyuGoodsReceiveItems"
+      :data="tableData"
       stripe
       style="width: 100%"
       :header-cell-style="{ backgroundColor: '#3f51b5', color: 'white' }"
@@ -17,24 +17,26 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, defineProps } from 'vue';
 import { useSHIKYUGoodsReceiveStore } from '../../../../stores/shikyugoodsreceive'; // 更新为你的实际路径
 
 
 // 获取 Pinia store 实例
-const shiKYUGoodsReceiveStore = useSHIKYUGoodsReceiveStore();
-
+const { tableData } = defineProps(['tableData'])
+/*const shiKYUGoodsReceiveStore = useSHIKYUGoodsReceiveStore();
 onMounted(async () => {
   try {
     // 调用 store 的方法获取数据
-    await shiKYUGoodsReceiveStore.getListItems();
+   await shiKYUGoodsReceiveStore.getListItems();
     // 将获取到的数据绑定到 tableData
     // console.log(tableData.value,"table",shippingResultStore.shippingResultItems);
     // tableData.value = shippingResultStore.shippingResultItems;
+    //table = shiKYUGoodsReceiveStore.shikyuGoodsReceiveItems;
+    console.log(shiKYUGoodsReceiveStore.shikyuGoodsReceiveItems)
   } catch (error) {
     console.error('Error fetching shipping results:', error);
   }
-});
+});*/
 
 
 

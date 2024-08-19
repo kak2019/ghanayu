@@ -30,7 +30,7 @@
       登录
     </el-button>
     <el-button style="width: 100px; height: 50px; margin-top: 1px"
-               @click="cancel"
+               @click="resetForm"
     >キャンセル
     </el-button>
     <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-right: 10px;margin-bottom: 10px;"
@@ -39,11 +39,11 @@
       ダウンロード
     </el-button>
   </el-row>
-  <el-row style="margin-bottom: 10px; display: flex;flex-wrap: wrap">
+  <!--<el-row style="margin-bottom: 10px; display: flex;flex-wrap: wrap">
     <label style="border: 1px solid black; background-color: orange; margin: 2px 0 2px 0;">メッセージ</label>
     <label style="border: 1px solid black; margin: 2px 20px 2px 0; width: 500px; display: inline-block;"></label>
-  </el-row>
-  <TableShipping></TableShipping>
+  </el-row>-->
+  <TableShipping :tableData="tableData"></TableShipping>
 </template>
 
 <script>
@@ -61,6 +61,7 @@ import {ElMessage} from "element-plus"; // 更新为你的实际路径
 // 获取 Pinia store 实例
 const shiKYUGoodsReceiveStore = useSHIKYUGoodsReceiveStore();
 const defaultShikyufrom = "2922";
+let defaultDate = new Date();
 export default {
   components: {
     TableShipping,
@@ -71,8 +72,9 @@ export default {
   },
   data() {
     return {
+      tableData: [],
       form: {
-        date: '',
+        date: defaultDate,
         select: '',
         id: '',
         note: '',
@@ -94,20 +96,37 @@ export default {
           Despatchnote: this.form.note,
           GoodsReceiveDate: this.form.date,
         };
-        console.log(this.form.date);
+
         const message = await shiKYUGoodsReceiveStore.addListItem(newItem);
         this.$message.success(message);
-        await shiKYUGoodsReceiveStore.getListItems();
+        await this.fetchTableData();
 
-        this.cancel(); // 调用 cancel 方法重置表单
+        this.resetForm(); // 调用 cancel 方法重置表单
       } catch (error) {
         this.$message.error('登録に失敗しました: ' + error.message);
       }
     },
-
-    cancel() {
+    async fetchTableData() {
+      try {
+        await shiKYUGoodsReceiveStore.getListItems(this.form.date);
+        
+        this.tableData = shiKYUGoodsReceiveStore.shikyuGoodsReceiveItems
+                 /* .filter(item => {
+            let condition = true
+            //condition = condition && item.GoodsReceiveDate === defaultFormatedDate
+            console.log("GoodsReceiveDate:" + item.GoodsReceiveDate.getFullYear())
+            //console.log("curent date:" + defaultFormatedDate.getFullYear())
+            return condition
+        });*/
+        console.log("Processed table data:", this.tableData);
+         //console.log("Date", defaultFormatedDate);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    },
+    resetForm() {
       this.form = {
-        date: new Date(),
+        date: defaultDate,
         select: defaultShikyufrom,
         id: '',
         note: '',
@@ -117,7 +136,7 @@ export default {
     },
 
     downloadExcel() {
-      const data = shiKYUGoodsReceiveStore.shikyuGoodsReceiveItems.map(item => ({
+      const data = this.tableData.map(item => ({
         '検収実績日': this.formatDate({GoodsReceiveDate: item.GoodsReceiveDate}, { property: 'GoodsReceiveDate' }),
         '支給元': item.SHIKYUFrom,
         'Call off id': item.Calloffid,
@@ -142,6 +161,9 @@ export default {
       const year = date.getFullYear();
       return `${month}/${day}/${year}`;
     }
+  },
+  async mounted() {
+    await this.fetchTableData();
   }
 };
 </script>
