@@ -5,12 +5,12 @@
             <el-row class="row-bg" justify="space-evenly" :gutter="8">
                 <el-col :span="4">
                     <el-form-item label="MLN部品番号" label-position="top" :style="{ margin: 0 }" v-bind="MLNPartNoProps">
-                        <el-input v-model="MLNPartNo" />
+                        <el-autocomplete v-model="MLNPartNo" :fetch-suggestions="queryMLNPartNo" clearable />
                     </el-form-item>
                 </el-col>
                 <el-col :span="4">
                     <el-form-item label="UD部品番号" label-position="top" v-bind="UDPartNoProps">
-                        <el-input v-model="UDPartNo" />
+                        <el-autocomplete v-model="UDPartNo" :fetch-suggestions="queryUDPartNo" clearable />
                     </el-form-item>
                 </el-col>
                 <el-col :span="2">
@@ -30,7 +30,7 @@
     <el-main :style="{paddingLeft:0,paddingRight:0}">
         <el-form size="small" @submit="onPartFormSubmit" :inline-message="false" :status-icon="true" :scroll-to-error="true">
             <el-table :header-cell-style="{ backgroundColor: '#366093', color: '#fff', textAlign: 'center' }" :data="isFiltered?filteredData:tableData" :highlight-current-row="!isEditing" @current-change="handleRowClick" v-loading="loading" ref="tableRef" :height="tableHeight">
-                <el-table-column fixed prop="MLNPartNo" label="MLN部品番号" width="140">
+                <el-table-column fixed prop="MLNPartNo" label="MLN部品番号" width="140" align="center">
                     <template #default="scope">
                         <el-form-item v-if="isInserting && currentRowIndex === scope.$index" v-bind="partFormMLNPartNoProps">
                             <el-input v-model="partFormMLNPartNo" />
@@ -38,7 +38,7 @@
                         <span v-else>{{ scope.row.MLNPartNo }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="UDPartNo" label="UD部品番号" width="120">
+                <el-table-column prop="UDPartNo" label="UD部品番号" width="120" align="center">
                     <template #default="scope">
                         <el-form-item v-if="isEditing && currentRowIndex === scope.$index" v-bind="partFormUDPartNoProps">
                             <el-input v-model="partFormUDPartNo" />
@@ -89,7 +89,7 @@
 </template>
 
 <script>
-module.exports = require('./parts');
+module.exports = require('./index');
 </script>
 
 <style scoped>

@@ -10,8 +10,22 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
     }),
     getters: {
         partMasterItems: (state) => state.parts,
+        partMasterMLNItems: (state) => state.parts.map(part => part.MLNPartNo),
+        partMasterUDItems: (state) => state.parts.map(part => part.UDPartNo)
     },
     actions: {
+        async getListItemById(itemId: number): Promise<IPartMasterItem> {
+            try {
+                const sp = spfi(getSP());
+                const web = await sp.web();
+
+                const item = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/PartsMaster`).items.getById(itemId)();
+                return item;
+            }
+            catch (error) {
+                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+            }
+        },
         async getListItems() {
             try {
                 const sp = spfi(getSP());
@@ -40,14 +54,36 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 throw new Error(`データの登録中にエラーが発生しました: ${error.message}`);
             }
         },
-        async updateListItem(itemId: number, item: IPartMasterItem): Promise<string> {
+        async updateListItem(itemId: number, item: IPartMasterItem, processType: string = null, isUpdate: boolean = true): Promise<string> {
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
-                await sp.web.getList(`${web.ServerRelativeUrl}/Lists/PartsMaster`).items.getById(itemId).update({
-                    // MLNPartNo: item.MLNPartNo,
-                    UDPartNo: item.UDPartNo
-                });
+                if (processType) {
+                    const item = await this.getListItemById(itemId);
+                    const values = (item.ProcessType || '').split(';');
+                    if (isUpdate) {
+                        if (values.indexOf(processType) === -1) {
+                            values.push(processType);
+                            await sp.web.getList(`${web.ServerRelativeUrl}/Lists/PartsMaster`).items.getById(itemId).update({
+                                ProcessType: values.filter(s => s !== '').join(';')
+                            });
+                        }
+                    }
+                    else {
+                        if (values.indexOf(processType) !== -1) {
+                            await sp.web.getList(`${web.ServerRelativeUrl}/Lists/PartsMaster`).items.getById(itemId).update({
+                                ProcessType: values.filter(s => s !== processType).join(';')
+                            });
+                        }
+                    }
+
+                }
+                else {
+                    await sp.web.getList(`${web.ServerRelativeUrl}/Lists/PartsMaster`).items.getById(itemId).update({
+                        // MLNPartNo: item.MLNPartNo,
+                        UDPartNo: item.UDPartNo
+                    });
+                }
                 return '登録完了。';
             }
             catch (error) {
