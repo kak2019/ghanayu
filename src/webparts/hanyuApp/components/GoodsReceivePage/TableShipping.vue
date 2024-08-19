@@ -1,9 +1,9 @@
 <template>
   <el-table
       :data="tableData"
-      stripe
-      style="width: 100%"
-      :header-cell-style="{ backgroundColor: '#3f51b5', color: 'white' }"
+      style="width: 100%; font-size:12px;"
+      :header-cell-style="{ backgroundColor: 'rgb(54, 96, 147)', color: '#fff' }"
+      height="320px"
   >
     <el-table-column prop="GoodsReceiveDate" label="検収実績日" width="180" :formatter="formatDate" />
     <el-table-column prop="SHIKYUFrom" label="支給元" width="180" />
