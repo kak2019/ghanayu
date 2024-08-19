@@ -3,7 +3,7 @@
     <label class="custom-label">{{ label }}</label>
     <el-select
         v-model="innerValue"
-        placeholder="请选择"
+        placeholder="Please select"
         @change="handleChange"
         style="max-width: 130px; border: 1px solid #000;"
     >

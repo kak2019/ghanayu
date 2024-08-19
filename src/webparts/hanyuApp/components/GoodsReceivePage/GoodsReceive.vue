@@ -61,7 +61,7 @@ import {ElMessage} from "element-plus"; // 更新为你的实际路径
 // 获取 Pinia store 实例
 const shiKYUGoodsReceiveStore = useSHIKYUGoodsReceiveStore();
 const defaultShikyufrom = "2922";
-let defaultDate = new Date();
+let curentDate = new Date();
 export default {
   components: {
     TableShipping,
@@ -74,7 +74,7 @@ export default {
     return {
       tableData: [],
       form: {
-        date: defaultDate,
+        date: curentDate,
         select: '',
         id: '',
         note: '',
@@ -111,14 +111,19 @@ export default {
         await shiKYUGoodsReceiveStore.getListItems(this.form.date);
         
         this.tableData = shiKYUGoodsReceiveStore.shikyuGoodsReceiveItems
-                 /* .filter(item => {
+                  .filter(item => {
             let condition = true
-            //condition = condition && item.GoodsReceiveDate === defaultFormatedDate
-            console.log("GoodsReceiveDate:" + item.GoodsReceiveDate.getFullYear())
-            //console.log("curent date:" + defaultFormatedDate.getFullYear())
+
+            const startOfMonth = new Date(new Date(curentDate).getFullYear(), new Date(curentDate).getMonth(), 1).toISOString();
+            console.log("startOfMonth:----------" + startOfMonth);
+            console.log("GoodsReceiveDate :" + new Date(item.GoodsReceiveDate).toISOString())
+            console.log("startOfMonth :" + (this.addOneDay(startOfMonth)))
+            console.log( "startOfMonth <======" + (this.addOneDay(startOfMonth) < new Date(item.GoodsReceiveDate)));
+
+            condition = condition && new Date(item.GoodsReceiveDate) <= new Date(curentDate.toISOString()) 
             return condition
-        });*/
-        console.log("Processed table data:", this.tableData);
+        });
+        //console.log("Processed table data:", this.tableData);
          //console.log("Date", defaultFormatedDate);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -126,7 +131,7 @@ export default {
     },
     resetForm() {
       this.form = {
-        date: defaultDate,
+        date: curentDate,
         select: defaultShikyufrom,
         id: '',
         note: '',
@@ -160,6 +165,12 @@ export default {
       const day = String(date.getDate()).padStart(2, '0');
       const year = date.getFullYear();
       return `${month}/${day}/${year}`;
+    },
+
+    addOneDay(date) {
+      let result = new Date(date);
+      result.setDate(result.getDate() + 1);
+      return result;
     }
   },
   async mounted() {

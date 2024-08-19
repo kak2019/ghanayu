@@ -6,7 +6,7 @@
     >
       {{ label }}
     </label>
-    <el-input
+    <el-input type="number"
         v-model="innerValue"
         clearable
         style="width: 120px; border: 1px solid #000;"
@@ -44,10 +44,15 @@ export default {
     },
     innerValue(newValue) {
       this.$emit('update:modelValue', newValue);
+
     }
   },
   methods: {
     handleChange(value) {
+      const regex = /^\+[1-9][0-9]*$/;
+      if (!regex.test(value)) {
+        value = value.substring(0, value.length - 1);
+      }
       this.$emit('update:modelValue', value);
     }
   }

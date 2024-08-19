@@ -102,18 +102,29 @@ export default {
       XLSX.writeFile(wb, "在庫管理表.xlsx");
     },
     submitForm() {
+
       const query = this.form
       this.tableData = SHIKYUGoodsReceiveStore.shikyuGoodsReceiveItems
           .filter(item => {
             let condition = true
+            if(query.date){
+              condition = condition && query.date === item.GoodsReceiveDate
+            }
+            if(query.select){
+               condition = condition && query.select === item.ProcessType
+            }
             if(query.MLNPartNo) {
               condition = condition && query.MLNPartNo === item.MLNPartNo
             }
             if(query.UDPartNo) {
               condition = condition && query.UDPartNo === item.UDPartNo
             }
+          
+            
             return condition
           });
+
+          alert("123");
     },
     resetForm() {
       // 重置表单字段并清空表格数据
