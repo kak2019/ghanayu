@@ -6,6 +6,6 @@ export interface IBillOfMaterialsItem {
     ChildProcessType?: string;
     StructureQty?: number;
     Registered?: string;
-    Message?: string;
     Modified?: string;
+    UniqueKey?: string;
 }

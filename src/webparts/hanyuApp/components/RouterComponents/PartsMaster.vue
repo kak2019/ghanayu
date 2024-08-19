@@ -5,7 +5,7 @@
     </div>
 </template>
 <script>
-import App from '../PartsMasterPage/Parts.vue';
+import App from '../PartsMasterPage/index.vue';
 
 export default {
     components: {

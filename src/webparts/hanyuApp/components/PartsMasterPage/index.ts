@@ -1,4 +1,4 @@
-import { IPartMasterItem } from './../../../../model/partitem';
+import { IPartMasterItem } from '../../../../model/partitem';
 import { nextTick, computed, onMounted, onBeforeUnmount, ref } from 'vue';
 import { usePartMasterStore } from '../../../../stores/part';
 import { useForm } from 'vee-validate';
@@ -7,6 +7,7 @@ import { Check, Close } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 
 export default {
+    name: "PartMaster",
     components: {
         Check,
         Close
@@ -51,8 +52,25 @@ export default {
         const isEditing = ref(false);
         const isInserting = ref(false);
         const tableRef = ref();
-
-
+        const createMLNFilter = (value: string): (s: string) => boolean => {
+            return (MLNPartNo: string) => {
+                return MLNPartNo.toLowerCase().indexOf(value.toLowerCase()) === 0;
+            }
+        }
+        const queryMLNPartNo = (queryString: string, cb: (r: { value: string }[]) => void): void => {
+            const results = queryString.length > 2 ? partMasterStore.partMasterMLNItems.filter(createMLNFilter(queryString)).map(s => ({ value: s })) : [];
+            cb(results);
+        }
+        const createUDFilter = (value: string): (s: string) => boolean => {
+            return (MLNPartNo: string) => {
+                return MLNPartNo.toLowerCase().indexOf(value.toLowerCase()) === 0;
+            }
+        }
+        const queryUDPartNo = (queryString: string, cb: (r: { value: string }[]) => void): void => {
+            const results = queryString.length > 2 ? partMasterStore.partMasterUDItems.filter(createUDFilter(queryString)).map(s => ({ value: s })) : [];
+            console.log(results);
+            cb(results);
+        }
         const windowHeight = ref(window.innerHeight);
         const tableHeight = computed(() => {
             const spcHeight = (windowHeight.value < 640) ? 500 : 389;
@@ -123,7 +141,6 @@ export default {
         onMounted((): void => {
             window.addEventListener('resize', handleResize);
             fetchData();
-
         });
         onBeforeUnmount((): void => {
             window.removeEventListener('resize', handleResize);
@@ -240,16 +257,16 @@ export default {
         }
         return {
             isFiltered,
+            queryMLNPartNo,
+            queryUDPartNo,
             ElMessage,
             Check,
             Close,
             isEditing,
             isInserting,
             currentRowIndex,
-            MLNPartNo,
-            MLNPartNoProps,
-            UDPartNo,
-            UDPartNoProps,
+            MLNPartNo, MLNPartNoProps,
+            UDPartNo, UDPartNoProps,
             tableHeight,
             tableData,
             filteredData,
@@ -263,10 +280,8 @@ export default {
             onPartFormSubmit,
             cancelRow,
             errors,
-            partFormMLNPartNo,
-            partFormMLNPartNoProps,
-            partFormUDPartNo,
-            partFormUDPartNoProps,
+            partFormMLNPartNo, partFormMLNPartNoProps,
+            partFormUDPartNo, partFormUDPartNoProps,
             tableRef,
             onDownloadClick,
         }
