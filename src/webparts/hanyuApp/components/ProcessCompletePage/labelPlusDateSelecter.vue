@@ -3,7 +3,7 @@
     <label class="custom-label">{{ label }}</label>
     <el-date-picker
         v-model="innerValue"
-        type="month"
+        type="date"
         placeholder="选择日期"
         class="custom-date-picker"
         @change="handleChange"

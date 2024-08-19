@@ -1,6 +1,11 @@
 <template>
   <div class="date-picker-with-label">
-    <label class="custom-label">{{ label }}</label>
+    <label
+        class="custom-label"
+        :style="{ backgroundColor: labelColor }"
+    >
+      {{ label }}
+    </label>
     <el-input
         v-model="innerValue"
         clearable
@@ -22,6 +27,10 @@ export default {
     modelValue: {
       type: [String],
       required: true
+    },
+    labelColor: {
+      type: String,
+      default: 'orange' // 设置默认颜色
     }
   },
   data() {
@@ -40,22 +49,6 @@ export default {
   methods: {
     handleChange(value) {
       this.$emit('update:modelValue', value);
-    },
-    querySearch: (queryString, cb) => {
-      const value = [
-    { value: 'vue', link: 'https://github.com/vuejs/vue' },
-    { value: 'element', link: 'https://github.com/ElemeFE/element' },
-    { value: 'cooking', link: 'https://github.com/ElemeFE/cooking' },
-    { value: 'mint-ui', link: 'https://github.com/ElemeFE/mint-ui' },
-    { value: 'vuex', link: 'https://github.com/vuejs/vuex' },
-    { value: 'vue-router', link: 'https://github.com/vuejs/vue-router' },
-    { value: 'babel', link: 'https://github.com/babel/babel' },
-  ]
-  let results = []
-      if(queryString) {
-        results = value.filter(val => val.value.indexOf(queryString) >= 0)
-      }
-      cb(results)
     }
   }
 };
@@ -66,9 +59,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  border: 1px;
   margin-right: 10px;
-
 }
 
 .custom-label {
@@ -76,11 +67,10 @@ export default {
   font-weight: bold;
   width: 117px;
   text-align: center;
-  border: 1px solid #000; /* 添加边框 */
-  background-color: rgba(0, 196, 255, 0.98);
+  border: 1px solid #000;
 }
 
 .custom-date-picker {
-  width: 120px; /* 调整日期选择器的宽度 */
+  width: 120px;
 }
 </style>

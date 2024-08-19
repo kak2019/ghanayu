@@ -3,22 +3,23 @@
     <label class="custom-label">{{ label }}</label>
     <el-select
         v-model="innerValue"
-        type="date"
         placeholder="请选择"
         @change="handleChange"
-        style="max-width: 130px ; border: 1px solid #000;"
+        style="max-width: 130px; border: 1px solid #000;"
     >
       <el-option
-        v-for="item in options"
-        :key="item.value"
-        :label="item.label"
-        :value="item.value"
+          v-for="item in options"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
       />
     </el-select>
   </div>
 </template>
 
 <script>
+import { useFunctionsMasterStore } from '../../../../stores/shippingto'; // 更新为你的实际路径
+
 export default {
   name: 'DatePickerWithLabel',
   props: {
@@ -34,20 +35,7 @@ export default {
   data() {
     return {
       innerValue: this.modelValue,
-      options: [
-  {
-    value: '2921',
-    label: '2921',
-  },
-  {
-    value: '2922',
-    label: '2922',
-  },
-  {
-    value: '2924',
-    label: '2924',
-  },
-]
+      options: [] // 初始化为空数组，稍后从store中获取数据
     };
   },
   watch: {
@@ -61,7 +49,24 @@ export default {
   methods: {
     handleChange(value) {
       this.$emit('update:modelValue', value);
+    },
+    async fetchOptions() {
+      const functionsMasterStore = useFunctionsMasterStore();
+      try {
+       await  functionsMasterStore.getListItems(); // 获取数据
+        console.log(functionsMasterStore.shippingToItems ,"res")
+
+        this.options = functionsMasterStore.shippingToItems.map(item => ({
+          value: item.Title,
+          label: item.Title
+        }));
+      } catch (error) {
+        console.error('Error fetching options:', error);
+      }
     }
+  },
+  mounted() {
+    this.fetchOptions(); // 在组件挂载时获取数据
   }
 };
 </script>
@@ -71,9 +76,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  border: 1px;
   margin-right: 10px;
-
 }
 
 .custom-label {

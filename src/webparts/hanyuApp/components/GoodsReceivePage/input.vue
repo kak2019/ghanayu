@@ -1,14 +1,18 @@
 <template>
   <div class="date-picker-with-label">
-    <label class="custom-label">{{ label }}</label>
-    <el-date-picker
+    <label
+        class="custom-label"
+        :style="{ backgroundColor: labelColor }"
+    >
+      {{ label }}
+    </label>
+    <el-input
         v-model="innerValue"
-        type="month"
-        placeholder="选择日期"
-        class="custom-date-picker"
-        @change="handleChange"
-        style="max-width: 127px ; border: 1px solid #000;"
-    ></el-date-picker>
+        clearable
+        style="width: 120px; border: 1px solid #000;"
+        placeholder="Please Input"
+        @input="handleChange"
+    />
   </div>
 </template>
 
@@ -21,13 +25,17 @@ export default {
       required: true
     },
     modelValue: {
-      type: [String, Date],
+      type: [String],
       required: true
+    },
+    labelColor: {
+      type: String,
+      default: 'orange' // 设置默认颜色
     }
   },
   data() {
     return {
-      innerValue: this.modelValue
+      innerValue: this.modelValue,
     };
   },
   watch: {
@@ -51,23 +59,18 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  border: 1px;
   margin-right: 10px;
-
 }
 
 .custom-label {
   font-size: 14px;
   font-weight: bold;
-  padding-left: 25px; /* 调整label文字位置 */
-  padding-right: 30px;
-  border: 1px solid #000; /* 添加边框 */
-  background-color: orange;
+  width: 117px;
+  text-align: center;
+  border: 1px solid #000;
 }
 
 .custom-date-picker {
-  width: 30px; /* 调整日期选择器的宽度 */
-  min-width: 30px;
-  max-width: 30px;
+  width: 120px;
 }
 </style>

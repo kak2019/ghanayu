@@ -13,7 +13,7 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/stockreport',
         component: () => import(/* webpackChunkName: "about-chunk" */
-            '../webparts/hanyuApp/components/RouterComponents/Stockreport.vue')
+            '../webparts/hanyuApp/components/StockReportPage/Stockreport.vue')
     },
     {
         path: '/goodsInventory',
@@ -23,7 +23,7 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/processcompletion',
         component: () => import(/* webpackChunkName: "about-chunk" */
-            '../webparts/hanyuApp/components/RouterComponents/ProcessCompletion.vue')
+            '../webparts/hanyuApp/components/ProcessCompletePage/ProcessComplete.vue')
     },
     {
         path: '/shippingrecord',
@@ -39,7 +39,7 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/goodsreceive',
         component: () => import(/* webpackChunkName: "about-chunk" */
-            '../webparts/hanyuApp/components/RouterComponents/GoodsReceive.vue')
+            '../webparts/hanyuApp/components/GoodsReceivePage/GoodsReceive.vue')
     },
     {
         path: '/billofmaterials',

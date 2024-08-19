@@ -1,7 +1,7 @@
 <template>
   <el-row>
     <el-col :span="24">
-      <div class="custom-header">在庫管理表 (支给品)</div>
+      <div class="custom-header">在庫管理表 (工程別)</div>
     </el-col>
   </el-row> <!-- 关闭第一个 el-row 标签 -->
   <el-row class="background-layer main" style="display: flex; justify-content: space-between; align-items: center;">
@@ -9,9 +9,9 @@
       <div class="background-layer" style="margin-right: 20px;">
         <date-picker-with-label v-model="form.date" label="当月年月"></date-picker-with-label>
       </div>
-      <!--      <div class="background-layer" style="margin-right: 20px;">-->
-      <!--        <Selecter v-model="form.select" label="工程区分"></Selecter>-->
-      <!--      </div>-->
+      <div class="background-layer" style="margin-right: 20px;">
+        <Selecter v-model="form.select" label="工程区分"></Selecter>
+      </div>
       <div class="background-layer" style="margin-right: 20px;">
         <InputRemoteData v-model="form.MLNPartNo" label="MLN部品番号" searchField="MLN" />
       </div>
