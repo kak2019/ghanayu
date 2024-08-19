@@ -12,10 +12,10 @@
       <Selecter v-model="form.select" label="支給元"></Selecter>
     </div>
     <div class="background-layer">
-      <Input v-model="form.id" label="Call off id" labelColor="skyblue"></Input>
+      <Input v-model="form.id" label="Call off id" labelColor="#92cddc"></Input>
     </div>
     <div class="background-layer">
-      <Input v-model="form.note" label="Despatch note" labelColor="skyblue"></Input>
+      <Input v-model="form.note" label="Despatch note" labelColor="#92cddc"></Input>
     </div>
     <div class="background-layer">
       <InputRemoteData v-model="form.num" label="MLN部品番号"/>
@@ -24,16 +24,16 @@
       <Input v-model="form.count" label="受入数"/>
     </div>
     <el-button
-        style="width: 100px; height: 50px; margin-top: 1px; margin-bottom: 10px;"
+        style="width: 100px; height: 40px; margin-top: 1px; margin-bottom: 10px;"
         @click="submitForm"
     >
       登录
     </el-button>
-    <el-button style="width: 100px; height: 50px; margin-top: 1px"
+    <el-button style="width: 100px; height: 40px; margin-top: 1px"
                @click="resetForm"
     >キャンセル
     </el-button>
-    <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-right: 10px;margin-bottom: 10px;"
+    <el-button style="width: 100px; height: 40px; margin-top: 1px; margin-right: 10px;margin-bottom: 10px;"
     @click="downloadExcel"
     >
       ダウンロード
@@ -197,5 +197,8 @@ export default {
 
 .main .background-layer {
   margin-bottom: 10px;
+}
+.el-input__inner {
+  font-size:12px;
 }
 </style>

@@ -9,9 +9,10 @@
     <el-input type="number"
         v-model="innerValue"
         clearable
-        style="width: 120px; border: 1px solid #000;"
+        style="width: 118px;border: 1px solid #000; border-top:none; font-size:12px"
         placeholder="Please Input"
         @input="handleChange"
+        size="small"
     />
   </div>
 </template>
@@ -30,7 +31,7 @@ export default {
     },
     labelColor: {
       type: String,
-      default: 'orange' // 设置默认颜色
+      default: '#fabf8f' // 设置默认颜色
     }
   },
   data() {
@@ -68,8 +69,7 @@ export default {
 }
 
 .custom-label {
-  font-size: 14px;
-  font-weight: bold;
+  font-size: 12px;
   width: 117px;
   text-align: center;
   border: 1px solid #000;
