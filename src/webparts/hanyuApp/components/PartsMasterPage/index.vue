@@ -2,29 +2,22 @@
 <el-container>
     <el-header height="36px" :style="{padding:0}">
         <el-form label-position="top" label-width="auto" size="small" @submit="onSubmit">
-            <el-row class="row-bg" justify="space-evenly" :gutter="8">
-                <el-col :span="4">
-                    <el-form-item label="MLN部品番号" label-position="top" :style="{ margin: 0 }" v-bind="MLNPartNoProps">
-                        <el-autocomplete v-model="MLNPartNo" :fetch-suggestions="queryMLNPartNo" clearable />
-                    </el-form-item>
-                </el-col>
-                <el-col :span="4">
-                    <el-form-item label="UD部品番号" label-position="top" v-bind="UDPartNoProps">
-                        <el-autocomplete v-model="UDPartNo" :fetch-suggestions="queryUDPartNo" clearable />
-                    </el-form-item>
-                </el-col>
-                <el-col :span="2">
-
-                </el-col>
-                <el-col :span="12">
+            <div class="row-bg">
+                <el-form-item label="MLN部品番号" label-position="top" :style="{ margin: 0 }" v-bind="MLNPartNoProps">
+                    <el-autocomplete v-model="MLNPartNo" :fetch-suggestions="queryMLNPartNo" clearable />
+                </el-form-item>
+                <div class="small-space"></div>
+                <el-form-item label="UD部品番号" label-position="top" v-bind="UDPartNoProps">
+                    <el-autocomplete v-model="UDPartNo" :fetch-suggestions="queryUDPartNo" clearable />
+                </el-form-item>
+                <div class="flex-grow"></div>
+                <div class="buttons">
                     <el-button plain size="large" type="primary" native-type="submit">検索</el-button>
                     <el-button plain size="large" @click="onResetQuery">キャンセル</el-button>
                     <el-button plain size="large" @click="onDownloadClick">ダウンロード</el-button>
-                </el-col>
-                <el-col :span="2">
-
-                </el-col>
-            </el-row>
+                </div>
+                <div class="small-space"></div>
+            </div>
         </el-form>
     </el-header>
     <el-main :style="{paddingLeft:0,paddingRight:0}">
@@ -93,22 +86,25 @@ module.exports = require('./index');
 </script>
 
 <style scoped>
-.el-row {
-    margin-bottom: 20px;
-}
-
-.el-row:last-child {
-    margin-bottom: 0;
-}
-
-.el-col {
-    border-radius: 4px;
-}
-
 .row-bg {
-    align-items: center;
+
     background-color: #DDDDDD;
-    padding: 4px
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px;
+}
+
+.fixed-width {
+    width: 200px;
+}
+
+.flex-grow {
+    flex-grow: 1;
+}
+
+.small-space {
+    width: 20px;
 }
 
 .el-form-item {

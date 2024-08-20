@@ -83,8 +83,8 @@ export default {
         const partForm = useForm({
             validationSchema:
                 yup.object({
-                    MLNPartNo: yup.string().required().min(5).label('MLN部品番号'),
-                    UDPartNo: yup.string().required().min(5).label('UD部品番号'),
+                    MLNPartNo: yup.string().required().matches(/^[a-zA-Z0-9]{10}$/, 'MLN部品番号は10文字の英数字でなければなりません').label('MLN部品番号'),
+                    UDPartNo: yup.string().required().min(8).label('UD部品番号'),
                 })
             ,
             initialValues: {

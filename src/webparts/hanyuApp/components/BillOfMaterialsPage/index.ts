@@ -94,9 +94,9 @@ export default defineComponent({
         const bomForm = useForm({
             validationSchema:
                 yup.object({
-                    ParentPartNo: yup.string().required().min(5).label('当工程 - MLN部品番号'),
+                    ParentPartNo: yup.string().required().matches(/^[a-zA-Z0-9]{10}$/, 'MLN部品番号は10文字の英数字でなければなりません').label('当工程 - MLN部品番号'),
                     ParentProcessType: yup.string().required().label('当工程 - 工程区分'),
-                    ChildPartNo: yup.string().required().min(5).label('前工程 - MLN部品番号'),
+                    ChildPartNo: yup.string().required().matches(/^[a-zA-Z0-9]{10}$/, 'MLN部品番号は10文字の英数字でなければなりません').label('前工程 - MLN部品番号'),
                     ChildProcessType: yup.string().required().label('前工程 - 工程区分'),
                     StructureQty: yup.number().integer().min(1).default(1).required().label('構成数量'),
                 })
