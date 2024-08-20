@@ -24,7 +24,26 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
             }
 
-        }
+        },
+        async addListItem(item: IStockHistoryItem): Promise<string> {
+            try {
+                    const sp = spfi(getSP());
+                    const web = await sp.web();
+                    await sp.web.getList(`${web.ServerRelativeUrl}/Lists/StockHistory`).items.add({
+                        MLNPartNo: item.MLNPartNo,
+                        ProcessType: "F", // Need to check if it's only F?
+                        UDPartNo: item.UDPartNo,
+                        Qty: item.Qty,
+                        FunctionID: item.FunctionID,
+                        StockQty: item.StockQty,
+                        Comment: item.Comment || "",
+                    });
+                    return '登録完了。';
+            }
+            catch (error) {
+                throw new Error(`データの登録中にエラーが発生しました: ${error.message}`);
+            }
+        },
 
     },
 });
