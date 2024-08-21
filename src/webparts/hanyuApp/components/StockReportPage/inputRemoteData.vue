@@ -96,7 +96,6 @@ export default {
 
 .custom-label {
   font-size: 12px;
-  font-weight: bold;
   width: 120px;
   text-align: center;
   border: 1px solid #000; /* 添加边框 */

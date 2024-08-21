@@ -3,7 +3,7 @@
     <label class="custom-label">{{ label }}</label>
     <el-select
         v-model="innerValue"
-        placeholder="请选择"
+        placeholder="Please select"
         @change="handleChange" 
         style="max-width: 128px; border: 1px solid #000; border-top:none;"
         size="small"
@@ -20,6 +20,7 @@
 
 <script>
 import { useProcessMasterStore } from '../../../../stores/process'; // 更新为你的实际路径
+const defaultProcess = "生加工";
 
 export default {
   name: 'DatePickerWithLabel',
@@ -35,7 +36,7 @@ export default {
   },
   data() {
     return {
-      innerValue: this.modelValue,
+      innerValue: defaultProcess,
       options: [] // 用于存储从Pinia store中获取的选项数据
     };
   },
@@ -80,7 +81,6 @@ export default {
 
 .custom-label {
   font-size: 12px;
-  font-weight: bold;
   padding-left: 25px;
   padding-right: 30px;
   border: 1px solid #000;

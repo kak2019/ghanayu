@@ -41,6 +41,7 @@ import {useSHIKYUGoodsReceiveStore} from "../../../../stores/shikyugoodsreceive"
 // 获取 Pinia store 实例
 
 const SHIKYUGoodsReceiveStore = useSHIKYUGoodsReceiveStore();
+const defaultProcess = "生加工";
 export default {
   components: {
     TableShipping,
@@ -123,14 +124,12 @@ export default {
             
             return condition
           });
-
-          alert("123");
     },
     resetForm() {
       // 重置表单字段并清空表格数据
       this.form = {
         date: '',
-        select: '',
+        select: defaultProcess,
         MLNPartNo: '',
         UDPartNo: ''
       };

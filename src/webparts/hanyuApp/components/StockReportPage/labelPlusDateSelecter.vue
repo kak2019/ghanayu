@@ -60,8 +60,8 @@ export default {
 }
 
 .custom-label {
+  width: 71px ;
   font-size: 12px;
-  font-weight: bold;
   padding-left: 25px; /* 调整label文字位置 */
   padding-right: 30px;
   border: 1px solid #000; /* 添加边框 */
