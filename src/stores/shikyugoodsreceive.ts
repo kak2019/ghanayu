@@ -31,7 +31,7 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
             try {
 
                 const billOfMaterialsStore = useBillOfMaterialsStore();
-                console.log("-----------------" + item.ProcessType);
+
                 const isMlnNumInBom = await billOfMaterialsStore.getItemCountByMLNPartNoProcessType(item.MLNPartNo, item.ProcessType);
                 if(isMlnNumInBom){
                     //Add shikyyuan to good receive table

@@ -4,8 +4,9 @@
     <el-select
         v-model="innerValue"
         placeholder="请选择"
-        @change="handleChange"
-        style="max-width: 130px; border: 1px solid #000;"
+        @change="handleChange" 
+        style="max-width: 128px; border: 1px solid #000; border-top:none;"
+        size="small"
     >
       <el-option
           v-for="item in options"
@@ -78,12 +79,12 @@ export default {
 }
 
 .custom-label {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: bold;
   padding-left: 25px;
   padding-right: 30px;
   border: 1px solid #000;
-  background-color: orange;
+  background-color: #fabf8f;
 }
 
 .custom-date-picker {

@@ -7,7 +7,10 @@
         placeholder="选择日期"
         class="custom-date-picker"
         @change="handleChange"
-        style="max-width: 127px ; border: 1px solid #000;"
+        style="max-width: 127px ; border: 1px solid #000;border-top:none"
+        :editable="false"
+        :clearable="false"
+        size="small"
     ></el-date-picker>
   </div>
 </template>
@@ -57,12 +60,12 @@ export default {
 }
 
 .custom-label {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: bold;
   padding-left: 25px; /* 调整label文字位置 */
   padding-right: 30px;
   border: 1px solid #000; /* 添加边框 */
-  background-color: orange;
+  background-color: #fabf8f;
 }
 
 .custom-date-picker {
