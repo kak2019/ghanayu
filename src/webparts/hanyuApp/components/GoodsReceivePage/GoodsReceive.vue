@@ -123,17 +123,15 @@ export default {
                   .filter(item => {
             let condition = true
 
-            const startOfMonth = new Date(new Date(curentDate).getFullYear(), new Date(curentDate).getMonth(), 1).toISOString();
-            /*console.log("startOfMonth:----------" + startOfMonth);
-            console.log("GoodsReceiveDate :" + new Date(item.GoodsReceiveDate).toISOString())
-            console.log("startOfMonth :" + (this.addOneDay(startOfMonth)))
-            console.log( "startOfMonth <======" + (this.addOneDay(startOfMonth) < new Date(item.GoodsReceiveDate)));*/
+            //const startOfMonth = new Date(new Date(curentDate).getFullYear(), new Date(curentDate).getMonth(), 1).toISOString();
+            const firstDayOfMonth = new Date(curentDate.getFullYear(), curentDate.getMonth(), 1);
+            /*console.log("firstDayOfMonth:----------" + firstDayOfMonth);
+            console.log("GoodsReceiveDate :" + new Date(item.GoodsReceiveDate))
+            console.log( "startOfMonth <======" + (new Date(firstDayOfMonth) <= new Date(item.GoodsReceiveDate)));*/
 
-            condition = condition && new Date(item.GoodsReceiveDate) <= new Date(curentDate.toISOString()) 
+            condition = condition && (new Date(firstDayOfMonth) <= new Date(item.GoodsReceiveDate)) && (new Date(item.GoodsReceiveDate) <= new Date(curentDate.toISOString()))
             return condition
         });
-        //console.log("Processed table data:", this.tableData);
-         //console.log("Date", defaultFormatedDate);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
