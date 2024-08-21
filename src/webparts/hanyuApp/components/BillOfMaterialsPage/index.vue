@@ -2,9 +2,8 @@
 <el-container>
     <el-header height="58px" :style="{padding:0}">
         <el-form label-position="top" label-width="auto" size="small" @submit="onSubmit">
-            <el-row class="row-bg" justify="space-evenly" :gutter="8">
-                <el-col :span="6">
-                    <table class="tbQueryForm">
+            <div class="row-bg">
+                <table class="tbQueryForm">
                         <tr>
                             <th colspan="2" clsss="el-form-item__label" :style="{ borderCollapse: 'collapse'}">当工程</th>
                         </tr>
@@ -23,10 +22,8 @@
                             </td>
                         </tr>
                     </table>
-
-                </el-col>
-                <el-col :span="6">
-                    <table class="tbQueryForm">
+                <div class="small-space"></div>
+                <table class="tbQueryForm">
                         <tr>
                             <th colspan="2" clsss="el-form-item__label" :style="{ borderCollapse: 'collapse'}">前工程</th>
                         </tr>
@@ -45,19 +42,14 @@
                             </td>
                         </tr>
                     </table>
-                </el-col>
-                <el-col :span="2">
-
-                </el-col>
-                <el-col :span="8">
+                <div class="flex-grow"></div>
+                <div class="buttons">
                     <el-button plain size="large" type="primary" native-type="submit">検索</el-button>
                     <el-button plain size="large" @click="onResetQuery">キャンセル</el-button>
                     <el-button plain size="large" @click="onDownloadClick">ダウンロード</el-button>
-                </el-col>
-                <el-col :span="2">
-
-                </el-col>
-            </el-row>
+                </div>
+                <div class="small-space"></div>
+            </div>
         </el-form>
     </el-header>
     <el-main :style="{paddingLeft:0,paddingRight:0}">
@@ -187,9 +179,24 @@ th {
 }
 
 .row-bg {
-    align-items: center;
+
     background-color: #DDDDDD;
-    padding: 4px
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px;
+}
+
+.fixed-width {
+    width: 200px;
+}
+
+.flex-grow {
+    flex-grow: 1;
+}
+
+.small-space {
+    width: 20px;
 }
 
 .el-form-item {
