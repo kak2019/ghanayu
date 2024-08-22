@@ -63,7 +63,7 @@ export default {
   width: 71px ;
   font-size: 12px;
   padding-left: 25px; /* 调整label文字位置 */
-  padding-right: 30px;
+  padding-right: 25px;
   border: 1px solid #000; /* 添加边框 */
   background-color: #fabf8f;
 }

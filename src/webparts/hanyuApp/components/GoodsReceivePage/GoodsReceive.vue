@@ -27,7 +27,7 @@
         style="width: 100px; height: 40px; margin-top: 1px; margin-bottom: 10px;"
         @click="submitForm"
     >
-      登录
+      登録
     </el-button>
     <el-button style="width: 100px; height: 40px; margin-top: 1px"
                @click="resetForm"
@@ -56,6 +56,7 @@ import Input from './input.vue';
 import {useSHIKYUGoodsReceiveStore} from '../../../../stores/shikyugoodsreceive';
 import * as XLSX from 'xlsx';
 import {ElMessage} from "element-plus"; // 更新为你的实际路径
+import { usePartMasterStore } from '../../../../stores/part';
 
 
 // 获取 Pinia store 实例
@@ -87,9 +88,11 @@ export default {
   methods: {
     async submitForm() {
       try {
+        //Add new record to good receive page
         const newItem = {
           MLNPartNo: this.form.num,
           UDPartNo: "",
+          ProcessType: "F",
           SHIKYUFrom: this.form.select,
           GoodsReceiveQty: parseInt(this.form.count, 10),
           Calloffid: this.form.id,
@@ -97,11 +100,17 @@ export default {
           GoodsReceiveDate: this.form.date,
         };
 
+        //Get UD part number in the part master table that corresponds to the entered MLN part number
+        const partMasterStore = usePartMasterStore();
+        const udPartNo = await partMasterStore.getListItemByMLNPartNo(newItem.MLNPartNo);
+        newItem.UDPartNo = udPartNo;
+
+        //Add record to good receive table
         const message = await shiKYUGoodsReceiveStore.addListItem(newItem);
         this.$message.success(message);
         await this.fetchTableData();
 
-        this.resetForm(); // 调用 cancel 方法重置表单
+        this.resetForm(); // 调用 reset 方法重置表单
       } catch (error) {
         this.$message.error('登録に失敗しました: ' + error.message);
       }
@@ -114,17 +123,15 @@ export default {
                   .filter(item => {
             let condition = true
 
-            const startOfMonth = new Date(new Date(curentDate).getFullYear(), new Date(curentDate).getMonth(), 1).toISOString();
-            console.log("startOfMonth:----------" + startOfMonth);
-            console.log("GoodsReceiveDate :" + new Date(item.GoodsReceiveDate).toISOString())
-            console.log("startOfMonth :" + (this.addOneDay(startOfMonth)))
-            console.log( "startOfMonth <======" + (this.addOneDay(startOfMonth) < new Date(item.GoodsReceiveDate)));
+            //const startOfMonth = new Date(new Date(curentDate).getFullYear(), new Date(curentDate).getMonth(), 1).toISOString();
+            const firstDayOfMonth = new Date(curentDate.getFullYear(), curentDate.getMonth(), 1);
+            /*console.log("firstDayOfMonth:----------" + firstDayOfMonth);
+            console.log("GoodsReceiveDate :" + new Date(item.GoodsReceiveDate))
+            console.log( "startOfMonth <======" + (new Date(firstDayOfMonth) <= new Date(item.GoodsReceiveDate)));*/
 
-            condition = condition && new Date(item.GoodsReceiveDate) <= new Date(curentDate.toISOString()) 
+            condition = condition && (new Date(firstDayOfMonth) <= new Date(item.GoodsReceiveDate)) && (new Date(item.GoodsReceiveDate) <= new Date(curentDate.toISOString()))
             return condition
         });
-        //console.log("Processed table data:", this.tableData);
-         //console.log("Date", defaultFormatedDate);
       } catch (error) {
         console.error('Error fetching data:', error);
       }

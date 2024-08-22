@@ -20,9 +20,9 @@
       </div>
     </div>
     <div style="text-align: right; flex-shrink: 0;">
-      <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-bottom: 10px;" @click="submitForm">検索</el-button>
-      <el-button style="width: 100px; height: 50px; margin-top: 1px;margin-bottom: 10px;" @click="resetForm">キャンセル</el-button>
-      <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-right: 10px;margin-bottom: 10px;" @click="downloadTable">ダウンロード</el-button>
+      <el-button style="width: 100px; height: 40px; margin-top: 1px; margin-bottom: 10px;" @click="submitForm">検索</el-button>
+      <el-button style="width: 100px; height: 40px; margin-top: 1px;margin-bottom: 10px;" @click="resetForm">キャンセル</el-button>
+      <el-button style="width: 100px; height: 40px; margin-top: 1px; margin-right: 10px;margin-bottom: 10px;" @click="downloadTable">ダウンロード</el-button>
     </div>
   </el-row>
 
@@ -41,6 +41,7 @@ import {useSHIKYUGoodsReceiveStore} from "../../../../stores/shikyugoodsreceive"
 // 获取 Pinia store 实例
 
 const SHIKYUGoodsReceiveStore = useSHIKYUGoodsReceiveStore();
+const defaultProcess = "生加工";
 export default {
   components: {
     TableShipping,
@@ -123,14 +124,12 @@ export default {
             
             return condition
           });
-
-          alert("123");
     },
     resetForm() {
       // 重置表单字段并清空表格数据
       this.form = {
         date: '',
-        select: '',
+        select: defaultProcess,
         MLNPartNo: '',
         UDPartNo: ''
       };

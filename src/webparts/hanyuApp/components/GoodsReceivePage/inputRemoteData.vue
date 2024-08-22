@@ -9,6 +9,7 @@
         size="small"
         placeholder="Please Input"
         @select="handleChange"
+        @input="handleInput"
         :props="{
         value: 'value',
         label: 'text'
@@ -52,6 +53,12 @@ export default {
       this.innerValue = value.value; // 确保更新的是value属性
       this.selectedText = value.text; // 更新显示文本
       this.$emit('update:modelValue', value.value);
+    },
+    handleInput(value){
+      //只允许字母和数字
+      this.innerValue = value.replace(/[^a-zA-Z0-9]/g, '');
+      this.selectedText = value.replace(/[^a-zA-Z0-9]/g, ''); // 更新显示文本
+      this.$emit('update:modelValue', value.replace(/[^a-zA-Z0-9]/g, ''));
     },
     querySearch(queryString, cb) {
       let results = [];
