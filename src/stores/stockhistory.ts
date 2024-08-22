@@ -37,6 +37,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                         FunctionID: item.FunctionID,
                         StockQty: item.StockQty,
                         Comment: item.Comment || "",
+                        Registered: new Date()
                     });
                     return '登録完了。';
             }
@@ -44,6 +45,31 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 throw new Error(`データの登録中にエラーが発生しました: ${error.message}`);
             }
         },
+        async getListItemsByRegisteredDate(mlnPartNo: string) : Promise<number>  {
+            try {
+                const sp = spfi(getSP());
+                const web = await sp.web();
 
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/StockHistory`).items.orderBy("Registered", false)();
+                items.filter(item => {
+                    let condition = true
+                    if(mlnPartNo) {
+                      condition = condition && mlnPartNo === item.MLNPartNo
+                    }
+                    return condition
+                  });
+                console.log("items order by register date" + items);
+                if(items.length>0)
+                {
+                    return items[0].StockQty
+                }else{
+                    return 0;
+                }
+                
+            }
+            catch (error) {
+                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+            }
+        },
     },
 });

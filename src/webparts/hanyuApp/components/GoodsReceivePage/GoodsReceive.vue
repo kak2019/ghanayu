@@ -123,11 +123,7 @@ export default {
                   .filter(item => {
             let condition = true
 
-            //const startOfMonth = new Date(new Date(curentDate).getFullYear(), new Date(curentDate).getMonth(), 1).toISOString();
             const firstDayOfMonth = new Date(curentDate.getFullYear(), curentDate.getMonth(), 1);
-            /*console.log("firstDayOfMonth:----------" + firstDayOfMonth);
-            console.log("GoodsReceiveDate :" + new Date(item.GoodsReceiveDate))
-            console.log( "startOfMonth <======" + (new Date(firstDayOfMonth) <= new Date(item.GoodsReceiveDate)));*/
 
             condition = condition && (new Date(firstDayOfMonth) <= new Date(item.GoodsReceiveDate)) && (new Date(item.GoodsReceiveDate) <= new Date(curentDate.toISOString()))
             return condition

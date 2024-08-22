@@ -50,13 +50,16 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
 
                     //Add record to StockHistory table.
                     const stockHistoryStore = useStockHistoryStore();
-                    const stockQty = 0 +  item.GoodsReceiveQty;
+                    const latestStockQty =  await stockHistoryStore.getListItemsByRegisteredDate(item.MLNPartNo);
+                    //console.log("latestStockQty=============" + latestStockQty)
+                    //console.log("item.GoodsReceiveQty=============" + item.GoodsReceiveQty)
+                    const stockQty = latestStockQty +  item.GoodsReceiveQty;
                     const billOfMaterialsItem = {
                         MLNPartNo: item.MLNPartNo,
                         ProcessType: item.ProcessType, // need to get form 工程区分，and covert to Janpnese words
                         UDPartNo: item.UDPartNo,
                         Qty: item.GoodsReceiveQty,
-                        FunctionID: "01", // need to check if it's only "01"
+                        FunctionID: "01", // it's only "01" in this process.
                         StockQty: stockQty, //Latest QTY  +  受入数, need to caculate
                     } as IStockHistoryItem;
                     await stockHistoryStore.addListItem(billOfMaterialsItem);
@@ -70,5 +73,6 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
                 throw new Error(`データの登録中にエラーが発生しました: ${error.message}`);
             }
         }
+        
     },
 });
