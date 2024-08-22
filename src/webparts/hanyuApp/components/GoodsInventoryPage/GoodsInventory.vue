@@ -52,7 +52,7 @@ export default {
     return {
       tableData: [],
       form: {
-        date: '',
+        date: new Date().toISOString(),
         select: '',
         MLNPartNo: '',
         UDPartNo: '',
@@ -118,7 +118,7 @@ export default {
     resetForm() {
       // 重置表单字段并清空表格数据
       this.form = {
-        date: '',
+        date: new Date().toISOString(),
         select: '',
         MLNPartNo: '',
         UDPartNo: ''
@@ -136,7 +136,7 @@ export default {
     try {
       // 调用 store 的方法获取数据
       await SHIKYUGoodsReceiveStore.getListItems();
-
+      console.log("rtyrtyrtyr")
       // 对数据进行处理以匹配表格字段
       this.tableData = SHIKYUGoodsReceiveStore.shikyuGoodsReceiveItems
 

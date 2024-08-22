@@ -6,7 +6,7 @@
         :fetch-suggestions="querySearch"
         clearable
         style="width: 120px; border: 1px solid #000000; border-radius: 0;"
-        placeholder="Please Input"
+        placeholder=""
         @select="handleChange"
         :props="{
         value: 'value',
