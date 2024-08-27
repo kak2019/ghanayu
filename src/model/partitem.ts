@@ -5,4 +5,10 @@ export interface IPartMasterItem {
     ProcessType?: string;
     Registered?: string;
     Modified?: string;
+    
+    lastLatestMonthQty?:string;
+    currentMonthDefectsQty?: string;
+    currentMonthCompletionQty?: string;
+    currentMonthShippingQty?: string;
+    curentMonthStockQty?: string;
 }

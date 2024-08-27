@@ -3,6 +3,7 @@ import { spfi } from '@pnp/sp';
 import { getSP } from '../pnpjsConfig';
 import { FeatureKey } from './keystrs';
 import { IPartMasterItem } from '../model';
+import { useStockHistoryStore } from '../stores/stockhistory'
 
 export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
     state: () => ({
@@ -162,7 +163,67 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
             catch (error) {
                 throw new Error(`データの削除中にエラーが発生しました: ${error.message}`);
             }
-        }
+        },
+        async getListItemsBySearchItems(date:string) {
+            try {
+                const sp = spfi(getSP());
+                const web = await sp.web();
 
+                const items = (await sp.web.getList(`${web.ServerRelativeUrl}/Lists/PartsMaster`).items.orderBy("MLNPartNo", true)());
+                const stockHistoryStore = useStockHistoryStore();
+                //const currentMonth = current;
+                console.log("=================" + date);
+                const currentMonth = new Date(date).getFullYear() + "-" + (new Date(date).getMonth() + 1);
+
+                
+                //前月末在庫
+                const listWithAllLastMonthQty = await Promise.all(items.map(async item =>{
+                    return await stockHistoryStore.getLastMonthsLatestStockQtyByMln(item.MLNPartNo, currentMonth);
+                }));
+                //console.log("----------" + listWithAllLastMonthQty);
+                //console.log("----------length" + listWithAllLastMonthQty.length);
+                
+                //当月実績 - 不良
+                const listWithCurrentMonthDefectsQty = await Promise.all(items.map(async item =>{
+                    return await stockHistoryStore.getCurrentMonthDefectsQtyByMlnNo(item.MLNPartNo, currentMonth);
+                }));
+                //console.log("----------" + listWithCurrentMonthDefectsQty);
+                //console.log("----------length" + listWithCurrentMonthDefectsQty.length);
+
+                //当月実績 - 完成
+                const listWithCurrentMonthCompletionQty = await Promise.all(items.map(async item =>{
+                    return await stockHistoryStore.getCurrentMonthCompletionQtyByMlnNo(item.MLNPartNo, currentMonth);
+                }));
+                //console.log("----------" + listWithCurrentMonthCompletionQty);
+                //console.log("----------length" + listWithCurrentMonthCompletionQty.length);
+
+                //当月実績 - 振替
+                const listWithCurrentMonthShippingQty = await Promise.all(items.map(async item =>{
+                    return await stockHistoryStore.getCurrentMonthShippingQtyByMlnNo(item.MLNPartNo, currentMonth);
+                }));
+                //console.log("----------" + listWithCurrentMonthShippingQty);
+                //console.log("----------length" + listWithCurrentMonthShippingQty.length);
+
+                //当月末在庫
+                const listWithCurentMonthStockQtyByMlnNo = await Promise.all(items.map(async item =>{
+                    return await stockHistoryStore.getCurentMonthStockQtyByMlnNo(item.MLNPartNo, currentMonth);
+                }));
+                //console.log("----------" + listWithCurentMonthStockQtyByMlnNo);
+                //console.log("----------length" + listWithCurentMonthStockQtyByMlnNo.length);
+
+                for(let i=0; i <items.length; i++){
+                    items[i].lastLatestMonthQty = listWithAllLastMonthQty[i];
+                    items[i].currentMonthDefectsQty = listWithCurrentMonthDefectsQty[i];
+                    items[i].currentMonthCompletionQty = listWithCurrentMonthCompletionQty[i];
+                    items[i].currentMonthShippingQty = listWithCurrentMonthShippingQty[i];
+                    items[i].curentMonthStockQty = listWithCurentMonthStockQtyByMlnNo[i];
+                }
+                console.log("========" + items);
+                this.parts = items;
+            }
+            catch (error) {
+                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+            }
+        }
     },
 });
