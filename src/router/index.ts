@@ -1,49 +1,49 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
-import Home from '../webparts/hanyuApp/components/RouterComponents/Home.vue';
 
 const routes: RouteRecordRaw[] = [
     {
         path: '/',
-        redirect: '/home'
+        redirect: '/stockreport'
     },
     {
-        path: '/home',
-        component: Home
+        path: '/stockresultmodification',
+        component: () => import(/* webpackChunkName: "stockresultmodification-chunk" */
+            '../webparts/hanyuApp/components/RouterComponents/StockResultModification.vue')
     },
     {
         path: '/stockreport',
-        component: () => import(/* webpackChunkName: "about-chunk" */
+        component: () => import(/* webpackChunkName: "stockreport-chunk" */
             '../webparts/hanyuApp/components/StockReportPage/StockReport.vue')
     },
     {
         path: '/goodsInventory',
-        component: () => import(/* webpackChunkName: "about-chunk" */
+        component: () => import(/* webpackChunkName: "goodsInventory-chunk" */
             '../webparts/hanyuApp/components/GoodsInventoryPage/GoodsInventory.vue')
     },
     {
         path: '/processcompletion',
-        component: () => import(/* webpackChunkName: "about-chunk" */
+        component: () => import(/* webpackChunkName: "processcompletion-chunk" */
             '../webparts/hanyuApp/components/ProcessCompletePage/ProcessComplete.vue')
     },
     {
         path: '/shippingrecord',
         //component: shippingRecord
-        component: () => import(/* webpackChunkName: "about-chunk" */
+        component: () => import(/* webpackChunkName: "shippingrecord-chunk" */
             '../webparts/hanyuApp/components/ShippingRecordPage/ShippingRecord.vue')
     },
     {
         path: '/partsmaster',
-        component: () => import(/* webpackChunkName: "about-chunk" */
+        component: () => import(/* webpackChunkName: "partsmaster-chunk" */
             '../webparts/hanyuApp/components/RouterComponents/PartsMaster.vue')
     },
     {
         path: '/goodsreceive',
-        component: () => import(/* webpackChunkName: "about-chunk" */
+        component: () => import(/* webpackChunkName: "goodsreceive-chunk" */
             '../webparts/hanyuApp/components/GoodsReceivePage/GoodsReceive.vue')
     },
     {
         path: '/billofmaterials',
-        component: () => import(/* webpackChunkName: "about-chunk" */
+        component: () => import(/* webpackChunkName: "billofmaterials-chunk" */
             '../webparts/hanyuApp/components/RouterComponents/BillOfMaterials.vue')
     },
     {
