@@ -20,7 +20,7 @@
       </div>
     </div>
     <div style="text-align: right; flex-shrink: 0;">
-      <el-button style="width: 100px; height: 40px; margin-top: 1px; margin-bottom: 10px;" @click="submitForm">検索</el-button>
+      <el-button style="width: 100px; height: 40px; margin-top: 1px; margin-bottom: 10px;" @click="searchForm">検索</el-button>
       <el-button style="width: 100px; height: 40px; margin-top: 1px;margin-bottom: 10px;" @click="resetForm">キャンセル</el-button>
       <el-button style="width: 100px; height: 40px; margin-top: 1px; margin-right: 10px;margin-bottom: 10px;" @click="downloadTable">ダウンロード</el-button>
     </div>
@@ -38,10 +38,14 @@ import InputRemoteData from './inputRemoteData.vue';
 import * as XLSX from 'xlsx';
 import { ref } from 'vue';
 import {useSHIKYUGoodsReceiveStore} from "../../../../stores/shikyugoodsreceive";
+import { usePartMasterStore } from "../../../../stores/part"
+import { useStockHistoryStore } from "../../../../stores/stockhistory"
 // 获取 Pinia store 实例
 
 const SHIKYUGoodsReceiveStore = useSHIKYUGoodsReceiveStore();
-const defaultProcess = "生加工";
+const partMasterStore =  usePartMasterStore();
+const stockHistoryStore = useStockHistoryStore();
+const defaultProcess = "M";
 export default {
   components: {
     TableShipping,
@@ -53,8 +57,8 @@ export default {
     return {
       tableData: [],
       form: {
-        date: '',
-        select: '',
+        date: new Date(),
+        select: "M",
         MLNPartNo: '',
         UDPartNo: '',
         // 其他表单字段
@@ -67,13 +71,14 @@ export default {
     downloadTable() {
       // 创建一个新的工作表
       const ws = XLSX.utils.json_to_sheet(this.tableData.map(val => ({
+        ProcessType: val.ProcessType,
         MLNPartNo: val.MLNPartNo,
         UDPartNo: val.UDPartNo,
-        前月末在庫: val.前月末在庫,
-        BadProducts: val.BadProducts,
-        Completion: val.Completion,
-        VibrationSubstitution: val.VibrationSubstitution,
-        EndMonthStock: val.EndMonthStock
+        前月末在庫: val.lastLatestMonthQty,
+        BadProducts: val.currentMonthDefectsQty,
+        Completion: val.currentMonthCompletionQty,
+        VibrationSubstitution: val.currentMonthShippingQty,
+        EndMonthStock: val.curentMonthStockQty
       })));
 
       const newData1 = [["工程区分", "MLN部品番号", "UD部品番号", "前月末在庫", "当月実績", "", "", "当月末在庫"]]
@@ -102,53 +107,81 @@ export default {
       // 将工作簿导出为 Excel 文件
       XLSX.writeFile(wb, "在庫管理表.xlsx");
     },
-    submitForm() {
-
-      const query = this.form
-      this.tableData = SHIKYUGoodsReceiveStore.shikyuGoodsReceiveItems
-          .filter(item => {
-            let condition = true
-            if(query.date){
-              condition = condition && query.date === item.GoodsReceiveDate
-            }
-            if(query.select){
-               condition = condition && query.select === item.ProcessType
-            }
-            if(query.MLNPartNo) {
-              condition = condition && query.MLNPartNo === item.MLNPartNo
-            }
-            if(query.UDPartNo) {
-              condition = condition && query.UDPartNo === item.UDPartNo
-            }
-          
-            
-            return condition
-          });
+    searchForm() {
+      this.tableData = this.filterDataBySearchItems();
     },
     resetForm() {
       // 重置表单字段并清空表格数据
       this.form = {
-        date: '',
+        date: new Date(),
         select: defaultProcess,
         MLNPartNo: '',
         UDPartNo: ''
       };
-      this.filteredData = this.tableData; // 重新设置过滤后的数据
+      this.tableData = this.filterDataBySearchItems(); // 重新设置过滤后的数据
     },
-    // async fetchTableData() {
-    //   // 模拟获取数据，你可以替换为真实的数据获取逻辑
-    //   await stockHistoryStore.getListItems();
-    //   this.tableData.value = stockHistoryStore.getListItems()
-    //   this.filteredData = this.tableData; // 初始化表格数据
-    // }
+    filterDataBySearchItems(){
+      const query = this.form
+     
+      const formatQueryDate = query.date.getFullYear() + '-' + (query.date.getMonth()+1);
+
+      const filterTable = partMasterStore.partMasterItems
+          .filter(item => {
+            //console.log("item.Registered ------"+  item.Registered);
+            let condition = true
+            if(query.date){
+              let formatRegisteredDate = item.Registered !=null? new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth()+1): ""
+              //console.log("formatRegisteredDate+-------" + formatRegisteredDate);
+              condition = condition && formatQueryDate === formatRegisteredDate
+            }
+            return condition;
+          }).filter(item => {
+              let condition = true;
+               //console.log(item.ID + "item.ProcessType-----------" + item.ProcessType);
+              if(query.select){
+                  const isProcessTypeIn = item.ProcessType != null && item.ProcessType.indexOf(query.select)>=0
+                  if(isProcessTypeIn){
+                    //item.ProcessType = query.select;
+                    condition = condition && isProcessTypeIn
+                  }else{
+                    condition = false;
+                  }
+              }
+              return condition;
+          }).filter(item => {
+            //console.log("item.MLNPartNo ------"+  item.MLNPartNo);
+            //console.log("item.UDPartNo ------"+  item.UDPartNo);
+            let condition = true;
+            const MLNPartNoValue = query.MLNPartNo.trim();
+            const UDPartNoValue = query.UDPartNo.trim();
+            const isEmpty1 = MLNPartNoValue === "";
+            const isEmpty2 = UDPartNoValue === "";
+            const filterByMLNPartNo = !isEmpty1 && item.MLNPartNo.indexOf(MLNPartNoValue) >= 0;
+            const filterByUDPartNo = !isEmpty2 && item.UDPartNo.indexOf(UDPartNoValue) >= 0;
+            if(isEmpty1 && isEmpty2){
+              condition = condition;
+            }else {
+                if(!isEmpty1 && !isEmpty2) {
+                  condition = condition && filterByMLNPartNo
+                }else{
+                  condition = condition && (filterByMLNPartNo|| filterByUDPartNo)
+                }
+            }
+            return condition; 
+          });
+
+        return filterTable;
+    }
   },
   async mounted() {
     try {
       // 调用 store 的方法获取数据
-      await SHIKYUGoodsReceiveStore.getListItems();
+      //const formatCurrentDate = query.date.getFullYear() + '-' + (query.date.getMonth()+1);
+      const date = this.form.date;
+      await partMasterStore.getListItemsBySearchItems(date);
 
       // 对数据进行处理以匹配表格字段
-      this.tableData = SHIKYUGoodsReceiveStore.shikyuGoodsReceiveItems
+      this.tableData = this.filterDataBySearchItems();
 
       console.log("Processed table data:", this.tableData);
     } catch (error) {

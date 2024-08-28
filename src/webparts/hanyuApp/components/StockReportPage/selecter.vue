@@ -12,7 +12,7 @@
           v-for="item in options"
           :key="item.Id"
           :label="item.ProcessName"
-          :value="item.ProcessName"
+          :value="item.ProcessType"
       />
     </el-select>
   </div>
@@ -59,7 +59,8 @@ export default {
       await processMasterStore.getListItems(); // 获取数据
       this.options = processMasterStore.processMasterItems.map(item => ({
         Id: item.Id,           // 保留Id用于key
-        ProcessName: item.ProcessName // 用于显示的名称
+        ProcessName: item.ProcessName, // 用于显示的名称
+        ProcessType: item.ProcessType // 用于查询
       }));
       this.options.shift();
       this.options.push({"" : ""});

@@ -8,3 +8,5 @@ export * from './functionsmasteritem';
 export * from './shikyugoodsreceiveitem';
 export * from './shippingresultitem';
 export * from './stockhistoryitem';
+export * from './modifiedreasonmasteritem';
+export * from './stockresultmodificationitem';
