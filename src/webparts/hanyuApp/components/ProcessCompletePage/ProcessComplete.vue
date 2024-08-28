@@ -10,10 +10,10 @@
         <date-picker-with-label v-model="form.ProcessCompletion" label="工程完了日"></date-picker-with-label>
       </div>
       <div class="background-layer" style="margin-right: 20px;">
-        <Selecter v-model="form.select" label="工程区分"></Selecter>
+        <Selecter v-model="form.select" label="工程区分" :processOptions="processOptions"></Selecter>
       </div>
       <div class="background-layer" style="margin-right: 20px;">
-        <InputRemoteData v-model="form.MLNPartNo" label="MLN部品番号" searchField="MLN" />
+        <InputRemoteData v-model="form.MLNPartNo" label="MLN部品番号" searchField="MLN" @confirmMethod="confirmMethod(abc)" />
       </div>
       <!-- <div class="background-layer">
         <InputRemoteData v-model="form.UDPartNo" label="UD部品番号" searchField="UD" />
@@ -45,7 +45,9 @@ import * as XLSX from 'xlsx';
 import { ref } from 'vue';
 import Input from './input.vue';
 import { useProcessCompletionResultStore } from "../../../../stores/processcompletion";
+import { useProcessMasterStore } from '../../../../stores/process';
 
+const ProcessMasterStore = useProcessMasterStore();
 const ProcessCompletionResultStore = useProcessCompletionResultStore();
 
 export default {
@@ -58,10 +60,11 @@ export default {
   },
   data() {
     return {
+      processOptions: [],
       tableData: [],
       form: {
-        ProcessCompletion: '',
-        select: '',
+        ProcessCompletion: new Date().toISOString(),
+        select: '生加工',
         MLNPartNo: '',
         UDPartNo: '',
         AbnormalNumber: '',
@@ -71,7 +74,38 @@ export default {
   },
   methods: {
     async submitForm() {
+      debugger
       try {
+        if (!this.form.MLNPartNo) {
+          this.$message.error('MLNPartNo不能为空');
+          return;
+        }
+
+        // 校验 MLNPartNo 的格式（10 位，由数字和英文组成）
+        const mlnPartNoPattern = /^[a-zA-Z0-9]{10}$/;
+        if (!mlnPartNoPattern.test(this.form.MLNPartNo)) {
+          this.$message.error('请输入有效的MLNPartNo');
+          return;
+        }
+
+        const defectQty = Number(this.form.AbnormalNumber);
+        const completionQty = Number(this.form.FinishedNumber);
+
+        if (isNaN(defectQty) || defectQty < 0) {
+          this.$message.error('请输入有效的不良数');
+          return;
+        }
+
+        if (isNaN(completionQty) || completionQty < 0) {
+          this.$message.error('请输入有效的完成数');
+          return;
+        }
+
+        if (defectQty === 0 && completionQty === 0) {
+          this.$message.error('不良数和完成数不能同时为 0');
+          return;
+        }
+
         const newItem = {
           MLNPartNo: this.form.MLNPartNo,
           ProcessType: this.form.select,
@@ -91,6 +125,20 @@ export default {
       }
     },
 
+    async fetchProcessMasterData() {
+      // const processMasterStore = useProcessMasterStore();
+      try {
+        await ProcessMasterStore.getListItems(); // 获取数据
+        this.processOptions = ProcessMasterStore.processMasterItems.map(item => ({
+          Id: item.Id,           // 保留Id用于key
+          ProcessName: item.ProcessName // 用于显示的名称
+        }));
+        console.log("Processed Master data:", this.processOptions);
+      } catch (error) {
+        console.error('Failed to load process master items:', error);
+      }
+    },
+
     async fetchTableData() {
       try {
         await ProcessCompletionResultStore.getListItems();
@@ -103,8 +151,8 @@ export default {
 
     resetForm() {
       this.form = {
-        ProcessCompletion: '',
-        select: '',
+        ProcessCompletion: new Date().toISOString(),
+        select: '生加工',
         MLNPartNo: '',
         UDPartNo: '',
         AbnormalNumber: '',
@@ -135,9 +183,17 @@ export default {
       const year = date.getFullYear();
       return `${month}/${day}/${year}`;
     },
+
+    confirmMethod(abc) {
+      console.log('============');
+      console.log('Received value:', abc);
+      console.log('Received text:', abc);
+    // 在这里进一步处理接收到的值
+    }
   },
   async mounted() {
     await this.fetchTableData();
+    await this.fetchProcessMasterData();
   }
 };
 </script>

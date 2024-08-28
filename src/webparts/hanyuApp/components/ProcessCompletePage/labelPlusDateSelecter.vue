@@ -7,6 +7,8 @@
         placeholder="选择日期"
         class="custom-date-picker"
         @change="handleChange"
+        :disabled-date="disabledDate"
+        :clearable="false"
         style="max-width: 127px ; border: 1px solid #000;"
     ></el-date-picker>
   </div>
@@ -41,7 +43,20 @@ export default {
   methods: {
     handleChange(value) {
       this.$emit('update:modelValue', value);
-    }
+    },
+
+    disabledDate(date) {
+      const start = this.getFirstDayOfCurrentMonth(); // 2024-08-01
+      const end = new Date(); // 2024-08-31
+      return date < start || date > end;
+    },
+
+    getFirstDayOfCurrentMonth() {
+      const date = new Date();
+      date.setDate(1); // 将日期设置为当月的第一天
+      date.setHours(0, 0, 0, 0); // 将时间设置为午夜
+      return date;
+    },
   }
 };
 </script>
