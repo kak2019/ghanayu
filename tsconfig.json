@@ -21,7 +21,7 @@
     ],
     "types": [
       "webpack-env",
-      "element-plus/global"
+      // "element-plus/global"
     ],
     "lib": [
       "es5",

@@ -64,11 +64,11 @@
 
             </el-col>
             <el-col :span="8">
-                <el-button plain size="large" @click="editRow" :disabled="isEditing || currentRowIndex === -1">登録</el-button>
-                <el-button plain size="large" @click="insertRow" :disabled="isEditing">行追加</el-button>
+                <el-button plain size="large" @click="editRow" :disabled="!isInventoryManager || isEditing || currentRowIndex === -1">登録</el-button>
+                <el-button plain size="large" @click="insertRow" :disabled="!isInventoryManager || isEditing">行追加</el-button>
                 <el-popconfirm confirm-button-text="はい" cancel-button-text="いいえ" title="これを削除してもよろしいですか?" @confirm="deleteRow">
                     <template #reference>
-                        <el-button plain size="large" :disabled="isEditing || currentRowIndex === -1">行削除</el-button>
+                        <el-button plain size="large" :disabled="!isInventoryManager || isEditing || currentRowIndex === -1">行削除</el-button>
                     </template>
                 </el-popconfirm>
                 <el-button plain size="large" v-show="false">キャンセル</el-button>

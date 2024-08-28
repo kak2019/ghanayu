@@ -10,3 +10,5 @@ export * from './shippingresultitem';
 export * from './stockhistoryitem';
 export * from './modifiedreasonmasteritem';
 export * from './stockresultmodificationitem';
+export * from './user';
+export * from './operationcalendaritem';

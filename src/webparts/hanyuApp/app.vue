@@ -1,24 +1,29 @@
 <template>
-<div class="nav">
-    <router-link class="tab" to="/stockreport" replace>在庫管理表(工程別)</router-link>
-    <router-link class="tab" to="/goodsInventory" replace>在庫管理表(支給品)</router-link>
-    <router-link class="tab" to="/shippingrecord" replace>出荷実績入力</router-link>
-    <router-link class="tab" to="/processcompletion" replace>内製工程完了実績入力</router-link>
-    <router-link class="tab" to="/goodsreceive" replace>支給品検収実績入力</router-link>
-    <router-link class="tab" to="/billofmaterials" replace>部品表</router-link>
-    <router-link class="tab" to="/partsmaster" replace>部品マスター</router-link>
-    <router-link class="tab" to="/stockresultmodification" replace>在庫&実績修正</router-link>
+<div class="hanyuapp" v-loading="loading">
+    <div class="nav">
+        <router-link class="tab" to="/stockreport" replace>在庫管理表(工程別)</router-link>
+        <router-link class="tab" to="/goodsInventory" replace>在庫管理表(支給品)</router-link>
+        <router-link class="tab" to="/shippingrecord" replace>出荷実績入力</router-link>
+        <router-link class="tab" to="/processcompletion" replace>内製工程完了実績入力</router-link>
+        <router-link class="tab" to="/goodsreceive" replace>支給品検収実績入力</router-link>
+        <router-link class="tab" to="/billofmaterials" replace>部品表</router-link>
+        <router-link class="tab" to="/partsmaster" replace>部品マスター</router-link>
+        <router-link class="tab" to="/stockresultmodification" replace>在庫&実績修正</router-link>
+    </div>
+    <router-view></router-view>
 </div>
-<router-view></router-view>
 </template>
 
 <script>
-export default {
-
-}
+module.exports = require('./app');
 </script>
 
 <style>
+.hanyuapp {
+    height: 80vh;
+    min-height: 400px;
+}
+
 div[data-automation-id="contentScrollRegion"] {
     overflow: hidden;
 }

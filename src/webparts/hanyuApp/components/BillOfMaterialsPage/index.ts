@@ -1,9 +1,10 @@
-import { IProcessMasterItem } from './../../../../model/processmasteritem';
+//import { IProcessMasterItem } from './../../../../model/processmasteritem';
 import { IBillOfMaterialsItem } from '../../../../model';
 import { nextTick, computed, onMounted, onBeforeUnmount, ref, defineComponent } from 'vue';
 import { usePartMasterStore } from '../../../../stores/part';
 import { useProcessMasterStore } from '../../../../stores/process';
 import { useBillOfMaterialsStore } from '../../../../stores/billofmaterials';
+import { useUserStore } from '../../../../stores/user';
 import { useForm } from 'vee-validate';
 import * as yup from 'yup';
 import { Check, Close } from '@element-plus/icons-vue';
@@ -58,13 +59,17 @@ export default defineComponent({
         const [ChildProcessType, ChildProcessTypeProps] = queryForm.defineField('ChildProcessType', config);
 
         const tableData = ref<IBillOfMaterialsItem[]>([]);
-        const processData = ref<IProcessMasterItem[]>([]);
+        //const processData = ref<IProcessMasterItem[]>([]);
         const filteredData = ref<IBillOfMaterialsItem[]>([]);
         const isFiltered = ref(false);
         const loading = ref(true);
         const processMasterStore = useProcessMasterStore();
+        const processData = computed(() => processMasterStore.processMasterItems);
         const partMasterStore = usePartMasterStore();
         const billOfMaterialsStore = useBillOfMaterialsStore();
+        const userStore = useUserStore();
+        const isInventoryManager = computed(() => userStore.groupInfo.indexOf('Inventory Manager') >= 0);
+        const isBusinessControler = computed(() => userStore.groupInfo.indexOf('Business Controler') >= 0);
         const currentRowIndex = ref(-1);
         const isEditing = ref(false);
         const isInserting = ref(false);
@@ -162,19 +167,20 @@ export default defineComponent({
         }
         const fetchData = (): void => {
             loading.value = true;
-            processMasterStore.getListItems().then(() => {
-                processData.value = processMasterStore.processMasterItems;
-                partMasterStore.getListItems().then(() => {
-                    billOfMaterialsStore.getListItems().then(() => {
-                        loading.value = false;
-                        tableData.value = billOfMaterialsStore.billOfMaterialsItems;
-                        refreshFilteredData();
-                    }).catch(error => {
-                        loading.value = false;
-                        ElMessage.error(error.message);
-                    });
-                }).catch(error => ElMessage.error(error.message));
-            }).catch(error => ElMessage.error(error.message));
+            //processMasterStore.getListItems().then(() => {
+            //processData.value = processMasterStore.processMasterItems;
+            //partMasterStore.getListItems().then(() => {
+            billOfMaterialsStore.getListItems().then(() => {
+                loading.value = false;
+                tableData.value = billOfMaterialsStore.billOfMaterialsItems;
+                refreshFilteredData();
+            }).catch(error => {
+                loading.value = false;
+                ElMessage.error(error.message);
+            });
+            // }).catch(error => ElMessage.error(error.message));
+
+            //}).catch(error => ElMessage.error(error.message));
 
         };
         const queryMLNPartNo = (queryString: string, cb: (r: { value: string }[]) => void): void => {
@@ -376,6 +382,8 @@ export default defineComponent({
             bomFormStructureQty, bomFormStructureQtyProps,
             tableRef,
             onDownloadClick,
+            isInventoryManager,
+            isBusinessControler,
         }
     }
 });
