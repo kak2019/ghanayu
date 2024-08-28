@@ -43,7 +43,7 @@
     <label style="border: 1px solid black; background-color: orange; margin: 2px 0 2px 0;">メッセージ</label>
     <label style="border: 1px solid black; margin: 2px 20px 2px 0; width: 500px; display: inline-block;"></label>
   </el-row>-->
-  <TableShipping :tableData="tableData"></TableShipping>
+  <TableShipping :tableData="tableData" :loading="loading"></TableShipping>
 </template>
 
 <script>
@@ -74,6 +74,7 @@ export default {
   data() {
     return {
       tableData: [],
+      loading: true,
       form: {
         date: curentDate,
         select: '',
@@ -117,16 +118,21 @@ export default {
     },
     async fetchTableData() {
       try {
-        await shiKYUGoodsReceiveStore.getListItems(this.form.date);
+        await shiKYUGoodsReceiveStore.getListItems(this.form.date).then(() => {
+          this.loading = false;
         
-        this.tableData = shiKYUGoodsReceiveStore.shikyuGoodsReceiveItems
-                  .filter(item => {
+          this.tableData = shiKYUGoodsReceiveStore.shikyuGoodsReceiveItems
+          .filter(item => {
             let condition = true
 
             const firstDayOfMonth = new Date(curentDate.getFullYear(), curentDate.getMonth(), 1);
 
             condition = condition && (new Date(firstDayOfMonth) <= new Date(item.GoodsReceiveDate)) && (new Date(item.GoodsReceiveDate) <= new Date(curentDate.toISOString()))
             return condition
+        });
+        }).catch(error => {
+          this.loading = false;
+          ElMessage.error(error.message);
         });
       } catch (error) {
         console.error('Error fetching data:', error);
