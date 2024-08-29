@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { useFunctionsMasterStore } from '../../../../stores/shippingto'; // 更新为你的实际路径
+import { useShippingToStore } from '../../../../stores/shippingto'; // 更新为你的实际路径
 
 export default {
   name: 'DatePickerWithLabel',
@@ -51,12 +51,12 @@ export default {
       this.$emit('update:modelValue', value);
     },
     async fetchOptions() {
-      const functionsMasterStore = useFunctionsMasterStore();
+      const shippingToStore = useShippingToStore();
       try {
-       await  functionsMasterStore.getListItems(); // 获取数据
-        console.log(functionsMasterStore.shippingToItems ,"res")
+       await  shippingToStore.getListItems(); // 获取数据
+        console.log(shippingToStore.shippingToItems ,"res")
 
-        this.options = functionsMasterStore.shippingToItems.map(item => ({
+        this.options = shippingToStore.shippingToItems.map(item => ({
           value: item.Title,
           label: item.Title
         }));

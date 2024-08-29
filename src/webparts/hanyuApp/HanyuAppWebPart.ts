@@ -11,7 +11,7 @@ import { getSP } from '../../pnpjsConfig';
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import router from '../../router';
-import AppComponent from './app.vue'
+import HanyuApp from './app.vue'
 
 import styles from './HanyuAppWebPart.module.scss';
 import * as strings from 'HanyuAppWebPartStrings';
@@ -32,7 +32,7 @@ export default class HanyuAppWebPart extends BaseClientSideWebPart<IHanyuAppWebP
     this.domElement.innerHTML = `<div class="${styles.hanyuApp}" id="app-${this.context.instanceId}"></div>`
 
     const pinia = createPinia();
-    const app = createApp(AppComponent);
+    const app = createApp(HanyuApp);
     app.use(pinia);
     app.use(ElementPlus);
     app.use(router);

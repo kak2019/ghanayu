@@ -4,7 +4,7 @@ import { getSP } from '../pnpjsConfig';
 import { FeatureKey } from './keystrs';
 import { IShippingToItem } from '../model';
 
-export const useFunctionsMasterStore = defineStore(FeatureKey.SHIPPINGTO, {
+export const useShippingToStore = defineStore(FeatureKey.SHIPPINGTO, {
     state: () => ({
         shippingTos: [] as IShippingToItem[],
     }),

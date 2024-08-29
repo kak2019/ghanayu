@@ -18,6 +18,23 @@ export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
                 const web = await sp.web();
 
                 const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/BillOfMaterials`).items.orderBy("ParentPartNo", true)();
+
+                const processTypeOrder: { [key: string]: number } = {
+                    'F': 1,
+                    'M': 2,
+                    'E': 3,
+                    'H': 4,
+                    'G': 5,
+                    'S': 6,
+                    'C': 7
+                };
+                items.sort((a: IBillOfMaterialsItem, b: IBillOfMaterialsItem) => {
+                    if (a.ParentPartNo === b.ParentPartNo) {
+                        return processTypeOrder[a.ParentProcessType as keyof typeof processTypeOrder] - processTypeOrder[b.ParentProcessType as keyof typeof processTypeOrder];
+                    }
+                    return a.ParentPartNo.localeCompare(b.ParentPartNo);
+                });
+
                 this.billOfMaterials = items;
             }
             catch (error) {
@@ -67,6 +84,14 @@ export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
             }
         },
         async getItemCountByMLNPartNoProcessType(mlnPartNo: string, processType: string): Promise<number> {
+            try {
+                const items = await this.getItemsByMLNPartNoProcessType(mlnPartNo, processType);
+                return items.length;
+            } catch (error) {
+                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+            }
+        },
+        async getItemsByMLNPartNoProcessType(mlnPartNo: string, processType: string): Promise<IBillOfMaterialsItem[]> {
             const camlQuery = {
                 ViewXml: `
                 <View>
@@ -90,7 +115,7 @@ export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
                 const sp = spfi(getSP());
                 const web = await sp.web();
                 const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/BillOfMaterials`).getItemsByCAMLQuery(camlQuery);
-                return items.length;
+                return items;
             } catch (error) {
                 throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
             }
