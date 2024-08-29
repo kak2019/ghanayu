@@ -164,7 +164,7 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 throw new Error(`データの削除中にエラーが発生しました: ${error.message}`);
             }
         },
-        async getListItemsBySearchItems(date:string) {
+        async getListItemsBySearchItems(date:string, processType:string) {
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
@@ -178,35 +178,35 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 
                 //前月末在庫
                 const listWithAllLastMonthQty = await Promise.all(items.map(async item =>{
-                    return await stockHistoryStore.getLastMonthsLatestStockQtyByMln(item.MLNPartNo, currentMonth);
+                    return await stockHistoryStore.getLastMonthsLatestStockQtyByMln(item.MLNPartNo, processType, currentMonth);
                 }));
                 //console.log("----------" + listWithAllLastMonthQty);
                 //console.log("----------length" + listWithAllLastMonthQty.length);
                 
                 //当月実績 - 不良
                 const listWithCurrentMonthDefectsQty = await Promise.all(items.map(async item =>{
-                    return await stockHistoryStore.getCurrentMonthDefectsQtyByMlnNo(item.MLNPartNo, currentMonth);
+                    return await stockHistoryStore.getCurrentMonthDefectsQtyByMlnNo(item.MLNPartNo,processType, currentMonth);
                 }));
                 //console.log("----------" + listWithCurrentMonthDefectsQty);
                 //console.log("----------length" + listWithCurrentMonthDefectsQty.length);
 
                 //当月実績 - 完成
                 const listWithCurrentMonthCompletionQty = await Promise.all(items.map(async item =>{
-                    return await stockHistoryStore.getCurrentMonthCompletionQtyByMlnNo(item.MLNPartNo, currentMonth);
+                    return await stockHistoryStore.getCurrentMonthCompletionQtyByMlnNo(item.MLNPartNo, processType, currentMonth);
                 }));
                 //console.log("----------" + listWithCurrentMonthCompletionQty);
                 //console.log("----------length" + listWithCurrentMonthCompletionQty.length);
 
                 //当月実績 - 振替
                 const listWithCurrentMonthShippingQty = await Promise.all(items.map(async item =>{
-                    return await stockHistoryStore.getCurrentMonthShippingQtyByMlnNo(item.MLNPartNo, currentMonth);
+                    return await stockHistoryStore.getCurrentMonthShippingQtyByMlnNo(item.MLNPartNo, processType, currentMonth);
                 }));
                 //console.log("----------" + listWithCurrentMonthShippingQty);
                 //console.log("----------length" + listWithCurrentMonthShippingQty.length);
 
                 //当月末在庫
                 const listWithCurentMonthStockQtyByMlnNo = await Promise.all(items.map(async item =>{
-                    return await stockHistoryStore.getCurentMonthStockQtyByMlnNo(item.MLNPartNo, currentMonth);
+                    return await stockHistoryStore.getCurentMonthStockQtyByMlnNo(item.MLNPartNo, processType, currentMonth);
                 }));
                 //console.log("----------" + listWithCurentMonthStockQtyByMlnNo);
                 //console.log("----------length" + listWithCurentMonthStockQtyByMlnNo.length);

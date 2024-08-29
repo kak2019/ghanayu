@@ -26,7 +26,23 @@
     </div>
   </el-row>
 
-  <TableShipping :tableData="tableData"></TableShipping>
+  <!-- <TableShipping :tableData="tableData" :loading="loading" :summaries="summaries"></TableShipping> -->
+
+  <el-table :data="tableData" stripe style="width: 100%; font-size:12px;" :header-cell-style="{backgroundColor: '#366093', color: '#fff'}" height="320px" v-loading="loading"
+  show-summary :summary-method="getSummaries" row-class-name="summary-row">
+    <!-- 第一层表头 -->
+    <el-table-column prop="ProcessType" label="工程区分" width="100" rowspan="2" />
+    <el-table-column prop="MLNPartNo" label="MLN部品番号" width="180" rowspan="2" />
+    <el-table-column prop="UDPartNo" label="UD部品番号" width="180" rowspan="2" />
+    <el-table-column prop="lastLatestMonthQty" label="前月末在庫" colspan="2">
+    </el-table-column>
+    <el-table-column label="当月実績" colspan="3" header-align="center">
+      <el-table-column prop="currentMonthDefectsQty" label="不良" width="80" />
+      <el-table-column prop="currentMonthCompletionQty" label="完成" width="100" />
+      <el-table-column prop="currentMonthShippingQty" label="振替" width="100" />
+    </el-table-column>
+    <el-table-column prop="curentMonthStockQty" label="当月末在庫" width="100" rowspan="2" />
+  </el-table>
 </template>
 
 <script>
@@ -37,9 +53,10 @@ import Selecter from './selecter.vue';
 import InputRemoteData from './inputRemoteData.vue';
 import * as XLSX from 'xlsx';
 import { ref } from 'vue';
-import {useSHIKYUGoodsReceiveStore} from "../../../../stores/shikyugoodsreceive";
+import { useSHIKYUGoodsReceiveStore } from "../../../../stores/shikyugoodsreceive";
 import { usePartMasterStore } from "../../../../stores/part"
 import { useStockHistoryStore } from "../../../../stores/stockhistory"
+import { ElMessage } from 'element-plus';
 // 获取 Pinia store 实例
 
 const SHIKYUGoodsReceiveStore = useSHIKYUGoodsReceiveStore();
@@ -56,6 +73,8 @@ export default {
   data() {
     return {
       tableData: [],
+      summaries:[],
+      loading: true,
       form: {
         date: new Date(),
         select: "M",
@@ -83,10 +102,11 @@ export default {
 
       const newData1 = [["工程区分", "MLN部品番号", "UD部品番号", "前月末在庫", "当月実績", "", "", "当月末在庫"]]
       const newData2 = [["", "", "", "", "不良", "完成", "振替", ""]]
+      const newData3 = [["", "", "合計", this.summaries[0],this.summaries[1], this.summaries[2], this.summaries[3], this.summaries[4]]]
 
       const originalData = XLSX.utils.sheet_to_json(ws, { header: 1 });
       originalData.shift()
-      const shiftedData = newData1.concat(newData2).concat(originalData); // 插入两个空行
+      const shiftedData = newData1.concat(newData2).concat(originalData).concat(newData3); // 插入两个空行
 
 
       const wb = XLSX.utils.book_new();
@@ -109,6 +129,8 @@ export default {
     },
     searchForm() {
       this.tableData = this.filterDataBySearchItems();
+      this.summaries = this.getSummaries();
+      console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" + this.summaries);
     },
     resetForm() {
       // 重置表单字段并清空表格数据
@@ -119,6 +141,8 @@ export default {
         UDPartNo: ''
       };
       this.tableData = this.filterDataBySearchItems(); // 重新设置过滤后的数据
+      this.summaries = this.getSummaries();
+      console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" + this.summaries);
     },
     filterDataBySearchItems(){
       const query = this.form
@@ -171,6 +195,25 @@ export default {
           });
 
         return filterTable;
+    },
+    getSummaries() {
+      const summaries = [];
+      let [totalLastLatestMonthQty,totalCurrentMonthDefectsQty,totalCurrentMonthCompletionQty,totalCurrentMonthShippingQty,totalCurentMonthStockQty] = [0,0,0,0,0];
+
+      this.tableData.forEach(element => {
+         totalLastLatestMonthQty += element.lastLatestMonthQty;
+         totalCurrentMonthDefectsQty += element.currentMonthDefectsQty;
+         totalCurrentMonthCompletionQty += element.currentMonthCompletionQty;
+         totalCurrentMonthShippingQty += element.currentMonthShippingQty;
+         totalCurentMonthStockQty += element.curentMonthStockQty;
+      });
+
+      const lastLatestMonthQty = totalLastLatestMonthQty;
+      const currentMonthDefectsQty =  totalCurrentMonthDefectsQty
+      const currentMonthCompletionQty =  totalCurrentMonthCompletionQty
+      const currentMonthShippingQty =  totalCurrentMonthShippingQty
+      const curentMonthStockQty = totalCurentMonthStockQty
+      return ['', '', `合計`, `${lastLatestMonthQty}`, ` ${currentMonthDefectsQty}`,`${currentMonthCompletionQty}`, `${currentMonthShippingQty}`,`${curentMonthStockQty}`,]
     }
   },
   async mounted() {
@@ -178,11 +221,18 @@ export default {
       // 调用 store 的方法获取数据
       //const formatCurrentDate = query.date.getFullYear() + '-' + (query.date.getMonth()+1);
       const date = this.form.date;
-      await partMasterStore.getListItemsBySearchItems(date);
-
-      // 对数据进行处理以匹配表格字段
-      this.tableData = this.filterDataBySearchItems();
-
+      const processType = this.form.select
+      await partMasterStore.getListItemsBySearchItems(date, processType).then(() => {
+                this.loading = false;
+                // 对数据进行处理以匹配表格字段
+                this.tableData = this.filterDataBySearchItems();
+                this.summaries = this.getSummaries();
+                
+                //console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" + this.summaries);
+            }).catch(error => {
+                this.loading = false;
+                ElMessage.error(error.message);
+            });
       console.log("Processed table data:", this.tableData);
     } catch (error) {
       console.error('Error fetching stock history:', error);
@@ -210,5 +260,9 @@ export default {
 
 .main .background-layer {
   margin-bottom: 10px;
+}
+.el-table .el-table_footer-wrapper tbody td{
+  background:#c4d79b;
+  font-weight:bolder;
 }
 </style>

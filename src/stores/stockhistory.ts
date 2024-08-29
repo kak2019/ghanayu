@@ -71,7 +71,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
             }
         },
-        async getLastMonthsLatestStockQtyByMln(mlnPartNo: string, current: string) : Promise<number>  {
+        async getLastMonthsLatestStockQtyByMln(mlnPartNo: string, processType:string, current: string) : Promise<number>  {
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
@@ -81,7 +81,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                     let condition = true;
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
                     if(mlnPartNo) {
-                      condition = condition && mlnPartNo === item.MLNPartNo && formatRegistered !== current
+                      condition = condition && mlnPartNo === item.MLNPartNo && item.processType === processType && formatRegistered !== current
                     }
                     return condition
                   });
@@ -98,7 +98,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
             }
         },
-        async getCurrentMonthDefectsQtyByMlnNo(mlnPartNo: string, current: string) : Promise<number>  {
+        async getCurrentMonthDefectsQtyByMlnNo(mlnPartNo: string, processType:string, current: string) : Promise<number>  {
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
@@ -108,7 +108,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                     let condition = true
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
                     if(mlnPartNo) {
-                      condition = condition && mlnPartNo === item.MLNPartNo && formatRegistered === current
+                      condition = condition && mlnPartNo === item.MLNPartNo && item.processType === processType && formatRegistered === current
                     }
                     return condition
                   });
@@ -131,7 +131,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
             }
         },
-        async getCurrentMonthCompletionQtyByMlnNo(mlnPartNo: string, current: string) : Promise<number>  {
+        async getCurrentMonthCompletionQtyByMlnNo(mlnPartNo: string, processType:string, current: string) : Promise<number>  {
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
@@ -141,7 +141,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                     let condition = true;
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
                     if(mlnPartNo) {
-                      condition = condition && mlnPartNo === item.MLNPartNo && formatRegistered === current
+                      condition = condition && mlnPartNo === item.MLNPartNo && item.processType === processType  && formatRegistered === current
                     }
                     return condition
                   });
@@ -164,7 +164,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
             }
         },
-        async getCurrentMonthShippingQtyByMlnNo(mlnPartNo: string, current: string) : Promise<number>  {
+        async getCurrentMonthShippingQtyByMlnNo(mlnPartNo: string, processType:string, current: string) : Promise<number>  {
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
@@ -174,7 +174,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                     let condition = true;
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
                     if(mlnPartNo) {
-                      condition = condition && mlnPartNo === item.MLNPartNo && formatRegistered === current
+                      condition = condition && mlnPartNo === item.MLNPartNo && item.processType === processType  && formatRegistered === current
                     }
                     return condition
                   });
@@ -182,12 +182,21 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 if(newItems.length>0)
                 {
                     let sumInOutQty = 0;
-                    newItems.forEach(i => {
-                        if((i.FunctionID === "02" && i.Qty > 0)  || i.FunctionID === "06"){
-                            sumInOutQty += i.Qty;
-                        }
-                    });
-                    return sumInOutQty
+                    if(processType!=="C"){
+                        newItems.forEach(i => {
+                            if((i.FunctionID === "02" && i.Qty < 0)  || (i.FunctionID === "03" && i.Qty < 0) || i.FunctionID === "08"){
+                                sumInOutQty += i.Qty;
+                            }
+                        });
+                        return sumInOutQty
+                    }else{
+                        newItems.forEach(i => {
+                            if((i.FunctionID === "04" && i.Qty < 0) || i.FunctionID === "08"){
+                                sumInOutQty += i.Qty;
+                            }
+                        });
+                        return sumInOutQty * -1;
+                    }
                 }else{
                     return 0;
                 }
@@ -197,7 +206,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
             }
         },
-        async getCurentMonthStockQtyByMlnNo(mlnPartNo: string, current: string) : Promise<number>  {
+        async getCurentMonthStockQtyByMlnNo(mlnPartNo: string, processType:string, current: string) : Promise<number>  {
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
@@ -207,23 +216,21 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                     let condition = true;
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
                     if(mlnPartNo) {
-                      condition = condition && mlnPartNo === item.MLNPartNo && formatRegistered === current
+                      condition = condition && mlnPartNo === item.MLNPartNo && item.processType === processType && formatRegistered === current
                     }
-                    console.log("=======" + item.StockQty);
                     return condition
-                  });
-                console.log("get Curent Month Stoc kQty By MlnNo " + items);
+                });
+                //console.log("get Curent Month Stoc kQty By MlnNo " + items);
                 if(newItems.length>0)
                 {
                     return newItems[0].StockQty
                 }else{
                     return 0;
                 }
-                
             }
             catch (error) {
                 throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
             }
         }
-    },
+    }
 });
