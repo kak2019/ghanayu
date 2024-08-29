@@ -1,23 +1,30 @@
 <template>
-  <el-row class="background-layer main">
+<el-row class="background-layer main">
     <div class="background-layer">
-      <date-picker-with-label v-model="form.date" label="検収実績日"></date-picker-with-label>
+      <Selecter v-model="form.select" label="修正領域"></Selecter>
     </div>
     <div class="background-layer">
-      <Selecter v-model="form.select" label="支給元"></Selecter>
-    </div>
-    <div class="background-layer">
-      <Input v-model="form.id" label="Call off id" labelColor="#92cddc"></Input>
-    </div>
-    <div class="background-layer">
-      <Input v-model="form.note" label="Despatch note" labelColor="#92cddc"></Input>
+      <Selecter v-model="form.select" label="工程区分"></Selecter>
     </div>
     <div class="background-layer">
       <InputRemoteData v-model="form.num" label="MLN部品番号"/>
     </div>
     <div class="background-layer">
-      <Input v-model="form.count" label="受入数"/>
+      <Input v-model="form.count" label="修正数"/>
     </div>
+    <div class="background-layer">
+      <Selecter v-model="form.select" label="修正者"></Selecter>
+    </div>
+    <div class="background-layer">
+      <Selecter v-model="form.select" label="修正理由"></Selecter>
+    </div>
+    <div class="background-layer">
+      <Input v-model="form.note" label="Despatch note" labelColor="#92cddc"></Input>
+    </div>
+    <div class="background-layer">
+      <Input v-model="form.id" label="コメント" labelColor="#92cddc"></Input>
+    </div>
+
     <el-button
         style="width: 100px; height: 40px; margin-top: 1px; margin-bottom: 10px;"
         @click="submitForm"
@@ -34,10 +41,7 @@
       ダウンロード
     </el-button>
   </el-row>
-  <!--<el-row style="margin-bottom: 10px; display: flex;flex-wrap: wrap">
-    <label style="border: 1px solid black; background-color: orange; margin: 2px 0 2px 0;">メッセージ</label>
-    <label style="border: 1px solid black; margin: 2px 20px 2px 0; width: 500px; display: inline-block;"></label>
-  </el-row>-->
+
   <TableShipping :tableData="tableData" :loading="loading"></TableShipping>
 </template>
 
@@ -124,7 +128,7 @@ export default {
 
             condition = condition && (new Date(firstDayOfMonth) <= new Date(item.GoodsReceiveDate)) && (new Date(item.GoodsReceiveDate) <= new Date(curentDate.toISOString()))
             return condition
-        });
+          });
         }).catch(error => {
           this.loading = false;
           ElMessage.error(error.message);

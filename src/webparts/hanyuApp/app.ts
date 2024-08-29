@@ -26,7 +26,6 @@ export default defineComponent({
         onMounted(async (): Promise<void> => {
             loading.value = true;
             try {
-
                 await processMasterStore.getListItems();
                 await functionsMasterStore.getListItems();
                 await modifiedReasonMasterStore.getListItems();

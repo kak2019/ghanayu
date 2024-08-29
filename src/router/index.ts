@@ -8,7 +8,7 @@ const routes: RouteRecordRaw[] = [
     {
         path: '/stockresultmodification',
         component: () => import(/* webpackChunkName: "stockresultmodification-chunk" */
-            '../webparts/hanyuApp/components/RouterComponents/StockResultModification.vue')
+            '../webparts/hanyuApp/components/StockResultModification/StockResultModification.vue')
     },
     {
         path: '/stockreport',
