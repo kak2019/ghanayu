@@ -31,6 +31,10 @@ export default {
     modelValue: {
       type: [String],
       required: true
+    },
+    options:{
+      type: Array,
+      default:()=>[]
     }
   },
   data() {

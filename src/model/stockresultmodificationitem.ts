@@ -9,5 +9,6 @@ export interface IStockResultModificationItem {
     Despatchnote?: string;
     Comment?: string;
     Editor?: string;
+    Registered?: string;
     Modified?: string;
 }

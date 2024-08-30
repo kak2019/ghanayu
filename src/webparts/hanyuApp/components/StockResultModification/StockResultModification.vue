@@ -1,7 +1,7 @@
 <template>
 <el-row class="background-layer main">
     <div class="background-layer">
-      <Selecter v-model="form.select" label="修正領域"></Selecter>
+      <Selecter v-model="form.select" :options="tableModifiedReason" label="修正領域"></Selecter>
     </div>
     <div class="background-layer">
       <Selecter v-model="form.select" label="工程区分"></Selecter>
@@ -47,19 +47,28 @@
 
 <script>
 import './App.css';
+import { computed } from 'vue';
 import DatePickerWithLabel from './labelPlusDateSelecter.vue';
 import TableShipping from './TableShipping.vue';
 import Selecter from './selecter.vue';
 import InputRemoteData from './inputRemoteData.vue';
 import Input from './input.vue';
-import {useSHIKYUGoodsReceiveStore} from '../../../../stores/shikyugoodsreceive';
+import { useStockResultModificationStore } from '../../../../stores/stockresultmodification';
 import * as XLSX from 'xlsx';
-import {ElMessage} from "element-plus"; // 更新为你的实际路径
+import { ElMessage } from "element-plus"; // 更新为你的实际路径
 import { usePartMasterStore } from '../../../../stores/part';
-
+import { useModifiedReasonMasterStore } from '../../../../stores/modifiedreason';
+import { useFunctionsMasterStore } from '../../../../stores/function';
+import { useUserStore } from '../../../../stores/user';
+import { useProcessMasterStore } from '../../../../stores/process';
 
 // 获取 Pinia store 实例
-const shiKYUGoodsReceiveStore = useSHIKYUGoodsReceiveStore();
+const stockResultModificationStore = useStockResultModificationStore();
+const modifiedReasonMasterStore = useModifiedReasonMasterStore();
+const functionsMasterStore = useFunctionsMasterStore();
+const processMasterStore = useProcessMasterStore();
+const userStore = useUserStore();
+
 const defaultShikyufrom = "2922";
 let curentDate = new Date();
 export default {
@@ -73,6 +82,9 @@ export default {
   data() {
     return {
       tableData: [],
+      tableModifiedReason:[],
+      tableFunctions: [],
+      tableUsers: [],
       loading: true,
       form: {
         date: curentDate,
@@ -117,18 +129,19 @@ export default {
     },
     async fetchTableData() {
       try {
-        await shiKYUGoodsReceiveStore.getListItems(this.form.date).then(() => {
+        await stockResultModificationStore.getListItems().then(() => {
           this.loading = false;
         
-          this.tableData = shiKYUGoodsReceiveStore.shikyuGoodsReceiveItems
-          .filter(item => {
-            let condition = true
-
-            const firstDayOfMonth = new Date(curentDate.getFullYear(), curentDate.getMonth(), 1);
-
-            condition = condition && (new Date(firstDayOfMonth) <= new Date(item.GoodsReceiveDate)) && (new Date(item.GoodsReceiveDate) <= new Date(curentDate.toISOString()))
-            return condition
+          this.tableData = stockResultModificationStore.stockResultModifications
+          const filteredTable = stockResultModificationStore.stockResultModifications.filter(element => {
+              const condition  = true;
+              element.ProcessName = this.getProcessNameByType(element.processType);
+              element.FunctionName = this.getFunctionNameById(element.FunctionID);
+              element.ModifiedReasonName = this.getModifiedReasonNameById(element.ModifiedReason);
+              element.EditorName = getModifiedReasonNameById(element.modifiedreason); // get user
+              return condition;
           });
+          this.tableData = filteredTable;
         }).catch(error => {
           this.loading = false;
           ElMessage.error(error.message);
@@ -136,6 +149,57 @@ export default {
       } catch (error) {
         console.error('Error fetching data:', error);
       }
+    },
+    getProcessNameByType(processType){
+        const tableData = computed(() => processMasterStore.processMasterItems);
+        const newTableData = tableData.value;
+        const tableProcessName = newTableData.filter(item => {
+          if(item.processType === processType){
+            return true
+          }else{
+            return false
+          }
+        });
+        if(tableProcessName.length>0)
+        {
+          return tableProcessName[0].ProcessName
+        }else{
+          return "";
+        }
+    },
+    getFunctionNameById(functionID){
+        const tableData = computed(() => functionsMasterStore.functionsMasterItems);
+        const newTableData = tableData.value;
+        const tableFunctionName = newTableData.filter(item => {
+          if(item.FunctionID === functionID){
+            return true
+          }else{
+            return false
+          }
+        });
+        if(tableFunctionName.length>0)
+        {
+          return tableFunctionName[0].FunctionName
+        }else{
+          return "";
+        }
+    },
+    getModifiedReasonNameById(modifiedReasonID){
+        const tableData = computed(() => modifiedReasonMasterStore.modifiedReasonMasterItems);
+        const newTableData = tableData.value;
+        const tableModifiedReasonName = newTableData.filter(item => {
+          if(item.ModifiedReasonID === modifiedReasonID){
+            return true
+          }else{
+            return false
+          }
+        });
+        if(tableModifiedReasonName.length>0)
+        {
+          return tableModifiedReasonName[0].ModifiedReasonName
+        }else{
+          return "";
+        }
     },
     resetForm() {
       this.form = {
@@ -150,21 +214,23 @@ export default {
 
     downloadExcel() {
       const data = this.tableData.map(item => ({
-        '検収実績日': this.formatDate({GoodsReceiveDate: item.GoodsReceiveDate}, { property: 'GoodsReceiveDate' }),
-        '支給元': item.SHIKYUFrom,
-        'Call off id': item.Calloffid,
-        'Despatch note': item.Despatchnote,
+        '修正年月日': this.formatDate({Registered: item.Registered}, { property: 'Registered' }),
+        '修正領域': item.ModifiedReasonName,
+        '工程区分': item.ProcessName,
         'MLN部品番号': item.MLNPartNo,
         'UD部品番号': item.UDPartNo,
-        '受入数': item.GoodsReceiveQty,
-        '実績登録日': this.formatDate({ Created: item.Created }, { property: 'Created' }),
+        '修正数': item.ModifiedQty,
+        '修正者': item.EditorName,
+        '修正理由': item.ModifiedReasonName,
+        'Despatch note': item.Despatchnote,
+        'コメント': item.Comment
       }));
 
       const worksheet = XLSX.utils.json_to_sheet(data);
       const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'Goods Receive');
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'stock result modification');
 
-      XLSX.writeFile(workbook, 'good_receive.xlsx');
+      XLSX.writeFile(workbook, 'stock_result_modification.xlsx');
     },
 
     formatDate(row, column) {

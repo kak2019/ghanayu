@@ -4,7 +4,7 @@ import { getSP } from '../pnpjsConfig';
 import { FeatureKey } from './keystrs';
 import { IStockResultModificationItem } from '../model';
 
-export const useStockHistoryStore = defineStore(FeatureKey.STOCKRESULTMODIFICATION, {
+export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESULTMODIFICATION, {
     state: () => ({
         stockResultModifications: [] as IStockResultModificationItem[],
     }),
