@@ -78,7 +78,7 @@
                 <el-table-column label="前工程">
                     <el-table-column fixed prop="ChildPartNo" label="MLN部品番号" width="140" align="center">
                         <template #default="scope">
-                            <el-form-item v-if="isInserting && currentRowIndex === scope.$index" v-bind="bomFormChildPartNoProps">
+                            <el-form-item v-if="isEditing && currentRowIndex === scope.$index" v-bind="bomFormChildPartNoProps">
                                 <el-autocomplete v-model="bomFormChildPartNo" :fetch-suggestions="queryMLNPartNo"  />
                             </el-form-item>
                             <span v-else>{{ scope.row.ChildPartNo }}</span>
@@ -86,7 +86,7 @@
                     </el-table-column>
                     <el-table-column prop="ChildProcessType" label="工程区分" width="120" align="center">
                         <template #default="scope">
-                            <el-form-item v-if="isInserting && currentRowIndex === scope.$index" v-bind="bomFormChildProcessTypeProps">
+                            <el-form-item v-if="isEditing && currentRowIndex === scope.$index" v-bind="bomFormChildProcessTypeProps">
                                 <el-select v-model="bomFormChildProcessType" placeholder="">
                                     <el-option v-for="item in childProcessData" :key="item.ProcessType" :label="item.ProcessName" :value="item.ProcessType" />
                                 </el-select>

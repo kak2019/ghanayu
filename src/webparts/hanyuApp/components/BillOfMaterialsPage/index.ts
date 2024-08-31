@@ -241,6 +241,7 @@ export default defineComponent({
         }
         const editRow = (): void => {
             const data = (isFiltered.value) ? filteredData : tableData;
+
             bomForm.setValues({
                 ...
                 data.value[currentRowIndex.value]
@@ -319,20 +320,41 @@ export default defineComponent({
             else {
                 const data = (isFiltered.value) ? filteredData : tableData;
                 loading.value = true;
-                billOfMaterialsStore.updateListItem(+data.value[currentRowIndex.value].ID, item).then((data) => {
+                const originalKey = data.value[currentRowIndex.value].UniqueKey;
+                const originalData = originalKey.split('-');
+                if (originalKey === `${item.ParentPartNo}-${item.ParentProcessType}-${item.ChildPartNo}-${item.ChildProcessType}`) {
+                    //  Only Qty update
+                    billOfMaterialsStore.updateListItem(+data.value[currentRowIndex.value].ID, item).then((data) => {
+                        isEditing.value = false;
+                        isInserting.value = false;
+                        bomForm.resetForm();
+                        ElMessage.success(data);
+                        fetchData();
+                    }).catch(error => ElMessage.error(error.message));
+                }
+                else {
+                    // Child update
+                    // Remove original child
+                    billOfMaterialsStore.getItemCountByUniqueKeySubstring(`${originalData[2]}-${originalData[3]}`).then(d => {
+                        if (d === 1) {
+                            partMasterStore.updateListItem(+partMasterStore.partMasterItems.find(i => i.MLNPartNo === originalData[2]).ID, undefined, originalData[3], false).then(() => {
+                                //
+                            }).catch(error => ElMessage.error(error.message));
+                        }
+                        billOfMaterialsStore.updateListItem(+data.value[currentRowIndex.value].ID, item).then((data) => {
+                            isEditing.value = false;
+                            isInserting.value = false;
+                            bomForm.resetForm();
 
-                    isEditing.value = false;
-                    isInserting.value = false;
-                    bomForm.resetForm();
-                    partMasterStore.updateListItem(+partMasterStore.partMasterItems.find(i => i.MLNPartNo === item.ParentPartNo).ID, undefined, item.ParentProcessType).then(() => {
-                        partMasterStore.updateListItem(+partMasterStore.partMasterItems.find(i => i.MLNPartNo === item.ChildPartNo).ID, undefined, item.ChildProcessType).then(() => {
-                            //
+                            // Insert current child
+                            partMasterStore.updateListItem(+partMasterStore.partMasterItems.find(i => i.MLNPartNo === item.ChildPartNo).ID, undefined, item.ChildProcessType).then(() => {
+                                //
+                            }).catch(error => ElMessage.error(error.message));
+                            ElMessage.success(data);
+                            fetchData();
                         }).catch(error => ElMessage.error(error.message));
                     }).catch(error => ElMessage.error(error.message));
-
-                    ElMessage.success(data);
-                    fetchData();
-                }).catch(error => ElMessage.error(error.message));
+                }
             }
 
         });

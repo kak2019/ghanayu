@@ -155,10 +155,10 @@ export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
                 await sp.web.getList(`${web.ServerRelativeUrl}/Lists/BillOfMaterials`).items.getById(itemId).update({
                     //ParentPartNo: item.ParentPartNo,
                     //ParentProcessType: item.ParentProcessType,
-                    //ChildPartNo: item.ChildPartNo,
-                    //ChildProcessType: item.ChildProcessType,
+                    ChildPartNo: item.ChildPartNo,
+                    ChildProcessType: item.ChildProcessType,
                     StructureQty: item.StructureQty,
-                    //UniqueKey: `${item.ParentPartNo}-${item.ParentProcessType}-${item.ChildPartNo}-${item.ChildProcessType}`
+                    UniqueKey: `${item.ParentPartNo}-${item.ParentProcessType}-${item.ChildPartNo}-${item.ChildProcessType}`
                 });
                 return '登録完了。';
             }
