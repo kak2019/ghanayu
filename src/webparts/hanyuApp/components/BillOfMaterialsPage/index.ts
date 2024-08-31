@@ -65,6 +65,9 @@ export default defineComponent({
         const loading = ref(true);
         const processMasterStore = useProcessMasterStore();
         const processData = computed(() => processMasterStore.processMasterItems);
+        const childProcessData = computed(() => processMasterStore.processMasterItems.filter(i => i.ProcessType !== 'C'));
+        const parentProcessData = computed(() => processMasterStore.processMasterItems.filter(i => i.ProcessType !== 'F'));
+
         const partMasterStore = usePartMasterStore();
         const billOfMaterialsStore = useBillOfMaterialsStore();
         const userStore = useUserStore();
@@ -99,9 +102,20 @@ export default defineComponent({
         const bomForm = useForm({
             validationSchema:
                 yup.object({
-                    ParentPartNo: yup.string().required().matches(/^[a-zA-Z0-9]{10}$/, 'MLN部品番号は10文字の英数字でなければなりません').label('当工程 - MLN部品番号'),
+                    ParentPartNo: yup.string()
+                        .required()
+                        .matches(/^[a-zA-Z0-9]{10}$/, 'MLN部品番号は10文字の英数字でなければなりません')
+                        .test('is-valid-value', 'MLN部品番号が無効です', value => {
+                            const option = partMasterStore.partMasterItems.find(opt => opt.MLNPartNo === value);
+                            return option && option.ProcessType !== 'F';
+                        })
+                        .label('当工程 - MLN部品番号'),
                     ParentProcessType: yup.string().required().label('当工程 - 工程区分'),
-                    ChildPartNo: yup.string().required().matches(/^[a-zA-Z0-9]{10}$/, 'MLN部品番号は10文字の英数字でなければなりません').label('前工程 - MLN部品番号'),
+                    ChildPartNo: yup.string()
+                        .required()
+                        .matches(/^[a-zA-Z0-9]{10}$/, 'MLN部品番号は10文字の英数字でなければなりません')
+                        .test('is-valid-value', 'MLN部品番号が無効です', value => partMasterStore.partMasterMLNItems.indexOf(value) !== -1)
+                        .label('前工程 - MLN部品番号'),
                     ChildProcessType: yup.string().required().label('前工程 - 工程区分'),
                     StructureQty: yup.number().integer().min(1).default(1).required().label('構成数量'),
                 })
@@ -185,6 +199,13 @@ export default defineComponent({
         };
         const queryMLNPartNo = (queryString: string, cb: (r: { value: string }[]) => void): void => {
             cb(queryString.length > 2 ? partMasterStore.partMasterMLNItems.filter(i => i.toLowerCase().indexOf(queryString.toLowerCase()) === 0).map(s => ({ value: s })) : []);
+        }
+        const queryMLNPartNoWithOutF = (queryString: string, cb: (r: { value: string }[]) => void): void => {
+            cb(queryString.length > 2 ?
+                partMasterStore.partMasterItems
+                    .filter(p => p.ProcessType !== 'F' && p.MLNPartNo.toLowerCase().indexOf(queryString.toLowerCase()) === 0)
+                    .map(p => ({ value: p.MLNPartNo }))
+                : []);
         }
         onMounted((): void => {
             window.addEventListener('resize', handleResize);
@@ -350,6 +371,7 @@ export default defineComponent({
         return {
             showProcessName,
             queryMLNPartNo,
+            queryMLNPartNoWithOutF,
             isFiltered,
             ElMessage,
             Check,
@@ -365,6 +387,8 @@ export default defineComponent({
             tableData,
             filteredData,
             processData,
+            childProcessData,
+            parentProcessData,
             loading,
             handleRowClick,
             onSubmit,

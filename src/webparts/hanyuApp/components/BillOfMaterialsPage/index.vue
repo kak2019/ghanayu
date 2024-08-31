@@ -15,8 +15,8 @@
                             </td>
                             <td>
                                 <el-form-item label="工程区分" label-position="top" :style="{ margin: 0 }" v-bind="ParentProcessTypeProps">
-                                    <el-select v-model="ParentProcessType" placeholder="" :style="{width:'120px'}">
-                                        <el-option v-for="item in processData" :key="item.ProcessType" :label="item.ProcessName" :value="item.ProcessType" />
+                                    <el-select v-model="ParentProcessType" placeholder="" :style="{width:'120px'}" clearable>
+                                        <el-option v-for="item in parentProcessData" :key="item.ProcessType" :label="item.ProcessName" :value="item.ProcessType" />
                                     </el-select>
                                 </el-form-item>
                             </td>
@@ -35,8 +35,8 @@
                             </td>
                             <td>
                                 <el-form-item label="工程区分" label-position="top" :style="{ margin: 0 }" v-bind="ChildProcessTypeProps">
-                                    <el-select v-model="ChildProcessType" placeholder="" :style="{width:'120px'}">
-                                        <el-option v-for="item in processData" :key="item.ProcessType" :label="item.ProcessName" :value="item.ProcessType" />
+                                    <el-select v-model="ChildProcessType" placeholder="" :style="{width:'120px'}" clearable>
+                                        <el-option v-for="item in childProcessData" :key="item.ProcessType" :label="item.ProcessName" :value="item.ProcessType" />
                                     </el-select>
                                 </el-form-item>
                             </td>
@@ -59,7 +59,7 @@
                     <el-table-column fixed prop="ParentPartNo" label="MLN部品番号" width="140" align="center">
                         <template #default="scope">
                             <el-form-item v-if="isInserting && currentRowIndex === scope.$index" v-bind="bomFormParentPartNoProps">
-                                <el-autocomplete v-model="bomFormParentPartNo" :fetch-suggestions="queryMLNPartNo"  />
+                                <el-autocomplete v-model="bomFormParentPartNo" :fetch-suggestions="queryMLNPartNoWithOutF"  />
                             </el-form-item>
                             <span v-else>{{ scope.row.ParentPartNo }}</span>
                         </template>
@@ -68,7 +68,7 @@
                         <template #default="scope">
                             <el-form-item v-if="isInserting && currentRowIndex === scope.$index" v-bind="bomFormParentProcessTypeProps">
                                 <el-select v-model="bomFormParentProcessType" placeholder="">
-                                    <el-option v-for="item in processData" :key="item.ProcessType" :label="item.ProcessName" :value="item.ProcessType" />
+                                    <el-option v-for="item in parentProcessData" :key="item.ProcessType" :label="item.ProcessName" :value="item.ProcessType" />
                                 </el-select>
                             </el-form-item>
                             <span v-else>{{ showProcessName(scope.row.ParentProcessType) || scope.row.ChildProcessType}}</span>
@@ -88,7 +88,7 @@
                         <template #default="scope">
                             <el-form-item v-if="isInserting && currentRowIndex === scope.$index" v-bind="bomFormChildProcessTypeProps">
                                 <el-select v-model="bomFormChildProcessType" placeholder="">
-                                    <el-option v-for="item in processData" :key="item.ProcessType" :label="item.ProcessName" :value="item.ProcessType" />
+                                    <el-option v-for="item in childProcessData" :key="item.ProcessType" :label="item.ProcessName" :value="item.ProcessType" />
                                 </el-select>
                             </el-form-item>
                             <span v-else>{{showProcessName(scope.row.ChildProcessType) || scope.row.ChildProcessType }}</span>
