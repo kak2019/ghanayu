@@ -1,9 +1,10 @@
-import { IProcessMasterItem } from './../../../../model/processmasteritem';
+//import { IProcessMasterItem } from './../../../../model/processmasteritem';
 import { IBillOfMaterialsItem } from '../../../../model';
 import { nextTick, computed, onMounted, onBeforeUnmount, ref, defineComponent } from 'vue';
 import { usePartMasterStore } from '../../../../stores/part';
 import { useProcessMasterStore } from '../../../../stores/process';
 import { useBillOfMaterialsStore } from '../../../../stores/billofmaterials';
+import { useUserStore } from '../../../../stores/user';
 import { useForm } from 'vee-validate';
 import * as yup from 'yup';
 import { Check, Close } from '@element-plus/icons-vue';
@@ -58,13 +59,20 @@ export default defineComponent({
         const [ChildProcessType, ChildProcessTypeProps] = queryForm.defineField('ChildProcessType', config);
 
         const tableData = ref<IBillOfMaterialsItem[]>([]);
-        const processData = ref<IProcessMasterItem[]>([]);
+        //const processData = ref<IProcessMasterItem[]>([]);
         const filteredData = ref<IBillOfMaterialsItem[]>([]);
         const isFiltered = ref(false);
         const loading = ref(true);
         const processMasterStore = useProcessMasterStore();
+        const processData = computed(() => processMasterStore.processMasterItems);
+        const childProcessData = computed(() => processMasterStore.processMasterItems.filter(i => i.ProcessType !== 'C'));
+        const parentProcessData = computed(() => processMasterStore.processMasterItems.filter(i => i.ProcessType !== 'F'));
+
         const partMasterStore = usePartMasterStore();
         const billOfMaterialsStore = useBillOfMaterialsStore();
+        const userStore = useUserStore();
+        const isInventoryManager = computed(() => userStore.groupInfo.indexOf('Inventory Manager') >= 0);
+        const isBusinessControler = computed(() => userStore.groupInfo.indexOf('Business Controler') >= 0);
         const currentRowIndex = ref(-1);
         const isEditing = ref(false);
         const isInserting = ref(false);
@@ -94,9 +102,20 @@ export default defineComponent({
         const bomForm = useForm({
             validationSchema:
                 yup.object({
-                    ParentPartNo: yup.string().required().matches(/^[a-zA-Z0-9]{10}$/, 'MLN部品番号は10文字の英数字でなければなりません').label('当工程 - MLN部品番号'),
+                    ParentPartNo: yup.string()
+                        .required()
+                        .matches(/^[a-zA-Z0-9]{10}$/, 'MLN部品番号は10文字の英数字でなければなりません')
+                        .test('is-valid-value', 'MLN部品番号が無効です', value => {
+                            const option = partMasterStore.partMasterItems.find(opt => opt.MLNPartNo === value);
+                            return option && option.ProcessType !== 'F';
+                        })
+                        .label('当工程 - MLN部品番号'),
                     ParentProcessType: yup.string().required().label('当工程 - 工程区分'),
-                    ChildPartNo: yup.string().required().matches(/^[a-zA-Z0-9]{10}$/, 'MLN部品番号は10文字の英数字でなければなりません').label('前工程 - MLN部品番号'),
+                    ChildPartNo: yup.string()
+                        .required()
+                        .matches(/^[a-zA-Z0-9]{10}$/, 'MLN部品番号は10文字の英数字でなければなりません')
+                        .test('is-valid-value', 'MLN部品番号が無効です', value => partMasterStore.partMasterMLNItems.indexOf(value) !== -1)
+                        .label('前工程 - MLN部品番号'),
                     ChildProcessType: yup.string().required().label('前工程 - 工程区分'),
                     StructureQty: yup.number().integer().min(1).default(1).required().label('構成数量'),
                 })
@@ -162,23 +181,31 @@ export default defineComponent({
         }
         const fetchData = (): void => {
             loading.value = true;
-            processMasterStore.getListItems().then(() => {
-                processData.value = processMasterStore.processMasterItems;
-                partMasterStore.getListItems().then(() => {
-                    billOfMaterialsStore.getListItems().then(() => {
-                        loading.value = false;
-                        tableData.value = billOfMaterialsStore.billOfMaterialsItems;
-                        refreshFilteredData();
-                    }).catch(error => {
-                        loading.value = false;
-                        ElMessage.error(error.message);
-                    });
-                }).catch(error => ElMessage.error(error.message));
-            }).catch(error => ElMessage.error(error.message));
+            //processMasterStore.getListItems().then(() => {
+            //processData.value = processMasterStore.processMasterItems;
+            //partMasterStore.getListItems().then(() => {
+            billOfMaterialsStore.getListItems().then(() => {
+                loading.value = false;
+                tableData.value = billOfMaterialsStore.billOfMaterialsItems;
+                refreshFilteredData();
+            }).catch(error => {
+                loading.value = false;
+                ElMessage.error(error.message);
+            });
+            // }).catch(error => ElMessage.error(error.message));
+
+            //}).catch(error => ElMessage.error(error.message));
 
         };
         const queryMLNPartNo = (queryString: string, cb: (r: { value: string }[]) => void): void => {
             cb(queryString.length > 2 ? partMasterStore.partMasterMLNItems.filter(i => i.toLowerCase().indexOf(queryString.toLowerCase()) === 0).map(s => ({ value: s })) : []);
+        }
+        const queryMLNPartNoWithOutF = (queryString: string, cb: (r: { value: string }[]) => void): void => {
+            cb(queryString.length > 2 ?
+                partMasterStore.partMasterItems
+                    .filter(p => p.ProcessType !== 'F' && p.MLNPartNo.toLowerCase().indexOf(queryString.toLowerCase()) === 0)
+                    .map(p => ({ value: p.MLNPartNo }))
+                : []);
         }
         onMounted((): void => {
             window.addEventListener('resize', handleResize);
@@ -214,6 +241,7 @@ export default defineComponent({
         }
         const editRow = (): void => {
             const data = (isFiltered.value) ? filteredData : tableData;
+
             bomForm.setValues({
                 ...
                 data.value[currentRowIndex.value]
@@ -292,20 +320,41 @@ export default defineComponent({
             else {
                 const data = (isFiltered.value) ? filteredData : tableData;
                 loading.value = true;
-                billOfMaterialsStore.updateListItem(+data.value[currentRowIndex.value].ID, item).then((data) => {
+                const originalKey = data.value[currentRowIndex.value].UniqueKey;
+                const originalData = originalKey.split('-');
+                if (originalKey === `${item.ParentPartNo}-${item.ParentProcessType}-${item.ChildPartNo}-${item.ChildProcessType}`) {
+                    //  Only Qty update
+                    billOfMaterialsStore.updateListItem(+data.value[currentRowIndex.value].ID, item).then((data) => {
+                        isEditing.value = false;
+                        isInserting.value = false;
+                        bomForm.resetForm();
+                        ElMessage.success(data);
+                        fetchData();
+                    }).catch(error => ElMessage.error(error.message));
+                }
+                else {
+                    // Child update
+                    // Remove original child
+                    billOfMaterialsStore.getItemCountByUniqueKeySubstring(`${originalData[2]}-${originalData[3]}`).then(d => {
+                        if (d === 1) {
+                            partMasterStore.updateListItem(+partMasterStore.partMasterItems.find(i => i.MLNPartNo === originalData[2]).ID, undefined, originalData[3], false).then(() => {
+                                //
+                            }).catch(error => ElMessage.error(error.message));
+                        }
+                        billOfMaterialsStore.updateListItem(+data.value[currentRowIndex.value].ID, item).then((data) => {
+                            isEditing.value = false;
+                            isInserting.value = false;
+                            bomForm.resetForm();
 
-                    isEditing.value = false;
-                    isInserting.value = false;
-                    bomForm.resetForm();
-                    partMasterStore.updateListItem(+partMasterStore.partMasterItems.find(i => i.MLNPartNo === item.ParentPartNo).ID, undefined, item.ParentProcessType).then(() => {
-                        partMasterStore.updateListItem(+partMasterStore.partMasterItems.find(i => i.MLNPartNo === item.ChildPartNo).ID, undefined, item.ChildProcessType).then(() => {
-                            //
+                            // Insert current child
+                            partMasterStore.updateListItem(+partMasterStore.partMasterItems.find(i => i.MLNPartNo === item.ChildPartNo).ID, undefined, item.ChildProcessType).then(() => {
+                                //
+                            }).catch(error => ElMessage.error(error.message));
+                            ElMessage.success(data);
+                            fetchData();
                         }).catch(error => ElMessage.error(error.message));
                     }).catch(error => ElMessage.error(error.message));
-
-                    ElMessage.success(data);
-                    fetchData();
-                }).catch(error => ElMessage.error(error.message));
+                }
             }
 
         });
@@ -344,6 +393,7 @@ export default defineComponent({
         return {
             showProcessName,
             queryMLNPartNo,
+            queryMLNPartNoWithOutF,
             isFiltered,
             ElMessage,
             Check,
@@ -359,6 +409,8 @@ export default defineComponent({
             tableData,
             filteredData,
             processData,
+            childProcessData,
+            parentProcessData,
             loading,
             handleRowClick,
             onSubmit,
@@ -376,6 +428,8 @@ export default defineComponent({
             bomFormStructureQty, bomFormStructureQtyProps,
             tableRef,
             onDownloadClick,
+            isInventoryManager,
+            isBusinessControler,
         }
     }
 });

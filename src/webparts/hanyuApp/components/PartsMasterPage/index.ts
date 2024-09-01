@@ -1,6 +1,7 @@
 import { IPartMasterItem } from '../../../../model/partitem';
 import { nextTick, computed, onMounted, onBeforeUnmount, ref } from 'vue';
 import { usePartMasterStore } from '../../../../stores/part';
+import { useUserStore } from '../../../../stores/user';
 import { useForm } from 'vee-validate';
 import * as yup from 'yup';
 import { Check, Close } from '@element-plus/icons-vue';
@@ -43,11 +44,14 @@ export default {
         const [MLNPartNo, MLNPartNoProps] = queryForm.defineField('MLNPartNo', config);
         const [UDPartNo, UDPartNoProps] = queryForm.defineField('UDPartNo', config);
 
-        const tableData = ref<IPartMasterItem[]>([]);
+        //const tableData = ref<IPartMasterItem[]>([]);
         const filteredData = ref<IPartMasterItem[]>([]);
         const isFiltered = ref(false);
-        const loading = ref(true);
+        const loading = ref(false);
         const partMasterStore = usePartMasterStore();
+        const tableData = computed(() => partMasterStore.partMasterItems);
+        const userStore = useUserStore();
+        const isInventoryManager = computed(() => userStore.groupInfo.indexOf('Inventory Manager') >= 0);
         const currentRowIndex = ref(-1);
         const isEditing = ref(false);
         const isInserting = ref(false);
@@ -68,7 +72,6 @@ export default {
         }
         const queryUDPartNo = (queryString: string, cb: (r: { value: string }[]) => void): void => {
             const results = queryString.length > 2 ? partMasterStore.partMasterUDItems.filter(createUDFilter(queryString)).map(s => ({ value: s })) : [];
-            console.log(results);
             cb(results);
         }
         const windowHeight = ref(window.innerHeight);
@@ -84,7 +87,7 @@ export default {
             validationSchema:
                 yup.object({
                     MLNPartNo: yup.string().required().matches(/^[a-zA-Z0-9]{10}$/, 'MLN部品番号は10文字の英数字でなければなりません').label('MLN部品番号'),
-                    UDPartNo: yup.string().required().min(8).label('UD部品番号'),
+                    UDPartNo: yup.string().required().matches(/^[0-9]{8}$/, 'UD部品番号は8数字でなければなりません').label('UD部品番号'),
                 })
             ,
             initialValues: {
@@ -131,16 +134,18 @@ export default {
             loading.value = true;
             partMasterStore.getListItems().then(() => {
                 loading.value = false;
-                tableData.value = partMasterStore.partMasterItems;
+                //tableData.value = partMasterStore.partMasterItems;
                 refreshFilteredData();
             }).catch(error => {
                 loading.value = false;
                 ElMessage.error(error.message);
             });
         };
+
         onMounted((): void => {
             window.addEventListener('resize', handleResize);
-            fetchData();
+
+            // fetchData();
         });
         onBeforeUnmount((): void => {
             window.removeEventListener('resize', handleResize);
@@ -284,6 +289,7 @@ export default {
             partFormUDPartNo, partFormUDPartNoProps,
             tableRef,
             onDownloadClick,
+            isInventoryManager,
         }
     }
 }

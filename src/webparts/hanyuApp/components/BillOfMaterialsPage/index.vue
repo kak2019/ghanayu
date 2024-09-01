@@ -15,8 +15,8 @@
                             </td>
                             <td>
                                 <el-form-item label="工程区分" label-position="top" :style="{ margin: 0 }" v-bind="ParentProcessTypeProps">
-                                    <el-select v-model="ParentProcessType" placeholder="" :style="{width:'120px'}">
-                                        <el-option v-for="item in processData" :key="item.ProcessType" :label="item.ProcessName" :value="item.ProcessType" />
+                                    <el-select v-model="ParentProcessType" placeholder="" :style="{width:'120px'}" clearable>
+                                        <el-option v-for="item in parentProcessData" :key="item.ProcessType" :label="item.ProcessName" :value="item.ProcessType" />
                                     </el-select>
                                 </el-form-item>
                             </td>
@@ -35,8 +35,8 @@
                             </td>
                             <td>
                                 <el-form-item label="工程区分" label-position="top" :style="{ margin: 0 }" v-bind="ChildProcessTypeProps">
-                                    <el-select v-model="ChildProcessType" placeholder="" :style="{width:'120px'}">
-                                        <el-option v-for="item in processData" :key="item.ProcessType" :label="item.ProcessName" :value="item.ProcessType" />
+                                    <el-select v-model="ChildProcessType" placeholder="" :style="{width:'120px'}" clearable>
+                                        <el-option v-for="item in childProcessData" :key="item.ProcessType" :label="item.ProcessName" :value="item.ProcessType" />
                                     </el-select>
                                 </el-form-item>
                             </td>
@@ -59,7 +59,7 @@
                     <el-table-column fixed prop="ParentPartNo" label="MLN部品番号" width="140" align="center">
                         <template #default="scope">
                             <el-form-item v-if="isInserting && currentRowIndex === scope.$index" v-bind="bomFormParentPartNoProps">
-                                <el-autocomplete v-model="bomFormParentPartNo" :fetch-suggestions="queryMLNPartNo"  />
+                                <el-autocomplete v-model="bomFormParentPartNo" :fetch-suggestions="queryMLNPartNoWithOutF"  />
                             </el-form-item>
                             <span v-else>{{ scope.row.ParentPartNo }}</span>
                         </template>
@@ -68,7 +68,7 @@
                         <template #default="scope">
                             <el-form-item v-if="isInserting && currentRowIndex === scope.$index" v-bind="bomFormParentProcessTypeProps">
                                 <el-select v-model="bomFormParentProcessType" placeholder="">
-                                    <el-option v-for="item in processData" :key="item.ProcessType" :label="item.ProcessName" :value="item.ProcessType" />
+                                    <el-option v-for="item in parentProcessData" :key="item.ProcessType" :label="item.ProcessName" :value="item.ProcessType" />
                                 </el-select>
                             </el-form-item>
                             <span v-else>{{ showProcessName(scope.row.ParentProcessType) || scope.row.ChildProcessType}}</span>
@@ -78,7 +78,7 @@
                 <el-table-column label="前工程">
                     <el-table-column fixed prop="ChildPartNo" label="MLN部品番号" width="140" align="center">
                         <template #default="scope">
-                            <el-form-item v-if="isInserting && currentRowIndex === scope.$index" v-bind="bomFormChildPartNoProps">
+                            <el-form-item v-if="isEditing && currentRowIndex === scope.$index" v-bind="bomFormChildPartNoProps">
                                 <el-autocomplete v-model="bomFormChildPartNo" :fetch-suggestions="queryMLNPartNo"  />
                             </el-form-item>
                             <span v-else>{{ scope.row.ChildPartNo }}</span>
@@ -86,9 +86,9 @@
                     </el-table-column>
                     <el-table-column prop="ChildProcessType" label="工程区分" width="120" align="center">
                         <template #default="scope">
-                            <el-form-item v-if="isInserting && currentRowIndex === scope.$index" v-bind="bomFormChildProcessTypeProps">
+                            <el-form-item v-if="isEditing && currentRowIndex === scope.$index" v-bind="bomFormChildProcessTypeProps">
                                 <el-select v-model="bomFormChildProcessType" placeholder="">
-                                    <el-option v-for="item in processData" :key="item.ProcessType" :label="item.ProcessName" :value="item.ProcessType" />
+                                    <el-option v-for="item in childProcessData" :key="item.ProcessType" :label="item.ProcessName" :value="item.ProcessType" />
                                 </el-select>
                             </el-form-item>
                             <span v-else>{{showProcessName(scope.row.ChildProcessType) || scope.row.ChildProcessType }}</span>
@@ -128,11 +128,11 @@
 
             </el-col>
             <el-col :span="8">
-                <el-button plain size="large" @click="editRow" :disabled="isEditing || currentRowIndex === -1">登録</el-button>
-                <el-button plain size="large" @click="insertRow" :disabled="isEditing">行追加</el-button>
+                <el-button plain size="large" @click="editRow" :disabled="(!isInventoryManager && !isBusinessControler) || isEditing || currentRowIndex === -1">登録</el-button>
+                <el-button plain size="large" @click="insertRow" :disabled="!isInventoryManager || isEditing">行追加</el-button>
                 <el-popconfirm confirm-button-text="はい" cancel-button-text="いいえ" title="これを削除してもよろしいですか?" @confirm="deleteRow">
                     <template #reference>
-                        <el-button plain size="large" :disabled="isEditing || currentRowIndex === -1">行削除</el-button>
+                        <el-button plain size="large" :disabled="!isInventoryManager || isEditing || currentRowIndex === -1">行削除</el-button>
                     </template>
                 </el-popconfirm>
                 <el-button plain size="large" v-show="false">キャンセル</el-button>

@@ -4,6 +4,7 @@
       style="width: 100%; font-size:12px;"
       :header-cell-style="{ backgroundColor: '#366093', color: '#fff' }"
       height="320px"
+      v-loading="loading"
   >
     <el-table-column prop="GoodsReceiveDate" label="検収実績日" width="180" :formatter="formatDate" />
     <el-table-column prop="SHIKYUFrom" label="支給元" width="180" />
@@ -22,7 +23,7 @@ import { useSHIKYUGoodsReceiveStore } from '../../../../stores/shikyugoodsreceiv
 
 
 // 获取 Pinia store 实例
-const { tableData } = defineProps(['tableData'])
+const { tableData, loading } = defineProps(['tableData','loading'])
 /*const shiKYUGoodsReceiveStore = useSHIKYUGoodsReceiveStore();
 onMounted(async () => {
   try {
