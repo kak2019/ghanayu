@@ -24,6 +24,33 @@ export const useProcessCompletionResultStore = defineStore(FeatureKey.PROCESSCOM
             }
 
         },
+
+        async getListItemsByMLNPartNo(mlnPartNo: string) {
+            try {
+                const sp = spfi(getSP());
+                const web = await sp.web();
+
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/ProcessCompletionResult`).getItemsByCAMLQuery({
+                    ViewXml: `
+                      <View>
+                        <Query>
+                          <Where>
+                            <Eq>
+                              <FieldRef Name='MLNPartNo' />
+                              <Value Type='Text'>${mlnPartNo}</Value>
+                            </Eq>
+                          </Where>
+                        </Query>
+                      </View>
+                    `
+                });
+                this.processCompletionResults = items;
+            }
+            catch (error) {
+                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+            }
+        },
+
         async addListItem(item: IProcessCompletionResultItem): Promise<string> {
             try {
                 const sp = spfi(getSP());

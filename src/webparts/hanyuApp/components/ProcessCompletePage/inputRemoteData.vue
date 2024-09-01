@@ -59,7 +59,7 @@ export default {
       console.log(value)
       this.selectedText = value.text; // 更新显示文本
       this.$emit('update:modelValue', value.value);
-      this.$emit('confirmMethod',value.text);
+      this.$emit('confirmMethod',{ value: value.value, relatedText: value.relatedText});
     },
     querySearch(queryString, cb) {
       let results = [];

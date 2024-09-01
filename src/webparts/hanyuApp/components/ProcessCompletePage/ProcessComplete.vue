@@ -10,10 +10,10 @@
         <date-picker-with-label v-model="form.ProcessCompletion" label="工程完了日"></date-picker-with-label>
       </div>
       <div class="background-layer" style="margin-right: 20px;">
-        <Selecter v-model="form.select" label="工程区分" :processOptions="processOptions"></Selecter>
+        <Selecter v-model="form.selectProcessType" label="工程区分" :processOptions="processOptions"></Selecter>
       </div>
       <div class="background-layer" style="margin-right: 20px;">
-        <InputRemoteData v-model="form.MLNPartNo" label="MLN部品番号" searchField="MLN" @confirmMethod="confirmMethod(abc)" />
+        <InputRemoteData v-model="form.MLNPartNo" label="MLN部品番号" searchField="MLN" @confirmMethod="confirmMethod" />
       </div>
       <!-- <div class="background-layer">
         <InputRemoteData v-model="form.UDPartNo" label="UD部品番号" searchField="UD" />
@@ -46,6 +46,7 @@ import { ref } from 'vue';
 import Input from './input.vue';
 import { useProcessCompletionResultStore } from "../../../../stores/processcompletion";
 import { useProcessMasterStore } from '../../../../stores/process';
+import { usePartMasterStore } from '../../../../stores/part';
 
 const ProcessMasterStore = useProcessMasterStore();
 const ProcessCompletionResultStore = useProcessCompletionResultStore();
@@ -64,7 +65,8 @@ export default {
       tableData: [],
       form: {
         ProcessCompletion: new Date().toISOString(),
-        select: '生加工',
+        selectProcessName: '生加工',
+        selectProcessType: 'M',
         MLNPartNo: '',
         UDPartNo: '',
         AbnormalNumber: '',
@@ -106,9 +108,33 @@ export default {
           return;
         }
 
+        //The BOM table is searched using the entered MLN part number + process category as a key.If a corresponding record exists, it is registered in the ProcessCompletionResult table.
+        const partMasterStore = usePartMasterStore();
+        const curPartCount = await partMasterStore.getItemCountByMLNPartNoProcessType(this.form.MLNPartNo,this.form.selectProcessType);
+        if (curPartCount <= 0) {
+          this.$message.error('Part不存在');
+          return;
+        }
+
+        //If the input "工程完了日" is smaller than the latest record date of this part, show error meesage "工程完了日エラー"
+        await ProcessCompletionResultStore.getListItemsByMLNPartNo(this.form.MLNPartNo);
+        const curPartRecords = ProcessCompletionResultStore.processCompletionResultItems;
+        console.log('=========+++++++++');
+        console.log(curPartRecords);
+        if (curPartRecords.length > 0) {
+          const latestRecord = curPartRecords[0];
+          const compareDateResult = this.compareDates(latestRecord.ProcessCompletion,this.form.ProcessCompletion)
+          if (compareDateResult === 1) {
+            this.$message.error('工程完了日エラー');
+            return;
+          }
+        }
+
+
+
         const newItem = {
           MLNPartNo: this.form.MLNPartNo,
-          ProcessType: this.form.select,
+          ProcessType: this.form.selectProcessType,
           UDPartNo: this.form.UDPartNo,
           DefectQty: this.form.AbnormalNumber,
           CompletionQty: this.form.FinishedNumber,
@@ -131,7 +157,8 @@ export default {
         await ProcessMasterStore.getListItems(); // 获取数据
         this.processOptions = ProcessMasterStore.processMasterItems.map(item => ({
           Id: item.Id,           // 保留Id用于key
-          ProcessName: item.ProcessName // 用于显示的名称
+          ProcessName: item.ProcessName, // 用于显示的名称
+          ProcessType: item.ProcessType,
         }));
         console.log("Processed Master data:", this.processOptions);
       } catch (error) {
@@ -152,7 +179,8 @@ export default {
     resetForm() {
       this.form = {
         ProcessCompletion: new Date().toISOString(),
-        select: '生加工',
+        selectProcessName: '生加工',
+        selectProcessType: 'M',
         MLNPartNo: '',
         UDPartNo: '',
         AbnormalNumber: '',
@@ -184,11 +212,23 @@ export default {
       return `${month}/${day}/${year}`;
     },
 
-    confirmMethod(abc) {
+    confirmMethod({ value, relatedText }) {
       console.log('============');
-      console.log('Received value:', abc);
-      console.log('Received text:', abc);
+      console.log('Received value:', value);
+      console.log('Received relatedText:', relatedText);
     // 在这里进一步处理接收到的值
+    },
+
+    compareDates(date1, date2) {
+      const dateObj1 = new Date(date1);
+      const dateObj2 = new Date(date2);
+      if (dateObj1 > dateObj2) {
+        return 1;
+      } else if (dateObj1 < date2) {
+        return -1;
+      } else {
+        return 0;
+      }
     }
   },
   async mounted() {

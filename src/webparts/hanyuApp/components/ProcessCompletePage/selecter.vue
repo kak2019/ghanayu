@@ -11,7 +11,7 @@
           v-for="item in processOptions"
           :key="item.Id"
           :label="item.ProcessName"
-          :value="item.ProcessName"
+          :value="item.ProcessType"
       />
     </el-select>
   </div>
