@@ -99,11 +99,11 @@ export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
                     <Where>
                       <And>
                         <Eq>
-                          <FieldRef Name='ChildPartNo' />
+                          <FieldRef Name='ParentPartNo' />
                           <Value Type='Text'>${mlnPartNo}</Value>
                         </Eq>
                         <Eq>
-                          <FieldRef Name='ChildProcessType' />
+                          <FieldRef Name='ParentProcessType' />
                           <Value Type='Text'>${processType}</Value>
                         </Eq>
                       </And>                     

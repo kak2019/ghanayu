@@ -8,18 +8,16 @@
         style="max-width: 130px; border: 1px solid #000;"
     >
       <el-option
-          v-for="item in options"
+          v-for="item in processOptions"
           :key="item.Id"
           :label="item.ProcessName"
-          :value="item.ProcessName"
+          :value="item.ProcessType"
       />
     </el-select>
   </div>
 </template>
 
 <script>
-import { useProcessMasterStore } from '../../../../stores/process'; // 更新为你的实际路径
-
 export default {
   name: 'DatePickerWithLabel',
   props: {
@@ -30,12 +28,14 @@ export default {
     modelValue: {
       type: [String],
       required: true
-    }
+    },
+    processOptions: {
+      type:[]
+    },
   },
   data() {
     return {
       innerValue: this.modelValue,
-      options: [] // 用于存储从Pinia store中获取的选项数据
     };
   },
   watch: {
@@ -44,25 +44,47 @@ export default {
     },
     innerValue(newValue) {
       this.$emit('update:modelValue', newValue);
+    },
+    options(newValue) {
+      this.$emit('update:processOptions', newValue);
     }
   },
   methods: {
     handleChange(value) {
       this.$emit('update:modelValue', value);
-    }
+    },
+
+    // getDefaultValue() {
+    //   if (!this.options || this.options.length === 0) {
+    //     return ''; // 如果 options 未定义或为空，返回空字符串
+    //   }
+
+    //   const defaultOption = this.options.find(item => item.ProcessName === '生加工');
+    //   return defaultOption ? defaultOption.ProcessName : ''; // 返回默认值或空字符串
+    // },
+
+    // setDefaultValue() {
+    //   if (!this.innerValue) {
+    //     this.innerValue = this.getDefaultValue();
+    //     this.$emit('update:modelValue', this.innerValue);
+    //   }
+    // }
   },
-  async mounted() {
-    const processMasterStore = useProcessMasterStore();
-    try {
-      await processMasterStore.getListItems(); // 获取数据
-      this.options = processMasterStore.processMasterItems.map(item => ({
-        Id: item.Id,           // 保留Id用于key
-        ProcessName: item.ProcessName // 用于显示的名称
-      }));
-    } catch (error) {
-      console.error('Failed to load process master items:', error);
-    }
-  }
+  // async mounted() {
+  //   const processMasterStore = useProcessMasterStore();
+  //   try {
+  //     await processMasterStore.getListItems(); // 获取数据
+  //     this.options = processMasterStore.processMasterItems.map(item => ({
+  //       Id: item.Id,           // 保留Id用于key
+  //       ProcessName: item.ProcessName // 用于显示的名称
+  //     }));
+
+  //     // 设置默认值为生加工
+  //     this.setDefaultValue();
+  //   } catch (error) {
+  //     console.error('Failed to load process master items:', error);
+  //   }
+  // }
 };
 </script>
 
