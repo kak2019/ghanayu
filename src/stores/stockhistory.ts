@@ -71,6 +71,34 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
             }
         },
+
+        async getLatestStockQtyByMLNPartNoProcessTypeDesc(mlnPartNo: string, processType: string) : Promise<number>  {
+            try {
+                const sp = spfi(getSP());
+                const web = await sp.web();
+
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/StockHistory`).items.orderBy("Registered", false)();
+                items.filter(item => {
+                    let condition = true
+                    if(mlnPartNo) {
+                      condition = condition && mlnPartNo === item.MLNPartNo && processType === item.ProcessType
+                    }
+                    return condition
+                  });
+                console.log("items order by register date" + items);
+                if(items.length>0)
+                {
+                    return items[0].StockQty
+                }else{
+                    return 0;
+                }
+                
+            }
+            catch (error) {
+                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+            }
+        },
+
         async getLastMonthsLatestStockQtyByMln(mlnPartNo: string, processType:string, current: string) : Promise<number>  {
             try {
                 const sp = spfi(getSP());

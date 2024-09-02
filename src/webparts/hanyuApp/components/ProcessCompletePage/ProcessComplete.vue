@@ -47,9 +47,13 @@ import Input from './input.vue';
 import { useProcessCompletionResultStore } from "../../../../stores/processcompletion";
 import { useProcessMasterStore } from '../../../../stores/process';
 import { usePartMasterStore } from '../../../../stores/part';
+import { useBillOfMaterialsStore } from '../../../../stores/billofmaterials';
+import { useStockHistoryStore } from "../../../../stores/stockhistory"
 
 const ProcessMasterStore = useProcessMasterStore();
 const ProcessCompletionResultStore = useProcessCompletionResultStore();
+const BillOfMaterialsStore = useBillOfMaterialsStore();
+
 
 export default {
   components: {
@@ -116,9 +120,12 @@ export default {
           return;
         }
 
+        const curUDPartNo = await partMasterStore.getListItemByMLNPartNo(this.form.MLNPartNo);
+        this.form.UDPartNo = curUDPartNo
+
         //If the input "工程完了日" is smaller than the latest record date of this part, show error meesage "工程完了日エラー"
-        await ProcessCompletionResultStore.getListItemsByMLNPartNo(this.form.MLNPartNo);
-        const curPartRecords = ProcessCompletionResultStore.processCompletionResultItems;
+        const processCompletionResultStore = useProcessCompletionResultStore();
+        const curPartRecords = await processCompletionResultStore.getItemsByMLNPartNoProcessType(this.form.MLNPartNo, this.form.selectProcessType);
         console.log('=========+++++++++');
         console.log(curPartRecords);
         if (curPartRecords.length > 0) {
@@ -130,7 +137,34 @@ export default {
           }
         }
 
+        //If the entered completed quantity is greater than the stock quantity of the previous process, an error message "完成数が前工程の在庫数より多くなっています" will be displayed and the item will not be registered in the in-house process completion results table.
+        //根据MLN编号和工程区分获得部品列表
+        const billOfMaterialsStore = useBillOfMaterialsStore();
+        const stockHistoryStore = useStockHistoryStore();
+        const stockHistoryStore2 = useStockHistoryStore();
+        const partRecords = await billOfMaterialsStore.getItemsByMLNPartNoProcessType(this.form.MLNPartNo, this.form.selectProcessType)
+        //遍历partRecords,获取所有前置部品中的最小库存数，然后用完成数与之比较做判断
+        const date = new Date();
+        const year = date.getFullYear();
+        // const month = (date.getMonth() + 1).toString.padStart(2, '0');
+        const currentMonth = `${year}-09`; // 获取当前月份，格式为 YYYY-MM
+        let minimumCount = Infinity;
+        for (const record of partRecords) { 
+          const { ChildPartNo, ChildProcessType } = record;
 
+          const stockQty = await stockHistoryStore.getLatestStockQtyByMLNPartNoProcessTypeDesc(ChildPartNo, ChildProcessType);
+
+          if (stockQty < minimumCount) {
+              minimumCount = stockQty;
+          }
+        }
+
+        if (this.form.FinishedNumber >  minimumCount) {
+          this.$message.error('完成数が前工程の在庫数より多くなっています');
+          return;
+        }
+  
+        const latestStockQty = await stockHistoryStore2.getLatestStockQtyByMLNPartNoProcessTypeDesc(this.form.MLNPartNo, this.form.selectProcessType);
 
         const newItem = {
           MLNPartNo: this.form.MLNPartNo,
@@ -144,6 +178,31 @@ export default {
         const message = await ProcessCompletionResultStore.addListItem(newItem);
         this.$message.success(message);
         await this.fetchTableData();
+
+        const newStockItemFinished = {
+          MLNPartNo: this.form.MLNPartNo,
+          ProcessType: this.form.selectProcessType,
+          UDPartNo: this.form.UDPartNo,
+          Qty: this.form.FinishedNumber,
+          FunctionID: '02',
+          StockQty:(Number(this.form.FinishedNumber) + latestStockQty).toString() //获取最新库存
+        };
+
+        const newStockItemAbnormal = {
+          MLNPartNo: this.form.MLNPartNo,
+          ProcessType: this.form.selectProcessType,
+          UDPartNo: this.form.UDPartNo,
+          Qty: this.form.AbnormalNumber,
+          FunctionID: '03',
+          StockQty: (Number(this.form.FinishedNumber) + latestStockQty).toString() //获取最新库存
+        };
+
+        const addFinishedStockMsg = await stockHistoryStore.addListItem(newStockItemFinished);
+        this.$message.success(addFinishedStockMsg);
+
+        const addAbnormalStockMsg = await stockHistoryStore.addListItem(newStockItemAbnormal);
+        this.$message.success(addAbnormalStockMsg);
+
 
         this.resetForm(); // 调用 resetForm 方法重置表单
       } catch (error) {
