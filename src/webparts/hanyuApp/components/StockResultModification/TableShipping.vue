@@ -6,9 +6,9 @@
       height="320px"
       v-loading="loading"
   >
-    <el-table-column prop="Registered" label="修正年月日" width="180" :formatter="formatDate" />
-    <el-table-column prop="FunctionName" label="修正領域" width="180" />
-    <el-table-column prop="ProcessName" label="工程区分" />
+    <el-table-column prop="Registered" label="修正年月日" width="100%" :formatter="formatDate" />
+    <el-table-column prop="FunctionName" label="修正領域" width="100%"/>
+    <el-table-column prop="ProcessName" label="工程区分" width="100%"/>
     <el-table-column prop="MLNPartNo" label="MLN部品番号" />
     <el-table-column prop="UDPartNo" label="UD部品番号" />
     <el-table-column prop="ModifiedQty" label="修正数" />

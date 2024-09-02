@@ -50,10 +50,10 @@ export default {
   },
   methods: {
     handleChange(value) {
-      const regex = /^[1-9]\d*$/;
+      /*const regex = /^[1-9]\d*$/;
       if (!regex.test(value)) {
         value = value.substring(0, value.length - 1);
-      }
+      }*/
       this.$emit('update:modelValue', value);
     }
   }
