@@ -147,7 +147,6 @@ export default {
         const date = new Date();
         const year = date.getFullYear();
         // const month = (date.getMonth() + 1).toString.padStart(2, '0');
-        const currentMonth = `${year}-09`; // 获取当前月份，格式为 YYYY-MM
         let minimumCount = Infinity;
         for (const record of partRecords) { 
           const { ChildPartNo, ChildProcessType } = record;

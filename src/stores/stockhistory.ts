@@ -76,25 +76,20 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
-
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/StockHistory`).items.orderBy("Registered", false)();
-                items.filter(item => {
-                    let condition = true
-                    if(mlnPartNo) {
-                      condition = condition && mlnPartNo === item.MLNPartNo && processType === item.ProcessType
-                    }
-                    return condition
-                  });
-                console.log("items order by register date" + items);
-                if(items.length>0)
-                {
-                    return items[0].StockQty
-                }else{
+                const list = sp.web.getList(`${web.ServerRelativeUrl}/Lists/StockHistory`);
+        
+                const items = await list.items
+                    .filter(`MLNPartNo eq '${mlnPartNo}' and ProcessType eq '${processType}'`)
+                    .orderBy("Registered", false)();
+        
+                if (items.length > 0) {
+                    console.log(`Found item: ${JSON.stringify(items[0])}`);
+                    return items[0].StockQty;
+                } else {
                     return 0;
                 }
-                
-            }
-            catch (error) {
+        
+            } catch (error) {
                 throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
             }
         },
