@@ -1,10 +1,10 @@
 <template>
 <el-row class="background-layer main">
-    <div class="background-layer">
-      <Selecter v-model="form.select" :options="tableModifiedReason" label="修正領域"></Selecter>
+    <div class="background-layer" label="1213">
+      <my-select v-model="form.selectedFunction" label="修正領域" :options="tableFunctions"></my-select>
     </div>
     <div class="background-layer">
-      <Selecter v-model="form.select" label="工程区分"></Selecter>
+       <my-select label="工程区分" v-model="form.selectedProcess" :options="tableRrocess"></my-select>
     </div>
     <div class="background-layer">
       <InputRemoteData v-model="form.num" label="MLN部品番号"/>
@@ -13,16 +13,16 @@
       <Input v-model="form.count" label="修正数"/>
     </div>
     <div class="background-layer">
-      <Selecter v-model="form.select" label="修正者"></Selecter>
+      <my-select label="修正者" v-model="form.modifiedUser" :options="tableUsers"></my-select>
     </div>
     <div class="background-layer">
-      <Selecter v-model="form.select" label="修正理由"></Selecter>
+      <my-select label="修正理由" v-model="form.modifiedReason" :options="tableModifiedReason"></my-select>
     </div>
     <div class="background-layer">
       <Input v-model="form.note" label="Despatch note" labelColor="#92cddc"></Input>
     </div>
     <div class="background-layer">
-      <Input v-model="form.id" label="コメント" labelColor="#92cddc"></Input>
+      <InputRemoteData v-model="form.comment" label="コメント" labelColor="#92cddc"></InputRemoteData>
     </div>
 
     <el-button
@@ -51,6 +51,7 @@ import { computed } from 'vue';
 import DatePickerWithLabel from './labelPlusDateSelecter.vue';
 import TableShipping from './TableShipping.vue';
 import Selecter from './selecter.vue';
+import MySelect from './MySelect.vue';
 import InputRemoteData from './inputRemoteData.vue';
 import Input from './input.vue';
 import { useStockResultModificationStore } from '../../../../stores/stockresultmodification';
@@ -69,7 +70,6 @@ const functionsMasterStore = useFunctionsMasterStore();
 const processMasterStore = useProcessMasterStore();
 const userStore = useUserStore();
 
-const defaultShikyufrom = "2922";
 let curentDate = new Date();
 export default {
   components: {
@@ -77,22 +77,26 @@ export default {
     DatePickerWithLabel,
     Selecter,
     InputRemoteData,
-    Input
+    Input,
+    MySelect
   },
   data() {
     return {
       tableData: [],
-      tableModifiedReason:[],
+      tableRrocess: [],
       tableFunctions: [],
+      tableModifiedReason:[],
       tableUsers: [],
       loading: true,
       form: {
-        date: curentDate,
-        select: '',
-        id: '',
-        note: '',
+        selectedFunction: '05',
+        selectedProcess: 'Z',
         num: '',
-        count: ''
+        modifiedQty: '',
+        modifiedUser: '',
+        modifiedReason: '01',
+        note: '',
+        comment: ''
       }
     };
   },
@@ -102,14 +106,14 @@ export default {
       try {
         //Add new record to good receive page
         const newItem = {
+          FunctionID: this.form.selectedFunction, // need to get from dropdownlist
+          ProcessType: this.form.selectedProcess,
           MLNPartNo: this.form.num,
-          UDPartNo: "",
-          ProcessType: "F",
-          SHIKYUFrom: this.form.select,
-          GoodsReceiveQty: parseInt(this.form.count, 10),
-          Calloffid: this.form.id,
+          ModifiedQty: this.form.count,
+          ModifiedUser: "", // need to get user from select
+          ModifiedReason: this.form.modifiedReason,
           Despatchnote: this.form.note,
-          GoodsReceiveDate: this.form.date,
+          Comment: this.form.comment
         };
 
         //Get UD part number in the part master table that corresponds to the entered MLN part number
@@ -118,7 +122,7 @@ export default {
         newItem.UDPartNo = udPartNo;
 
         //Add record to good receive table
-        const message = await shiKYUGoodsReceiveStore.addListItem(newItem);
+        const message = await stockResultModificationStore.addListItem(newItem);
         this.$message.success(message);
         await this.fetchTableData();
 
@@ -135,10 +139,10 @@ export default {
           this.tableData = stockResultModificationStore.stockResultModifications
           const filteredTable = stockResultModificationStore.stockResultModifications.filter(element => {
               const condition  = true;
-              element.ProcessName = this.getProcessNameByType(element.processType);
+              element.ProcessName = this.getProcessNameByType(element.ProcessType);
               element.FunctionName = this.getFunctionNameById(element.FunctionID);
               element.ModifiedReasonName = this.getModifiedReasonNameById(element.ModifiedReason);
-              element.EditorName = getModifiedReasonNameById(element.modifiedreason); // get user
+              //element.EditorName = getModifiedReasonNameById(element.modifiedreason); // get user
               return condition;
           });
           this.tableData = filteredTable;
@@ -150,11 +154,16 @@ export default {
         console.error('Error fetching data:', error);
       }
     },
-    getProcessNameByType(processType){
+    getProcessNameByType(ProcessType){
+      if(ProcessType ==="Z"){
+        return "支給"
+      }else if(ProcessType ==="CH"){
+        return "出荷"
+      }else{
         const tableData = computed(() => processMasterStore.processMasterItems);
         const newTableData = tableData.value;
         const tableProcessName = newTableData.filter(item => {
-          if(item.processType === processType){
+          if(item.ProcessType === ProcessType){
             return true
           }else{
             return false
@@ -166,12 +175,13 @@ export default {
         }else{
           return "";
         }
+      }
     },
-    getFunctionNameById(functionID){
+    getFunctionNameById(FunctionID){
         const tableData = computed(() => functionsMasterStore.functionsMasterItems);
         const newTableData = tableData.value;
         const tableFunctionName = newTableData.filter(item => {
-          if(item.FunctionID === functionID){
+          if(item.FunctionID === FunctionID){
             return true
           }else{
             return false
@@ -184,11 +194,11 @@ export default {
           return "";
         }
     },
-    getModifiedReasonNameById(modifiedReasonID){
+    getModifiedReasonNameById(ModifiedReasonID){
         const tableData = computed(() => modifiedReasonMasterStore.modifiedReasonMasterItems);
         const newTableData = tableData.value;
         const tableModifiedReasonName = newTableData.filter(item => {
-          if(item.ModifiedReasonID === modifiedReasonID){
+          if(item.ModifiedReasonID === ModifiedReasonID){
             return true
           }else{
             return false
@@ -197,19 +207,22 @@ export default {
         if(tableModifiedReasonName.length>0)
         {
           return tableModifiedReasonName[0].ModifiedReasonName
-        }else{
+        } else {
           return "";
         }
     },
-    resetForm() {
+    resetForm() {      
       this.form = {
-        date: curentDate,
-        select: defaultShikyufrom,
-        id: '',
-        note: '',
+        selectedFunction: '05',
+        selectedProcess: 'Z',
         num: '',
-        count: ''
+        count: '',
+        user: '', //need to confirm how to get it.
+        modifiedReason: '01',
+        note: '',
+        comment: ''
       };
+      this.refreshFunctionName();
     },
 
     downloadExcel() {
@@ -245,9 +258,58 @@ export default {
       let result = new Date(date);
       result.setDate(result.getDate() + 1);
       return result;
+    },
+    refreshFunctionName(){
+      //修正領域
+      const functionsMasterItems = computed(() => functionsMasterStore.functionsMasterItems);
+      let tempTableFunctions = [];
+      functionsMasterItems.value.forEach(item => {
+        tempTableFunctions.push({ label: item.FunctionName, value: item.FunctionID})
+      })
+      tempTableFunctions = tempTableFunctions.filter(item=>{
+        let condition = true;
+        condition = condition && (item.value ==="05" || item.value ==="06" || item.value ==="07")
+        return condition;
+      });
+      this.tableFunctions = tempTableFunctions;
     }
   },
   async mounted() {
+
+    this.refreshFunctionName();
+    //工程区分
+     const processMasterItems = computed(() => processMasterStore.processMasterItems);
+     let tempTableRrocess = [{ label: "支給", value: "Z"}];
+     processMasterItems.value.forEach(item => {
+      tempTableRrocess.push({ label: item.ProcessName, value: item.ProcessType})
+     });
+
+     tempTableRrocess.push({ label: "出荷", value: "CH"})
+
+     tempTableRrocess = tempTableRrocess.filter(item=>{
+       let condition = true;
+       condition = condition && (item.value !== "F")
+       return condition;
+     });
+
+     this.tableRrocess = tempTableRrocess;
+
+     //修正理由
+     const modifiedReasonMasterItems = computed(() => modifiedReasonMasterStore.modifiedReasonMasterItems);
+     let tempTableModifiedReason = [];
+     modifiedReasonMasterItems.value.forEach(item => {
+      tempTableModifiedReason.push({ label: item.ModifiedReasonName, value: item.ModifiedReasonID})
+     });
+     this.tableModifiedReason = tempTableModifiedReason;
+
+    //修正者
+     /*const users = computed(() => userStore.user);
+     let tempTableUserInfo = [];
+     users.value.forEach(item => {
+      tempTableUserInfo.push({ label: item.LoginName, value: item.Id})
+     });
+     this.tableUsers = tempTableUserInfo;*/
+
     await this.fetchTableData();
   }
 };
