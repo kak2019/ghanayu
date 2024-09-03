@@ -12,5 +12,4 @@ export interface IStockResultModificationItem {
     Registered?: string;
     Modified?: string;
     ModifiedBy?: string;
-    People?:string;
 }

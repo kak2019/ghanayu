@@ -111,11 +111,11 @@ export default {
           ProcessType: this.form.selectedProcess,
           MLNPartNo: this.form.num,
           ModifiedQty: this.form.count,
-          People: this.form.modifiedUser,
+          //People: this.form.modifiedUser,
           ModifiedReason: this.form.modifiedReason,
           Despatchnote: this.form.note,
           Comment: this.form.comment,
-          //ModifiedBy: regularUser.value[0].Id
+          ModifiedBy: JSON.stringify(userStore.hanyutype1s[0]),
         };
 
         //Get UD part number in the part master table that corresponds to the entered MLN part number
