@@ -36,9 +36,10 @@ export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESUL
                     ModifiedQty: item.ModifiedQty,
                     FunctionID: item.FunctionID,
                     ModifiedReason: item.ModifiedReason,
-                    ModifiedUser: item.Editor,
                     Despatchnote: item.Despatchnote,
                     Comment: item.Comment || "",
+                    People: item.People.toString(),
+                    //ModifiedBy:item.ModifiedBy.toString()
                 });
                 return '登録完了。';
             }

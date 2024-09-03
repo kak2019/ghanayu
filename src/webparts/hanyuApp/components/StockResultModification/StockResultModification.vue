@@ -105,15 +105,17 @@ export default {
     async submitForm() {
       try {
         //Add new record to good receive page
+        const regularUser = computed(() => userStore.hanyutype1s);
         const newItem = {
           FunctionID: this.form.selectedFunction, // need to get from dropdownlist
           ProcessType: this.form.selectedProcess,
           MLNPartNo: this.form.num,
           ModifiedQty: this.form.count,
-          ModifiedUser: "", // need to get user from select
+          People: this.form.modifiedUser,
           ModifiedReason: this.form.modifiedReason,
           Despatchnote: this.form.note,
-          Comment: this.form.comment
+          Comment: this.form.comment,
+          //ModifiedBy: regularUser.value[0].Id
         };
 
         //Get UD part number in the part master table that corresponds to the entered MLN part number
@@ -142,7 +144,7 @@ export default {
               element.ProcessName = this.getProcessNameByType(element.ProcessType);
               element.FunctionName = this.getFunctionNameById(element.FunctionID);
               element.ModifiedReasonName = this.getModifiedReasonNameById(element.ModifiedReason);
-              //element.EditorName = getModifiedReasonNameById(element.modifiedreason); // get user
+              element.EditorName = this.getEditorNameById(element.People); 
               return condition;
           });
           this.tableData = filteredTable;
@@ -207,6 +209,34 @@ export default {
         if(tableModifiedReasonName.length>0)
         {
           return tableModifiedReasonName[0].ModifiedReasonName
+        } else {
+          return "";
+        }
+    },
+    getEditorNameById(Editor){
+
+        const regularUser = computed(() => userStore.hanyutype1s);
+        //const managerUser = computed(() => userStore.inventorymanagers);
+
+        let tempTableUserInfo = [];
+        regularUser.value.forEach(item => {
+          tempTableUserInfo.push({ Title: item.Title, Id: item.Id})
+        });
+
+        /*managerUser.value.forEach(item => {
+          tempTableUserInfo.push({ label: item.Title, value: item.Id})
+        });*/
+
+        const tableEditorName = tempTableUserInfo.filter(item => {
+          if(item.Id.toString() === Editor){
+            return true
+          }else{
+            return false
+          }
+        });
+        if(tableEditorName.length>0)
+        {
+          return tableEditorName[0].Title
         } else {
           return "";
         }
@@ -303,12 +333,17 @@ export default {
      this.tableModifiedReason = tempTableModifiedReason;
 
     //修正者
-     /*const users = computed(() => userStore.user);
+     const regularUser = computed(() => userStore.hanyutype1s);
+     const managerUser = computed(() => userStore.inventorymanagers);
+
      let tempTableUserInfo = [];
-     users.value.forEach(item => {
-      tempTableUserInfo.push({ label: item.LoginName, value: item.Id})
+     regularUser.value.forEach(item => {
+      tempTableUserInfo.push({ label: item.Title, value: item.Id})
      });
-     this.tableUsers = tempTableUserInfo;*/
+     /*managerUser.value.forEach(item => {
+      tempTableUserInfo.push({ label: item.Title, value: item.Id})
+     });*/
+     this.tableUsers = tempTableUserInfo;
 
     await this.fetchTableData();
   }

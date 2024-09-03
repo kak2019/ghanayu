@@ -12,6 +12,10 @@
         style="width: 118px;border: 1px solid #000; border-top:none; font-size:12px"
         placeholder="Please Input"
         @input="handleChange"
+        @onkeyup="handleChange"
+        @onkeydown="handleChange"
+        @onafterpaste="handleChange"
+        @oninput="handleChange"
         size="small"
     />
   </div>
@@ -45,7 +49,6 @@ export default {
     },
     innerValue(newValue) {
       this.$emit('update:modelValue', newValue);
-
     }
   },
   methods: {
@@ -54,6 +57,12 @@ export default {
       if (!regex.test(value)) {
         value = value.substring(0, value.length - 1);
       }*/
+     /*console.log("&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+     
+      if(value==="0"){
+        value=="";
+      }*/
+      //value=value.replace(/[^[0]/g,'').replace(/^0[0]*/g,'');
       this.$emit('update:modelValue', value);
     }
   }
