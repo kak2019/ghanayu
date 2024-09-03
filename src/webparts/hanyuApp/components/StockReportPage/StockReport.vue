@@ -125,7 +125,7 @@ export default {
     searchForm() {
       this.tableData = this.filterDataBySearchItems();
       this.summaries = this.getSummaries();
-      console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" + this.summaries);
+      //console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" + this.summaries);
     },
     resetForm() {
       // 重置表单字段并清空表格数据
@@ -137,7 +137,6 @@ export default {
       };
       this.tableData = this.filterDataBySearchItems(); // 重新设置过滤后的数据
       this.summaries = this.getSummaries();
-      console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" + this.summaries);
     },
     filterDataBySearchItems(){
       const query = this.form

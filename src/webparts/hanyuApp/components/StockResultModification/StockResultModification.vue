@@ -104,6 +104,31 @@ export default {
   methods: {
     async submitForm() {
       try {
+
+        if (!this.form.num) {
+          this.$message.error('MLNPartNo不能为空');
+          return;
+        }
+
+        // 校验 MLNPartNo 的格式（10 位，由数字和英文组成）
+        const mlnPartNoPattern = /^[a-zA-Z0-9]{10}$/;
+        if (!mlnPartNoPattern.test(this.form.num)) {
+          this.$message.error('请输入有效的MLNPartNo');
+          return;
+        }
+
+        const modifiedQty = this.form.modifiedQty;
+
+        if (isNaN(modifiedQty)) {
+          this.$message.error('请输入有效的值');
+          return;
+        }
+
+        if (Number(modifiedQty) === 0) {
+          this.$message.error('0は不可としマイナス数値は可とする.');
+          return;
+        }
+
         //Add new record to good receive page
         const regularUser = computed(() => userStore.hanyutype1s);
         const newItem = {
