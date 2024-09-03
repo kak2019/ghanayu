@@ -26,21 +26,20 @@ export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESUL
 
         },
         async addListItem(item: IStockResultModificationItem): Promise<string> {
+            let ModifiedById = "";
+            const Comment = item.Comment || "";
+            if (item.ModifiedBy?.length > 0) {
+                try {
+                    ModifiedById = JSON.parse(item.ModifiedBy).Id;
+                } catch (e) { console.log(e) }
+            }
+            const itemForAdd = { ...item, ModifiedById, Comment };
+            delete itemForAdd.ModifiedBy;
+            if (itemForAdd.ModifiedById === "") delete itemForAdd.ModifiedById;
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
-                await sp.web.getList(`${web.ServerRelativeUrl}/Lists/StockResultModification`).items.add({
-                    MLNPartNo: item.MLNPartNo,
-                    ProcessType: item.ProcessType,
-                    UDPartNo: item.UDPartNo,
-                    ModifiedQty: item.ModifiedQty,
-                    FunctionID: item.FunctionID,
-                    ModifiedReason: item.ModifiedReason,
-                    Despatchnote: item.Despatchnote,
-                    Comment: item.Comment || "",
-                    People: item.People.toString(),
-                    //ModifiedBy:item.ModifiedBy.toString()
-                });
+                await sp.web.getList(`${web.ServerRelativeUrl}/Lists/StockResultModification`).items.add(itemForAdd);
                 return '登録完了。';
             }
             catch (error) {
