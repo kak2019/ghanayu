@@ -13,7 +13,7 @@
       <Input v-model="form.count" label="修正数"/>
     </div>
     <div class="background-layer">
-      <my-select label="修正者" v-model="form.modifiedUser" :options="tableUsers"></my-select>
+      <my-select label="修正者" v-model="form.ModifiedBy" :options="tableUsers"></my-select>
     </div>
     <div class="background-layer">
       <my-select label="修正理由" v-model="form.modifiedReason" :options="tableModifiedReason"></my-select>
@@ -92,8 +92,8 @@ export default {
         selectedFunction: '05',
         selectedProcess: 'Z',
         num: '',
-        modifiedQty: '',
-        modifiedUser: '',
+        count: '',
+        ModifiedBy: userStore.hanyutype1s[0],
         modifiedReason: '01',
         note: '',
         comment: ''
@@ -104,7 +104,7 @@ export default {
   methods: {
     async submitForm() {
       try {
-
+        
         if (!this.form.num) {
           this.$message.error('MLNPartNo不能为空');
           return;
@@ -117,9 +117,9 @@ export default {
           return;
         }
 
-        const modifiedQty = this.form.modifiedQty;
+        const modifiedQty = this.form.count;
 
-        if (isNaN(modifiedQty)) {
+        /*if (isNaN(modifiedQty)) {
           this.$message.error('请输入有效的值');
           return;
         }
@@ -127,7 +127,7 @@ export default {
         if (Number(modifiedQty) === 0) {
           this.$message.error('0は不可としマイナス数値は可とする.');
           return;
-        }
+        }*/
 
         //Add new record to good receive page
         const regularUser = computed(() => userStore.hanyutype1s);
@@ -162,14 +162,14 @@ export default {
       try {
         await stockResultModificationStore.getListItems().then(() => {
           this.loading = false;
-        
+        console.log("-----------------------------------------");
           this.tableData = stockResultModificationStore.stockResultModifications
           const filteredTable = stockResultModificationStore.stockResultModifications.filter(element => {
               const condition  = true;
               element.ProcessName = this.getProcessNameByType(element.ProcessType);
               element.FunctionName = this.getFunctionNameById(element.FunctionID);
               element.ModifiedReasonName = this.getModifiedReasonNameById(element.ModifiedReason);
-              element.EditorName = this.getEditorNameById(element.People); 
+              element.EditorName = this.getEditorNameById(element.ModifiedById);
               return condition;
           });
           this.tableData = filteredTable;
@@ -253,7 +253,7 @@ export default {
         });*/
 
         const tableEditorName = tempTableUserInfo.filter(item => {
-          if(item.Id.toString() === Editor){
+          if(item.Id === Editor){
             return true
           }else{
             return false
@@ -272,7 +272,7 @@ export default {
         selectedProcess: 'Z',
         num: '',
         count: '',
-        user: '', //need to confirm how to get it.
+        ModifiedBy: userStore.hanyutype1s[0], //need to confirm how to get it.
         modifiedReason: '01',
         note: '',
         comment: ''
