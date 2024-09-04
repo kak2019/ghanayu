@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia';
 import { spfi } from '@pnp/sp';
 import { getSP } from '../pnpjsConfig';
-import { FeatureKey } from './keystrs';
+import { FeatureKey } from '../config/keystrs';
 import { IShippingToItem } from '../model';
+import { CONST } from '../config/const';
 
 export const useShippingToStore = defineStore(FeatureKey.SHIPPINGTO, {
     state: () => ({
@@ -17,7 +18,7 @@ export const useShippingToStore = defineStore(FeatureKey.SHIPPINGTO, {
                 const sp = spfi(getSP());
                 const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/ShippingTo`).items.orderBy("Title", true)();
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSHIPPINGTO}`).items.orderBy("Title", true)();
                 this.shippingTos = items;
             }
             catch (error) {

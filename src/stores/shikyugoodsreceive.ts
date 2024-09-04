@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia';
 import { spfi } from '@pnp/sp';
 import { getSP } from '../pnpjsConfig';
-import { FeatureKey } from './keystrs';
+import { FeatureKey } from '../config/keystrs';
 import { ISHIKYUGoodsReceiveItem, IStockHistoryItem } from '../model';
-import { useStockHistoryStore} from '../stores/stockhistory';
+import { useStockHistoryStore } from '../stores/stockhistory';
 import { useBillOfMaterialsStore } from '../stores/billofmaterials';
+import { CONST } from '../config/const';
 
 export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECEIVE, {
     state: () => ({
@@ -19,7 +20,7 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
                 const sp = spfi(getSP());
                 const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/SHIKYUGoodsReceive`).items.orderBy("GoodsReceiveDate", false)();
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSHIKYUGOODSRECEIVE}`).items.orderBy("GoodsReceiveDate", false)();
                 this.shikyuGoodsReceives = items;
             }
             catch (error) {
@@ -33,11 +34,11 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
                 const billOfMaterialsStore = useBillOfMaterialsStore();
 
                 const isMlnNumInBom = await billOfMaterialsStore.getItemCountByMLNPartNoProcessType(item.MLNPartNo, item.ProcessType);
-                if(isMlnNumInBom){
+                if (isMlnNumInBom) {
                     //Add shikyyuan to good receive table
                     const sp = spfi(getSP());
                     const web = await sp.web();
-                    await sp.web.getList(`${web.ServerRelativeUrl}/Lists/SHIKYUGoodsReceive`).items.add({
+                    await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSHIKYUGOODSRECEIVE}`).items.add({
                         MLNPartNo: item.MLNPartNo,
                         UDPartNo: item.UDPartNo,
                         ProcessType: item.ProcessType,
@@ -50,10 +51,10 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
 
                     //Add record to StockHistory table.
                     const stockHistoryStore = useStockHistoryStore();
-                    const latestStockQty =  await stockHistoryStore.getListItemsByRegisteredDate(item.MLNPartNo);
+                    const latestStockQty = await stockHistoryStore.getListItemsByRegisteredDate(item.MLNPartNo);
                     //console.log("latestStockQty=============" + latestStockQty)
                     //console.log("item.GoodsReceiveQty=============" + item.GoodsReceiveQty)
-                    const stockQty = latestStockQty +  item.GoodsReceiveQty;
+                    const stockQty = latestStockQty + item.GoodsReceiveQty;
                     const billOfMaterialsItem = {
                         MLNPartNo: item.MLNPartNo,
                         ProcessType: item.ProcessType, // need to get form 工程区分，and covert to Janpnese words
@@ -65,7 +66,7 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
                     await stockHistoryStore.addListItem(billOfMaterialsItem);
 
                     return '登録完了。';
-                }else{
+                } else {
                     throw new Error(`存在チェックに失敗しました`);//
                 }
             }
@@ -73,6 +74,6 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
                 throw new Error(`データの登録中にエラーが発生しました: ${error.message}`);
             }
         }
-        
+
     },
 });

@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia';
 import { spfi } from '@pnp/sp';
 import { getSP } from '../pnpjsConfig';
-import { FeatureKey } from './keystrs';
+import { FeatureKey } from '../config/keystrs';
 import { IStockResultModificationItem } from '../model';
+import { CONST } from '../config/const';
 
 export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESULTMODIFICATION, {
     state: () => ({
@@ -17,7 +18,7 @@ export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESUL
                 const sp = spfi(getSP());
                 const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/StockResultModification`).items.orderBy("Modified", false)();
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKRESULTMODIFICATION}`).items.orderBy("Modified", false)();
                 this.stockResultModifications = items;
             }
             catch (error) {
@@ -40,7 +41,7 @@ export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESUL
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
-                await sp.web.getList(`${web.ServerRelativeUrl}/Lists/StockResultModification`).items.add(itemForAdd);
+                await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKRESULTMODIFICATION}`).items.add(itemForAdd);
                 return '登録完了。';
             }
             catch (error) {

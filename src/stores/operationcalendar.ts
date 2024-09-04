@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { IOperationCalenderItem } from "../model";
-import { FeatureKey } from "./keystrs";
+import { FeatureKey } from "../config/keystrs";
 
 export const useOperationCalendarStore = defineStore(FeatureKey.OPERATIONCALENDAR, {
     state: () => ({

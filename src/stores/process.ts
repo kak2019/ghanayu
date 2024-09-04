@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia';
 import { spfi } from '@pnp/sp';
 import { getSP } from '../pnpjsConfig';
-import { FeatureKey } from './keystrs';
+import { FeatureKey } from '../config/keystrs';
 import { IProcessMasterItem } from '../model';
+import { CONST } from '../config/const';
 
 export const useProcessMasterStore = defineStore(FeatureKey.PROCESSMASTER, {
     state: () => ({
@@ -17,7 +18,7 @@ export const useProcessMasterStore = defineStore(FeatureKey.PROCESSMASTER, {
                 const sp = spfi(getSP());
                 const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/ProcessMaster`).items.orderBy("Position", true)();
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNamePROCESSMASTER}`).items.orderBy("Position", true)();
                 this.processes = items;
             }
             catch (error) {

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { spfi } from '@pnp/sp';
 import { getSP } from '../pnpjsConfig';
-import { FeatureKey } from './keystrs';
+import { FeatureKey } from '../config/keystrs';
 
 export const useWebStore = defineStore(FeatureKey.WEB, {
 

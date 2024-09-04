@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia';
 import { spfi } from '@pnp/sp';
 import { getSP } from '../pnpjsConfig';
-import { FeatureKey } from './keystrs';
+import { FeatureKey } from '../config/keystrs';
 import { IPartMasterItem } from '../model';
 import { useStockHistoryStore } from '../stores/stockhistory'
+import { CONST } from '../config/const';
 
 export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
     state: () => ({
@@ -20,7 +21,7 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 const sp = spfi(getSP());
                 const web = await sp.web();
 
-                const item = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/PartsMaster`).items.getById(itemId)();
+                const item = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNamePARTMASTER}`).items.getById(itemId)();
                 return item;
             }
             catch (error) {
@@ -32,7 +33,7 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 const sp = spfi(getSP());
                 const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/PartsMaster`).getItemsByCAMLQuery({
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNamePARTMASTER}`).getItemsByCAMLQuery({
                     ViewXml: `
                       <View>
                         <Query>
@@ -81,7 +82,7 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/PartsMaster`).getItemsByCAMLQuery(camlQuery);
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNamePARTMASTER}`).getItemsByCAMLQuery(camlQuery);
                 return items.length;
             } catch (error) {
                 throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
@@ -92,7 +93,7 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 const sp = spfi(getSP());
                 const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/PartsMaster`).items.orderBy("MLNPartNo", true)();
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNamePARTMASTER}`).items.orderBy("MLNPartNo", true)();
                 this.parts = items;
             }
             catch (error) {
@@ -104,7 +105,7 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
-                await sp.web.getList(`${web.ServerRelativeUrl}/Lists/PartsMaster`).items.add({
+                await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNamePARTMASTER}`).items.add({
                     MLNPartNo: item.MLNPartNo,
                     UDPartNo: item.UDPartNo,
                     Registered: new Date()
@@ -125,14 +126,14 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                     if (isUpdate) {
                         if (values.indexOf(processType) === -1) {
                             values.push(processType);
-                            await sp.web.getList(`${web.ServerRelativeUrl}/Lists/PartsMaster`).items.getById(itemId).update({
+                            await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNamePARTMASTER}`).items.getById(itemId).update({
                                 ProcessType: values.filter(s => s !== '').join(';')
                             });
                         }
                     }
                     else {
                         if (values.indexOf(processType) !== -1) {
-                            await sp.web.getList(`${web.ServerRelativeUrl}/Lists/PartsMaster`).items.getById(itemId).update({
+                            await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNamePARTMASTER}`).items.getById(itemId).update({
                                 ProcessType: values.filter(s => s !== processType).join(';')
                             });
                         }
@@ -140,7 +141,7 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
 
                 }
                 else {
-                    await sp.web.getList(`${web.ServerRelativeUrl}/Lists/PartsMaster`).items.getById(itemId).update({
+                    await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNamePARTMASTER}`).items.getById(itemId).update({
                         // MLNPartNo: item.MLNPartNo,
                         UDPartNo: item.UDPartNo
                     });
@@ -157,61 +158,61 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
-                await sp.web.getList(`${web.ServerRelativeUrl}/Lists/PartsMaster`).items.getById(itemId).delete();
+                await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNamePARTMASTER}`).items.getById(itemId).delete();
                 return '消去完了。';
             }
             catch (error) {
                 throw new Error(`データの削除中にエラーが発生しました: ${error.message}`);
             }
         },
-        async getListItemsBySearchItems(date:string, processType:string) {
+        async getListItemsBySearchItems(date: string, processType: string) {
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
 
-                const items = (await sp.web.getList(`${web.ServerRelativeUrl}/Lists/PartsMaster`).items.orderBy("MLNPartNo", true)());
+                const items = (await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNamePARTMASTER}`).items.orderBy("MLNPartNo", true)());
                 const stockHistoryStore = useStockHistoryStore();
                 //const currentMonth = current;
                 console.log("=================" + date);
                 const currentMonth = new Date(date).getFullYear() + "-" + (new Date(date).getMonth() + 1);
 
-                
+
                 //前月末在庫
-                const listWithAllLastMonthQty = await Promise.all(items.map(async item =>{
+                const listWithAllLastMonthQty = await Promise.all(items.map(async item => {
                     return await stockHistoryStore.getLastMonthsLatestStockQtyByMln(item.MLNPartNo, processType, currentMonth);
                 }));
                 //console.log("----------" + listWithAllLastMonthQty);
                 //console.log("----------length" + listWithAllLastMonthQty.length);
-                
+
                 //当月実績 - 不良
-                const listWithCurrentMonthDefectsQty = await Promise.all(items.map(async item =>{
-                    return await stockHistoryStore.getCurrentMonthDefectsQtyByMlnNo(item.MLNPartNo,processType, currentMonth);
+                const listWithCurrentMonthDefectsQty = await Promise.all(items.map(async item => {
+                    return await stockHistoryStore.getCurrentMonthDefectsQtyByMlnNo(item.MLNPartNo, processType, currentMonth);
                 }));
                 //console.log("----------" + listWithCurrentMonthDefectsQty);
                 //console.log("----------length" + listWithCurrentMonthDefectsQty.length);
 
                 //当月実績 - 完成
-                const listWithCurrentMonthCompletionQty = await Promise.all(items.map(async item =>{
+                const listWithCurrentMonthCompletionQty = await Promise.all(items.map(async item => {
                     return await stockHistoryStore.getCurrentMonthCompletionQtyByMlnNo(item.MLNPartNo, processType, currentMonth);
                 }));
                 //console.log("----------" + listWithCurrentMonthCompletionQty);
                 //console.log("----------length" + listWithCurrentMonthCompletionQty.length);
 
                 //当月実績 - 振替
-                const listWithCurrentMonthShippingQty = await Promise.all(items.map(async item =>{
+                const listWithCurrentMonthShippingQty = await Promise.all(items.map(async item => {
                     return await stockHistoryStore.getCurrentMonthShippingQtyByMlnNo(item.MLNPartNo, processType, currentMonth);
                 }));
                 //console.log("----------" + listWithCurrentMonthShippingQty);
                 //console.log("----------length" + listWithCurrentMonthShippingQty.length);
 
                 //当月末在庫
-                const listWithCurentMonthStockQtyByMlnNo = await Promise.all(items.map(async item =>{
+                const listWithCurentMonthStockQtyByMlnNo = await Promise.all(items.map(async item => {
                     return await stockHistoryStore.getCurentMonthStockQtyByMlnNo(item.MLNPartNo, processType, currentMonth);
                 }));
                 //console.log("----------" + listWithCurentMonthStockQtyByMlnNo);
                 //console.log("----------length" + listWithCurentMonthStockQtyByMlnNo.length);
 
-                for(let i=0; i <items.length; i++){
+                for (let i = 0; i < items.length; i++) {
                     items[i].lastLatestMonthQty = listWithAllLastMonthQty[i];
                     items[i].currentMonthDefectsQty = listWithCurrentMonthDefectsQty[i];
                     items[i].currentMonthCompletionQty = listWithCurrentMonthCompletionQty[i];
