@@ -32,12 +32,12 @@ jobs:
           echo $(BeginOperationDate) 
           echo $(EndOperationDate)
         displayName: 'ARM template variables'
-      
+
       - script: |
             npm install
             npm install --global cross-env
-            npm run build
         displayName: 'npm install'
+
       - script: |
             gulp clean
             gulp build
@@ -50,8 +50,8 @@ jobs:
       - task: CopyFiles@2
         displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
         inputs:
-          SourceFolder: '$(Build.Repository.LocalPath)/sharepoint/solution'
-          Contents: '*.sppkg'
+          Contents: |
+            sharepoint/**/*.sppkg
           TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
 
