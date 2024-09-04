@@ -4,10 +4,10 @@ parameters:
   # friendly name of the job
   display_name: Upload & deploy *.sppkg to SharePoint app catalog
   # name of target enviroment deploying to
-  target_environment: 
+  target_environment:
   # app catalog scope (tenant|sitecollection)
-  o365cli_app_catalog_scope: 'tenant'
-  variable_group_name: 
+  o365cli_app_catalog_scope: "tenant"
+  variable_group_name:
 jobs:
   - deployment: ${{ parameters.job_name }}
     displayName: ${{ parameters.display_name }}
@@ -42,7 +42,7 @@ jobs:
                 $siteUrl = "$(SiteUrl)"
 
                 Write-Host  "##vso[task.LogIssue type=warning;] Importing Spfx"
-                $pathToPackage ="$Env:AGENT_BUILDDIRECTORY/drop/hanyu-frontend.sppkg"
+                $pathToPackage ="$Env:AGENT_BUILDDIRECTORY/drop/sharepoint/solution/hanyu-frontend.sppkg"
 
                 Write-Host  "##vso[task.LogIssue type=warning;] Deploying.."
 
