@@ -1,9 +1,4 @@
 <template>
-  <el-row>
-    <el-col :span="24">
-      <div class="custom-header">内製工程完了実績入力</div>
-    </el-col>
-  </el-row>
   <el-row class="background-layer main" style="display: flex; justify-content: space-between; align-items: center;">
     <div style="display: flex; flex-grow: 1;">
       <div class="background-layer" style="margin-right: 20px;">

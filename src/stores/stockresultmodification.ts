@@ -26,6 +26,7 @@ export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESUL
 
         },
         async addListItem(item: IStockResultModificationItem): Promise<string> {
+            console.log("++++++++++++++++++++++++++++++++++++++++++++------")
             let ModifiedById = "";
             const Comment = item.Comment || "";
             if (item.ModifiedBy?.length > 0) {

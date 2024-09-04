@@ -19,16 +19,17 @@
       <Input v-model="form.count" label="受入数"/>
     </div>
     <el-button
-        style="width: 100px; height: 40px; margin-top: 1px; margin-bottom: 10px;"
+        style="width: 100px; height: 30px; margin-top: 5px; border-radius: 50px;"
         @click="submitForm"
+        type="primary"
     >
       登録
     </el-button>
-    <el-button style="width: 100px; height: 40px; margin-top: 1px"
+    <el-button type="success" style="width: 100px; height: 30px; margin-top: 5px;border-radius: 50px;"
                @click="resetForm"
     >キャンセル
     </el-button>
-    <el-button style="width: 100px; height: 40px; margin-top: 1px; margin-right: 10px;margin-bottom: 10px;"
+    <el-button style="width: 100px; height: 30px; margin-top: 5px; border-radius: 50px;"
     @click="downloadExcel"
     >
       ダウンロード

@@ -1,9 +1,5 @@
 <template>
-  <el-row>
-    <el-col :span="24">
-      <div class="custom-header">在庫管理表 (支给品)</div>
-    </el-col>
-  </el-row> <!-- 关闭第一个 el-row 标签 -->
+<!-- 关闭第一个 el-row 标签 -->
   <el-row class="background-layer main" style="display: flex; justify-content: space-between; align-items: center;">
     <div style="display: flex; flex-grow: 1;">
       <div class="background-layer" style="margin-right: 20px;">
@@ -20,7 +16,7 @@
       </div>
     </div>
     <div style="text-align: right; flex-shrink: 0;">
-      <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-bottom: 10px;" @click="submitForm">検索</el-button>
+      <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-bottom: 10px;" type="primary" @click="submitForm">検索</el-button>
       <el-button style="width: 100px; height: 50px; margin-top: 1px;margin-bottom: 10px;" @click="resetForm">キャンセル</el-button>
       <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-right: 10px;margin-bottom: 10px;" @click="downloadTable">ダウンロード</el-button>
     </div>

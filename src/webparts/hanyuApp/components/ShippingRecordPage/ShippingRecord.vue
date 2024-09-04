@@ -1,9 +1,4 @@
 <template>
-  <el-row>
-    <el-col :span="24">
-      <div class="custom-header">出荷実績入力</div>
-    </el-col>
-  </el-row>
   <el-row class="background-layer main">
     <div class="background-layer">
       <date-picker-with-label v-model="form.date" label="出荷実績日"></date-picker-with-label>

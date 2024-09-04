@@ -12,9 +12,9 @@
     <div class="background-layer">
       <Input v-model="form.count" label="修正数"/>
     </div>
-    <div class="background-layer">
+   <!---- <div class="background-layer">
       <my-select label="修正者" v-model="form.ModifiedBy" :options="tableUsers"></my-select>
-    </div>
+    </div>-->
     <div class="background-layer">
       <my-select label="修正理由" v-model="form.modifiedReason" :options="tableModifiedReason"></my-select>
     </div>
@@ -26,16 +26,17 @@
     </div>
 
     <el-button
-        style="width: 100px; height: 40px; margin-top: 1px; margin-bottom: 10px;"
+        type="primary"
+        style="width: 100px; height: 30px; margin-top: 6px; border-radius: 50px;"
         @click="submitForm"
     >
       登録
     </el-button>
-    <el-button style="width: 100px; height: 40px; margin-top: 1px"
+    <el-button type="success" style="width: 100px; height: 30px; margin-top: 8px;border-radius: 50px;"
                @click="resetForm"
     >キャンセル
     </el-button>
-    <el-button style="width: 100px; height: 40px; margin-top: 1px; margin-right: 10px;margin-bottom: 10px;"
+    <el-button style="width: 100px; height: 30px; margin-top: 8px; border-radius: 50px;"
     @click="downloadExcel"
     >
       ダウンロード
@@ -93,7 +94,7 @@ export default {
         selectedProcess: 'Z',
         num: '',
         count: '',
-        ModifiedBy: userStore.hanyutype1s[0],
+        //ModifiedBy: userStore.hanyutype1s[0],
         modifiedReason: '01',
         note: '',
         comment: ''
@@ -130,7 +131,7 @@ export default {
         }*/
 
         //Add new record to good receive page
-        const regularUser = computed(() => userStore.hanyutype1s);
+        //const regularUser = computed(() => userStore.hanyutype1s);
         const newItem = {
           FunctionID: this.form.selectedFunction, // need to get from dropdownlist
           ProcessType: this.form.selectedProcess,
@@ -140,7 +141,7 @@ export default {
           ModifiedReason: this.form.modifiedReason,
           Despatchnote: this.form.note,
           Comment: this.form.comment,
-          ModifiedBy: JSON.stringify(userStore.hanyutype1s[0]),
+          //ModifiedBy: JSON.stringify(userStore.hanyutype1s[0]),
         };
 
         //Get UD part number in the part master table that corresponds to the entered MLN part number
@@ -169,7 +170,7 @@ export default {
               element.ProcessName = this.getProcessNameByType(element.ProcessType);
               element.FunctionName = this.getFunctionNameById(element.FunctionID);
               element.ModifiedReasonName = this.getModifiedReasonNameById(element.ModifiedReason);
-              element.EditorName = this.getEditorNameById(element.ModifiedById);
+              element.EditorName = this.getEditorNameById(element.EditorId);
               return condition;
           });
           this.tableData = filteredTable;
@@ -241,19 +242,19 @@ export default {
     getEditorNameById(Editor){
 
         const regularUser = computed(() => userStore.hanyutype1s);
-        //const managerUser = computed(() => userStore.inventorymanagers);
+        const managerUser = computed(() => userStore.inventorymanagers);
 
         let tempTableUserInfo = [];
         regularUser.value.forEach(item => {
           tempTableUserInfo.push({ Title: item.Title, Id: item.Id})
         });
 
-        /*managerUser.value.forEach(item => {
+        managerUser.value.forEach(item => {
           tempTableUserInfo.push({ label: item.Title, value: item.Id})
-        });*/
+        });
 
         const tableEditorName = tempTableUserInfo.filter(item => {
-          if(item.Id === Editor){
+          if(item.value === Editor){
             return true
           }else{
             return false
@@ -261,7 +262,7 @@ export default {
         });
         if(tableEditorName.length>0)
         {
-          return tableEditorName[0].Title
+          return tableEditorName[0].label
         } else {
           return "";
         }
@@ -272,7 +273,7 @@ export default {
         selectedProcess: 'Z',
         num: '',
         count: '',
-        ModifiedBy: userStore.hanyutype1s[0], //need to confirm how to get it.
+        //ModifiedBy: userStore.hanyutype1s[0], //remove because customer agreen to use current user as it.
         modifiedReason: '01',
         note: '',
         comment: ''
