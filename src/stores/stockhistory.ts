@@ -139,13 +139,14 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`).items.orderBy("Registered", false)();
                 const newItems = items.filter(item => {
                     let condition = true;
+                    //?????????????????????????? 前月末的库存需要改一下时间上的比较
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
                     if (mlnPartNo) {
                         condition = condition && mlnPartNo === item.MLNPartNo && item.ProcessType === processType && formatRegistered !== current
                     }
                     return condition
                 });
-                console.log("get Last Months Latest Stock Qty ByMln" + newItems);
+                //console.log("get Last Months Latest Stock Qty ByMln" + newItems);
                 if (newItems.length > 0) {
                     return newItems[0].StockQty
                 } else {
