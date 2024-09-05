@@ -124,24 +124,28 @@ export default {
         this.form.UDPartNo = curUDPartNo
 
         //If the input "工程完了日" is smaller than the latest record date of this part, show error meesage "工程完了日エラー"
-        const processCompletionResultStore = useProcessCompletionResultStore();
-        const curPartRecords = await processCompletionResultStore.getItemsByMLNPartNoProcessType(this.form.MLNPartNo, this.form.selectProcessType);
-        console.log('=========+++++++++');
-        console.log(curPartRecords);
-        if (curPartRecords.length > 0) {
-          const latestRecord = curPartRecords[0];
-          const compareDateResult = this.compareDates(latestRecord.ProcessCompletion,this.form.ProcessCompletion)
-          if (compareDateResult === 1) {
-            this.$message.error('工程完了日エラー');
-            return;
+        
+          const processCompletionResultStore = useProcessCompletionResultStore();
+          const curPartRecords = await processCompletionResultStore.getItemsByMLNPartNoProcessType(this.form.MLNPartNo, this.form.selectProcessType);
+          console.log('=========+++++++++');
+          console.log(curPartRecords);
+          if (curPartRecords.length > 0) {
+            const latestRecord = curPartRecords[0];
+            if (!this.isToday(Date(latestRecord.ProcessCompletion))) { 
+              const compareDateResult = this.compareDates(latestRecord.ProcessCompletion,this.form.ProcessCompletion)
+              if (compareDateResult === 1) {
+                this.$message.error('工程完了日エラー');
+                return;
+              }
+            }
           }
-        }
+        
+        
 
         //If the entered completed quantity is greater than the stock quantity of the previous process, an error message "完成数が前工程の在庫数より多くなっています" will be displayed and the item will not be registered in the in-house process completion results table.
         //根据MLN编号和工程区分获得部品列表
         const billOfMaterialsStore = useBillOfMaterialsStore();
         const stockHistoryStore = useStockHistoryStore();
-        const stockHistoryStore2 = useStockHistoryStore();
         const partRecords = await billOfMaterialsStore.getItemsByMLNPartNoProcessType(this.form.MLNPartNo, this.form.selectProcessType)
         //遍历partRecords,获取所有前置部品中的最小库存数，然后用完成数与之比较做判断
         const date = new Date();
@@ -163,7 +167,7 @@ export default {
           return;
         }
   
-        const latestStockQty = await stockHistoryStore2.getLatestStockQtyByMLNPartNoProcessTypeDesc(this.form.MLNPartNo, this.form.selectProcessType);
+        const latestStockQty = await stockHistoryStore.getLatestStockQtyByMLNPartNoProcessTypeDesc(this.form.MLNPartNo, this.form.selectProcessType);
 
         const newItem = {
           MLNPartNo: this.form.MLNPartNo,
@@ -213,7 +217,9 @@ export default {
       // const processMasterStore = useProcessMasterStore();
       try {
         await ProcessMasterStore.getListItems(); // 获取数据
-        this.processOptions = ProcessMasterStore.processMasterItems.map(item => ({
+        this.processOptions = ProcessMasterStore.processMasterItems
+        .filter(item => item.ProcessType !== 'F')
+        .map(item => ({
           Id: item.Id,           // 保留Id用于key
           ProcessName: item.ProcessName, // 用于显示的名称
           ProcessType: item.ProcessType,
@@ -287,6 +293,18 @@ export default {
       } else {
         return 0;
       }
+    },
+
+    isToday(date) {
+      const today = new Date(); // 获取当前日期
+      const givenDate = new Date(date);
+  
+      // 将当前日期和传入日期的时间部分都设置为 00:00:00
+      today.setHours(0, 0, 0, 0);
+      givenDate.setHours(0, 0, 0, 0);
+
+      // 比较日期
+      return today.getTime() === givenDate.getTime();
     }
   },
   async mounted() {

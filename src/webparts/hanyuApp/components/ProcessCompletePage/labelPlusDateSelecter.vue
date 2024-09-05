@@ -42,7 +42,9 @@ export default {
   },
   methods: {
     handleChange(value) {
-      this.$emit('update:modelValue', value);
+      if (value) { 
+        this.$emit('update:modelValue', value);
+      }
     },
 
     disabledDate(date) {
