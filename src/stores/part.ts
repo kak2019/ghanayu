@@ -165,18 +165,53 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 throw new Error(`データの削除中にエラーが発生しました: ${error.message}`);
             }
         },
-        async getListItemsBySearchItems(date: string, processType: string) {
+        async getListItemsBySearchItems(date: string, processType: string, mlnPartNo: string, udPartNo: string ) {
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
 
-                const items = (await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNamePARTMASTER}`).items.orderBy("MLNPartNo", true)());
-                const stockHistoryStore = useStockHistoryStore();
-                //const currentMonth = current;
-                console.log("=================" + date);
+                let items = (await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNamePARTMASTER}`).items.orderBy("MLNPartNo", true)());
+                
+                //filter part list with process type
+                if(processType !== ""){
+                    items = items.filter(item => {
+                        let condition = true;
+                            //console.log(item.ID + "item.ProcessType-----------" + item.ProcessType);
+                            const isProcessTypeIn = (item.ProcessType !== null) && (item.ProcessType.indexOf(processType)>=0)
+                            if(isProcessTypeIn){
+                            condition = condition && isProcessTypeIn
+                            }else{
+                            condition = false;
+                            }
+                        return condition;
+                    });
+                }
+
+                //filter parts list with process type
+                const MLNPartNoValue = mlnPartNo.trim();
+                const UDPartNoValue = udPartNo.trim();
+                const isEmpty1 = MLNPartNoValue === "";
+                const isEmpty2 = UDPartNoValue === "";
+                if(isEmpty1 && isEmpty2){
+                    console.log("");
+                }else{
+                    items = items.filter(item => {
+                        let condition = true;
+                        const filterByMLNPartNo = !isEmpty1 && item.MLNPartNo.indexOf(MLNPartNoValue) >= 0;
+                        const filterByUDPartNo = !isEmpty2 && item.UDPartNo.indexOf(UDPartNoValue) >= 0;
+                      
+                        if(!isEmpty1 && !isEmpty2) {
+                            condition = condition && filterByMLNPartNo
+                        }else{
+                            condition = condition && (filterByMLNPartNo|| filterByUDPartNo)
+                        }
+                        return condition; 
+                    });
+                }
+                
+                //Beginning of caculation
                 const currentMonth = new Date(date).getFullYear() + "-" + (new Date(date).getMonth() + 1);
-
-
+                const stockHistoryStore = useStockHistoryStore();
                 //前月末在庫
                 const listWithAllLastMonthQty = await Promise.all(items.map(async item => {
                     return await stockHistoryStore.getLastMonthsLatestStockQtyByMln(item.MLNPartNo, processType, currentMonth);

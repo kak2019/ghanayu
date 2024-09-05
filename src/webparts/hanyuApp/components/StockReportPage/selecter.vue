@@ -63,7 +63,7 @@ export default {
         ProcessType: item.ProcessType // 用于查询
       }));
       this.options.shift();
-      this.options.push({"" : ""});
+      this.options.push({Id : "", ProcessName:"", ProcessType: ""});
     } catch (error) {
       console.error('Failed to load process master items:', error);
     }

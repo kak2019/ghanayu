@@ -97,7 +97,7 @@ export default {
 
       const newData1 = [["工程区分", "MLN部品番号", "UD部品番号", "前月末在庫", "当月実績", "", "", "当月末在庫"]]
       const newData2 = [["", "", "", "", "不良", "完成", "振替", ""]]
-      const newData3 = [["", "", "合計", this.summaries[0],this.summaries[1], this.summaries[2], this.summaries[3], this.summaries[4]]]
+      const newData3 = [["", "", "合計", this.summaries[3],this.summaries[4], this.summaries[5], this.summaries[6], this.summaries[7]]];
 
       const originalData = XLSX.utils.sheet_to_json(ws, { header: 1 });
       originalData.shift()
@@ -122,12 +122,14 @@ export default {
       // 将工作簿导出为 Excel 文件
       XLSX.writeFile(wb, "在庫管理表.xlsx");
     },
-    searchForm() {
-      this.tableData = this.filterDataBySearchItems();
-      this.summaries = this.getSummaries();
+    async searchForm() {
+      //this.tableData = this.filterDataBySearchItems();
+      //this.summaries = this.getSummaries();
+
+      await this.filterDataBySearchItems();
       //console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" + this.summaries);
     },
-    resetForm() {
+    async resetForm() {
       // 重置表单字段并清空表格数据
       this.form = {
         date: new Date(),
@@ -135,16 +137,38 @@ export default {
         MLNPartNo: '',
         UDPartNo: ''
       };
-      this.tableData = this.filterDataBySearchItems(); // 重新设置过滤后的数据
-      this.summaries = this.getSummaries();
+      await this.filterDataBySearchItems().then(() => {
+      }).catch(error => {
+            
+      });
     },
-    filterDataBySearchItems(){
+    async filterDataBySearchItems(){
       const query = this.form
      
       const formatQueryDate = query.date.getFullYear() + '-' + (query.date.getMonth()+1);
 
-      const filterTable = partMasterStore.partMasterItems
-          /*.filter(item => {
+    try {
+      this.loading = true;
+      const date = this.form.date;
+      const processType = this.form.select;
+      const mlnPartNo = this.form.MLNPartNo;
+      const udPartNo = this.form.UDPartNo;
+      await partMasterStore.getListItemsBySearchItems(date, processType, mlnPartNo, udPartNo).then(() => {
+                this.loading = false;
+                // 对数据进行处理以匹配表格字段
+                this.tableData = partMasterStore.partMasterItems;
+                this.summaries = this.getSummaries();
+            }).catch(error => {
+                this.loading = false;
+                ElMessage.error(error.message);
+            });
+      console.log("Processed table data:", this.tableData);
+    } catch (error) {
+      console.error('Error fetching stock history:', error);
+    }
+
+      /*const filterTable = partMasterStore.partMasterItems
+          .filter(item => {
             //console.log("item.Registered ------"+  item.Registered);
             let condition = true
             if(query.date){
@@ -153,7 +177,7 @@ export default {
               condition = condition && formatQueryDate === formatRegisteredDate
             }
             return condition;
-          })*/.filter(item => {
+          }).filter(item => {
               let condition = true;
                //console.log(item.ID + "item.ProcessType-----------" + item.ProcessType);
               if(query.select){
@@ -167,8 +191,6 @@ export default {
               }
               return condition;
           }).filter(item => {
-            //console.log("item.MLNPartNo ------"+  item.MLNPartNo);
-            //console.log("item.UDPartNo ------"+  item.UDPartNo);
             let condition = true;
             const MLNPartNoValue = query.MLNPartNo.trim();
             const UDPartNoValue = query.UDPartNo.trim();
@@ -188,7 +210,7 @@ export default {
             return condition; 
           });
 
-        return filterTable;
+        return filterTable;*/
     },
     getSummaries() {
       const summaries = [];
@@ -214,7 +236,7 @@ export default {
     try {
       // 调用 store 的方法获取数据
       //const formatCurrentDate = query.date.getFullYear() + '-' + (query.date.getMonth()+1);
-      const date = this.form.date;
+      /*const date = this.form.date;
       const processType = this.form.select
       await partMasterStore.getListItemsBySearchItems(date, processType).then(() => {
                 this.loading = false;
@@ -226,7 +248,9 @@ export default {
             }).catch(error => {
                 this.loading = false;
                 ElMessage.error(error.message);
-            });
+            });*/
+            await this.filterDataBySearchItems();
+
       console.log("Processed table data:", this.tableData);
     } catch (error) {
       console.error('Error fetching stock history:', error);
