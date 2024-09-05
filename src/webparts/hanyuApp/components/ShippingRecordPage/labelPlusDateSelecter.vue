@@ -7,6 +7,7 @@
         placeholder="选择日期"
         class="custom-date-picker"
         @change="handleChange"
+        :disabled-date="disabledDate"
         style="max-width: 127px ; border: 1px solid #000;"
     ></el-date-picker>
   </div>
@@ -41,6 +42,12 @@ export default {
   methods: {
     handleChange(value) {
       this.$emit('update:modelValue', value);
+    },
+
+    disabledDate(date) {
+      const start = new Date('2024-01-01'); // need to change to 2025-01-01
+      const end = new Date();
+      return date < start || date > end;
     }
   }
 };

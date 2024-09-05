@@ -70,7 +70,7 @@ export const useProcessCompletionResultStore = defineStore(FeatureKey.PROCESSCOM
                       </And>                     
                     </Where>
                     <OrderBy>
-                      <FieldRef Name='ProcessCompletion' Ascending='TRUE' />
+                      <FieldRef Name='ProcessCompletion' Ascending='FALSE' />
                     </OrderBy>
                   </Query>
                 </View>`
@@ -97,7 +97,7 @@ export const useProcessCompletionResultStore = defineStore(FeatureKey.PROCESSCOM
           DefectQty: item.DefectQty,
           CompletionQty: item.CompletionQty,
           ProcessCompletion: item.ProcessCompletion,
-          // Registered: new Date(),
+          Registered: new Date(),
         });
         return '登録完了。';
       } catch (error) {

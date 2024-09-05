@@ -26,6 +26,29 @@ export const useShippingResultStore = defineStore(FeatureKey.SHIPPINGRESULT, {
             }
 
         },
+
+        async getLatestShippingResultDateByMLNPartNoDesc(mlnPartNo: string): Promise<string> {
+            try {
+                const sp = spfi(getSP());
+                const web = await sp.web();
+                const list = sp.web.getList(`${web.ServerRelativeUrl}/Lists/ShippingResult`);
+
+                const items = await list.items
+                    .filter(`MLNPartNo eq '${mlnPartNo}'`)
+                    .orderBy("ShippingResultDate", false)();
+
+                if (items.length > 0) {
+                    console.log(`Found item: ${JSON.stringify(items[0])}`);
+                    return items[0].ShippingResultDate;
+                } else {
+                    return '';
+                }
+
+            } catch (error) {
+                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+            }
+        },
+
         async addListItem(item: IShippingResultItem): Promise<string> {
             try {
                 const sp = spfi(getSP());
