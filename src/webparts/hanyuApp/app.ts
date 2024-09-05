@@ -8,6 +8,7 @@ import { useUserStore } from '../../stores/user';
 import { useOperationCalendarStore } from '../../stores/operationcalendar';
 import { useModifiedReasonMasterStore } from '../../stores/modifiedreason';
 import { ElMessage } from 'element-plus';
+import { CONST } from '../../config/const';
 
 export default defineComponent({
     name: "HanyuApp",
@@ -24,6 +25,7 @@ export default defineComponent({
 
 
         onMounted(async (): Promise<void> => {
+            console.log(`${CONST.beginOperationDate} - ${CONST.endOperationDate}`);
             loading.value = true;
             try {
                 await processMasterStore.getListItems();

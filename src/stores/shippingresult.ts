@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia';
 import { spfi } from '@pnp/sp';
 import { getSP } from '../pnpjsConfig';
-import { FeatureKey } from './keystrs';
-import { IShippingResultItem} from '../model';
+import { FeatureKey } from '../config/keystrs';
+import { IShippingResultItem } from '../model';
+import { CONST } from '../config/const';
 
 export const useShippingResultStore = defineStore(FeatureKey.SHIPPINGRESULT, {
     state: () => ({
@@ -17,7 +18,7 @@ export const useShippingResultStore = defineStore(FeatureKey.SHIPPINGRESULT, {
                 const sp = spfi(getSP());
                 const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/ShippingResult`).items.orderBy("Registered", false)();
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSHIPPINGRESULT}`).items.orderBy("Registered", false)();
                 this.shippingResults = items;
             }
             catch (error) {
@@ -29,7 +30,7 @@ export const useShippingResultStore = defineStore(FeatureKey.SHIPPINGRESULT, {
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
-                await sp.web.getList(`${web.ServerRelativeUrl}/Lists/ShippingResult`).items.add({
+                await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSHIPPINGRESULT}`).items.add({
                     MLNPartNo: item.MLNPartNo,
                     UDPartNo: item.UDPartNo,
                     ShipTo: item.ShipTo,

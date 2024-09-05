@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia';
 import { spfi } from '@pnp/sp';
 import { getSP } from '../pnpjsConfig';
-import { FeatureKey } from './keystrs';
+import { FeatureKey } from '../config/keystrs';
 import { IFunctionsMasterItem } from '../model';
+import { CONST } from '../config/const';
 
 export const useFunctionsMasterStore = defineStore(FeatureKey.FUNCTIONSMASTER, {
     state: () => ({
@@ -17,7 +18,7 @@ export const useFunctionsMasterStore = defineStore(FeatureKey.FUNCTIONSMASTER, {
                 const sp = spfi(getSP());
                 const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/FunctionsMaster`).items.orderBy("FunctionID", true)();
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameFUNCTIONSMASTER}`).items.orderBy("FunctionID", true)();
                 this.functions = items;
             }
             catch (error) {

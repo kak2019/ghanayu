@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia';
 import { spfi } from '@pnp/sp';
 import { getSP } from '../pnpjsConfig';
-import { FeatureKey } from './keystrs';
+import { FeatureKey } from '../config/keystrs';
 import { IModifiedReasonMasterItem } from '../model';
+import { CONST } from '../config/const';
 
 export const useModifiedReasonMasterStore = defineStore(FeatureKey.MODIFIEDREASONMASTER, {
     state: () => ({
@@ -17,7 +18,7 @@ export const useModifiedReasonMasterStore = defineStore(FeatureKey.MODIFIEDREASO
                 const sp = spfi(getSP());
                 const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/ModifiedReasonMaster`).items.orderBy("ModifiedReasonID", true)();
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameMODIFIEDREASONMASTER}`).items.orderBy("ModifiedReasonID", true)();
                 this.modifiedreasons = items;
             }
             catch (error) {

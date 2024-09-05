@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia';
 import { spfi } from '@pnp/sp';
 import { getSP } from '../pnpjsConfig';
-import { FeatureKey } from './keystrs';
+import { FeatureKey } from '../config/keystrs';
 import { IBillOfMaterialsItem } from '../model';
+import { CONST } from '../config/const';
 
 export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
     state: () => ({
@@ -17,7 +18,7 @@ export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
                 const sp = spfi(getSP());
                 const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/BillOfMaterials`).items.orderBy("ParentPartNo", true)();
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameBILLOFMATERIALS}`).items.orderBy("ParentPartNo", true)();
 
                 const processTypeOrder: { [key: string]: number } = {
                     'F': 1,
@@ -47,7 +48,7 @@ export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
                 const sp = spfi(getSP());
                 const web = await sp.web();
                 // `${item.ParentPartNo}-${item.ParentProcessType}-${item.ChildPartNo}-${item.ChildProcessType}`
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/BillOfMaterials`).items.filter(`UniqueKey eq '${uniqueKey}'`)();
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameBILLOFMATERIALS}`).items.filter(`UniqueKey eq '${uniqueKey}'`)();
                 if (items.length === 0) {
                     return false;
                 }
@@ -77,7 +78,7 @@ export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/BillOfMaterials`).getItemsByCAMLQuery(camlQuery);
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameBILLOFMATERIALS}`).getItemsByCAMLQuery(camlQuery);
                 return items.length;
             } catch (error) {
                 throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
@@ -143,7 +144,7 @@ export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/BillOfMaterials`).getItemsByCAMLQuery(camlQuery);
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameBILLOFMATERIALS}`).getItemsByCAMLQuery(camlQuery);
                 return items;
             } catch (error) {
                 throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
@@ -158,7 +159,7 @@ export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
                 }
                 const sp = spfi(getSP());
                 const web = await sp.web();
-                await sp.web.getList(`${web.ServerRelativeUrl}/Lists/BillOfMaterials`).items.add({
+                await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameBILLOFMATERIALS}`).items.add({
                     ParentPartNo: item.ParentPartNo,
                     ParentProcessType: item.ParentProcessType,
                     ChildPartNo: item.ChildPartNo,
@@ -181,7 +182,7 @@ export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
                 }
                 const sp = spfi(getSP());
                 const web = await sp.web();
-                await sp.web.getList(`${web.ServerRelativeUrl}/Lists/BillOfMaterials`).items.getById(itemId).update({
+                await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameBILLOFMATERIALS}`).items.getById(itemId).update({
                     //ParentPartNo: item.ParentPartNo,
                     //ParentProcessType: item.ParentProcessType,
                     ChildPartNo: item.ChildPartNo,
@@ -202,7 +203,7 @@ export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
                 // TODO: maybe dependency check
                 const sp = spfi(getSP());
                 const web = await sp.web();
-                await sp.web.getList(`${web.ServerRelativeUrl}/Lists/BillOfMaterials`).items.getById(itemId).delete();
+                await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameBILLOFMATERIALS}`).items.getById(itemId).delete();
                 return '消去完了。';
             }
             catch (error) {

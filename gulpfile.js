@@ -11,12 +11,30 @@ build.sass.setConfig({
 
 build.configureWebpack.mergeConfig({
   additionalConfiguration: function (config) {
+    let beginOperationDate = process.env.BeginOperationDate;
+    let endOperationDate = process.env.EndOperationDate;
+    let defineOptions = {};
+    if (beginOperationDate && endOperationDate) {
+      console.log('************    Applying production settings to webpack    **********************');
+      defineOptions = {
+        'beginOperationDate': JSON.stringify(beginOperationDate),
+        'endOperationDate': JSON.stringify(endOperationDate),
+      }
+    } else {
+      // specify dev settings here
+      defineOptions = {
+        'beginOperationDate': JSON.stringify('1/1/2024'),
+        'endOperationDate': JSON.stringify('12/31/2025'),
+      }
+    }
+
     config.plugins.push(new VueLoaderPlugin());
 
     var vueConfig = {
       devtool: process.env.NODE_ENV === 'development' ? 'source-map' : undefined,
       plugins: [
         new webpack.DefinePlugin({
+          ...defineOptions,
           __VUE_OPTIONS_API__: 'true',
           __VUE_PROD_DEVTOOLS__: 'false',
           __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false'

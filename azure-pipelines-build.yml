@@ -4,9 +4,9 @@ parameters:
   # friendly name of the job
   display_name: Building & packaging
   # project name
-  project_name: ''
-  working_directory: '.'
-  variable_group_name: 
+  project_name: ""
+  working_directory: "."
+  variable_group_name:
 jobs:
   - job: ${{ parameters.job_name }}
     displayName: ${{ parameters.display_name }}
@@ -21,45 +21,45 @@ jobs:
       - name: npm_config_cache
         value: $(Pipeline.Workspace)/.
 
-
     steps:
       - task: NodeTool@0
-        displayName: 'Use Node 18.x'
+        displayName: "Use Node 18.x"
         inputs:
           versionSpec: 18.x
 
-      - task: Npm@1
-        displayName: 'npm install'
-        inputs:
-          verbose: false
+      - script: |
+          echo $(BeginOperationDate) 
+          echo $(EndOperationDate)
+        displayName: "ARM template variables"
 
-      - task: gulp@0
-        displayName: 'gulp bundle'
-        inputs:
-          targets: bundle
-          arguments: '--ship'
-        continueOnError: true
+      - script: npm install
+        displayName: "npm install"
+      - script: npm install --global cross-env
+        displayName: "Install cross-env"
 
-      - task: gulp@0
-        displayName: 'gulp package-solution'
-        inputs:
-          targets: 'package-solution'
-          arguments: '--ship'
+      - script: gulp clean
+        displayName: "Clean"
+      - script: gulp build
+        displayName: "Build"
+      - script: cross-env BeginOperationDate=$(BeginOperationDate) EndOperationDate=$(EndOperationDate) gulp bundle --ship
+        displayName: "Bundle"
+      - script: gulp package-solution --ship
+        displayName: "Package Solution"
+      - script: dir
+        displayName: "List Directory"
 
       - task: CopyFiles@2
-        displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
+        displayName: "Copy Files to: $(Build.ArtifactStagingDirectory)"
         inputs:
-          SourceFolder: '$(Build.Repository.LocalPath)/sharepoint/solution'
-          Contents: '*.sppkg'
-          TargetFolder: '$(Build.ArtifactStagingDirectory)'
+          Contents: |
+            sharepoint/**/*.sppkg
+          TargetFolder: "$(Build.ArtifactStagingDirectory)"
 
-
-     
       - task: CopyFiles@2
         displayName: "Copy Files to: $(Build.ArtifactStagingDirectory)"
         inputs:
           Contents: "$(Build.SourcesDirectory)/artifacts/3.19.2003.0/*.*"
           TargetFolder: "$(Build.ArtifactStagingDirectory)"
-      
+
       - task: PublishBuildArtifacts@1
-        displayName: 'Publish Artifact: drop'
+        displayName: "Publish Artifact: drop"

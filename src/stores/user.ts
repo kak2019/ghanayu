@@ -4,7 +4,7 @@ import { getSP } from '../pnpjsConfig';
 import "@pnp/sp/webs";
 import "@pnp/sp/site-users/web";
 import "@pnp/sp/site-groups/web";
-import { FeatureKey } from './keystrs';
+import { FeatureKey } from '../config/keystrs';
 import { IUser } from '../model/user';
 
 export const useUserStore = defineStore(FeatureKey.USER, {

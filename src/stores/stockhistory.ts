@@ -1,8 +1,9 @@
 import { defineStore } from 'pinia';
 import { spfi } from '@pnp/sp';
 import { getSP } from '../pnpjsConfig';
-import { FeatureKey } from './keystrs';
+import { FeatureKey } from '../config/keystrs';
 import { IStockHistoryItem } from '../model';
+import { CONST } from '../config/const';
 
 export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
     state: () => ({
@@ -19,7 +20,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 const sp = spfi(getSP());
                 const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/StockHistory`).items.orderBy("Registered", false)();
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`).items.orderBy("Registered", false)();
                 this.stockHistories = items;
             }
             catch (error) {
@@ -54,7 +55,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 const sp = spfi(getSP());
                 const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/StockHistory`).getItemsByCAMLQuery({ ViewXml: camlQuery });
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`).getItemsByCAMLQuery({ ViewXml: camlQuery });
                 this.currentMonthStockHistories = items;
             }
             catch (error) {
@@ -66,7 +67,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
-                await sp.web.getList(`${web.ServerRelativeUrl}/Lists/StockHistory`).items.add({
+                await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`).items.add({
                     MLNPartNo: item.MLNPartNo,
                     ProcessType: item.ProcessType, // Need to check if it's only F?
                     UDPartNo: item.UDPartNo,
@@ -112,7 +113,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
-                const list = sp.web.getList(`${web.ServerRelativeUrl}/Lists/StockHistory`);
+                const list = sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`);
 
                 const items = await list.items
                     .filter(`MLNPartNo eq '${mlnPartNo}' and ProcessType eq '${processType}'`)
@@ -135,7 +136,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 const sp = spfi(getSP());
                 const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/StockHistory`).items.orderBy("Registered", false)();
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`).items.orderBy("Registered", false)();
                 const newItems = items.filter(item => {
                     let condition = true;
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
@@ -161,7 +162,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 const sp = spfi(getSP());
                 const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/StockHistory`).items.orderBy("Registered", false)();
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`).items.orderBy("Registered", false)();
                 const newItems = items.filter(item => {
                     let condition = true
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
@@ -193,7 +194,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 const sp = spfi(getSP());
                 const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/StockHistory`).items.orderBy("Registered", false)();
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`).items.orderBy("Registered", false)();
                 const newItems = items.filter(item => {
                     let condition = true;
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
@@ -225,7 +226,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 const sp = spfi(getSP());
                 const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/StockHistory`).items.orderBy("Registered", false)();
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`).items.orderBy("Registered", false)();
                 const newItems = items.filter(item => {
                     let condition = true;
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
@@ -266,7 +267,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 const sp = spfi(getSP());
                 const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/StockHistory`).items.orderBy("Registered", false)();
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`).items.orderBy("Registered", false)();
                 const newItems = items.filter(item => {
                     let condition = true;
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);

@@ -9,10 +9,27 @@ const { VueLoaderPlugin } = require('vue-loader');
  * you can add your project related webpack configuration here, it will be merged using webpack-merge module
  * i.e. plugins: [new webpack.Plugin()]
  */
+let beginOperationDate = process.env.BeginOperationDate;
+let endOperationDate = process.env.EndOperationDate;
+let defineOptions = {};
+if (beginOperationDate && endOperationDate) {
+  console.log('************    Applying production settings to webpack    **********************');
+  defineOptions = {
+    'beginOperationDate': JSON.stringify(beginOperationDate),
+    'endOperationDate': JSON.stringify(endOperationDate),
+  }
+} else {
+  // specify dev settings here
+  defineOptions = {
+    'beginOperationDate': JSON.stringify('1/1/2024'),
+    'endOperationDate': JSON.stringify('12/31/2025'),
+  }
+}
 const webpackConfig = {
   devtool: 'source-map',//align with gulpfile, but it seems does not work in fast serve and chrome, try edge or back to gulp serve if you use it.
   plugins: [new VueLoaderPlugin(),
   new webpack.DefinePlugin({
+    ...defineOptions,
     __VUE_OPTIONS_API__: 'true',
     __VUE_PROD_DEVTOOLS__: 'false',
     __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false'
