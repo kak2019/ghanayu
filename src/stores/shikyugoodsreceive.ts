@@ -47,6 +47,7 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
                         Calloffid: item.Calloffid || "",
                         Despatchnote: item.Despatchnote || "",
                         GoodsReceiveDate: item.GoodsReceiveDate || "",
+                        Registered: new Date() || ""
                     });
 
                     //Add record to StockHistory table.
