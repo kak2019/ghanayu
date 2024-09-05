@@ -85,8 +85,37 @@ export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
         },
         async getItemCountByMLNPartNoProcessType(mlnPartNo: string, processType: string): Promise<number> {
             try {
-                const items = await this.getItemsByMLNPartNoProcessType(mlnPartNo, processType);
+                const items = await this.getItemsByChildMLNPartNoProcessType(mlnPartNo, processType);
                 return items.length;
+            } catch (error) {
+                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+            }
+        },
+        async getItemsByChildMLNPartNoProcessType(mlnPartNo: string, processType: string): Promise<IBillOfMaterialsItem[]> {
+            const camlQuery = {
+                ViewXml: `
+                <View>
+                  <Query>
+                    <Where>
+                      <And>
+                        <Eq>
+                          <FieldRef Name='ChildPartNo' />
+                          <Value Type='Text'>${mlnPartNo}</Value>
+                        </Eq>
+                        <Eq>
+                          <FieldRef Name='ChildProcessType' />
+                          <Value Type='Text'>${processType}</Value>
+                        </Eq>
+                      </And>                     
+                    </Where>
+                  </Query>
+                </View>`
+            };
+            try {
+                const sp = spfi(getSP());
+                const web = await sp.web();
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/BillOfMaterials`).getItemsByCAMLQuery(camlQuery);
+                return items;
             } catch (error) {
                 throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
             }

@@ -144,7 +144,7 @@ export default {
       const formatQueryDate = query.date.getFullYear() + '-' + (query.date.getMonth()+1);
 
       const filterTable = partMasterStore.partMasterItems
-          .filter(item => {
+          /*.filter(item => {
             //console.log("item.Registered ------"+  item.Registered);
             let condition = true
             if(query.date){
@@ -153,7 +153,7 @@ export default {
               condition = condition && formatQueryDate === formatRegisteredDate
             }
             return condition;
-          }).filter(item => {
+          })*/.filter(item => {
               let condition = true;
                //console.log(item.ID + "item.ProcessType-----------" + item.ProcessType);
               if(query.select){

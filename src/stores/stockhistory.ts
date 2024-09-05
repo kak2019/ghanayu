@@ -68,7 +68,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 const web = await sp.web();
                 await sp.web.getList(`${web.ServerRelativeUrl}/Lists/StockHistory`).items.add({
                     MLNPartNo: item.MLNPartNo,
-                    ProcessType: "F", // Need to check if it's only F?
+                    ProcessType: item.ProcessType, // Need to check if it's only F?
                     UDPartNo: item.UDPartNo,
                     Qty: item.Qty,
                     FunctionID: item.FunctionID,
@@ -86,9 +86,9 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
-
+                let tempItems = [];
                 const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/StockHistory`).items.orderBy("Registered", false)();
-                items.filter(item => {
+                tempItems = items.filter(item => {
                     let condition = true
                     if (mlnPartNo) {
                         condition = condition && mlnPartNo === item.MLNPartNo
@@ -96,8 +96,8 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                     return condition
                 });
                 console.log("items order by register date" + items);
-                if (items.length > 0) {
-                    return items[0].StockQty
+                if (tempItems.length > 0) {
+                    return tempItems[0].StockQty
                 } else {
                     return 0;
                 }
@@ -140,7 +140,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                     let condition = true;
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
                     if (mlnPartNo) {
-                        condition = condition && mlnPartNo === item.MLNPartNo && item.processType === processType && formatRegistered !== current
+                        condition = condition && mlnPartNo === item.MLNPartNo && item.ProcessType === processType && formatRegistered !== current
                     }
                     return condition
                 });
@@ -166,7 +166,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                     let condition = true
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
                     if (mlnPartNo) {
-                        condition = condition && mlnPartNo === item.MLNPartNo && item.processType === processType && formatRegistered === current
+                        condition = condition && mlnPartNo === item.MLNPartNo && item.ProcessType === processType && formatRegistered === current
                     }
                     return condition
                 });
@@ -198,7 +198,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                     let condition = true;
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
                     if (mlnPartNo) {
-                        condition = condition && mlnPartNo === item.MLNPartNo && item.processType === processType && formatRegistered === current
+                        condition = condition && mlnPartNo === item.MLNPartNo && item.ProcessType === processType && formatRegistered === current
                     }
                     return condition
                 });
@@ -230,7 +230,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                     let condition = true;
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
                     if (mlnPartNo) {
-                        condition = condition && mlnPartNo === item.MLNPartNo && item.processType === processType && formatRegistered === current
+                        condition = condition && mlnPartNo === item.MLNPartNo && item.ProcessType === processType && formatRegistered === current
                     }
                     return condition
                 });
@@ -271,7 +271,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                     let condition = true;
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
                     if (mlnPartNo) {
-                        condition = condition && mlnPartNo === item.MLNPartNo && item.processType === processType && formatRegistered === current
+                        condition = condition && mlnPartNo === item.MLNPartNo && item.ProcessType === processType && formatRegistered === current
                     }
                     return condition
                 });
