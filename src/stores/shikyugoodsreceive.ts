@@ -52,7 +52,7 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
 
                     //Add record to StockHistory table.
                     const stockHistoryStore = useStockHistoryStore();
-                    const latestStockQty = await stockHistoryStore.getListItemsByRegisteredDate(item.MLNPartNo);
+                    const latestStockQty = await stockHistoryStore.getListItemsByRegisteredDate(item.MLNPartNo,item.ProcessType);
                     const stockQty = latestStockQty + item.GoodsReceiveQty;
                     const billOfMaterialsItem = {
                         MLNPartNo: item.MLNPartNo,

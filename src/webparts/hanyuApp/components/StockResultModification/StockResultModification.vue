@@ -64,6 +64,7 @@ import { useFunctionsMasterStore } from '../../../../stores/function';
 import { useUserStore } from '../../../../stores/user';
 import { useProcessMasterStore } from '../../../../stores/process';
 
+
 // 获取 Pinia store 实例
 const stockResultModificationStore = useStockResultModificationStore();
 const modifiedReasonMasterStore = useModifiedReasonMasterStore();
@@ -150,7 +151,8 @@ export default {
         newItem.UDPartNo = udPartNo;
 
         //Add record to good receive table
-        const message = await stockResultModificationStore.addListItem(newItem);
+        let message = await stockResultModificationStore.addListItem(newItem);
+
         this.$message.success(message);
         await this.fetchTableData();
 

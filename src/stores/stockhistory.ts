@@ -83,7 +83,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 throw new Error(`データの登録中にエラーが発生しました: ${error.message}`);
             }
         },
-        async getListItemsByRegisteredDate(mlnPartNo: string): Promise<number> {
+        async getListItemsByRegisteredDate(mlnPartNo: string, processType:string): Promise<number> {
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
@@ -92,7 +92,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 tempItems = items.filter(item => {
                     let condition = true
                     if (mlnPartNo) {
-                        condition = condition && mlnPartNo === item.MLNPartNo
+                        condition = condition && mlnPartNo === item.MLNPartNo && processType === item.ProcessType
                     }
                     return condition
                 });

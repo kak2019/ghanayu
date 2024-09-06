@@ -7,11 +7,11 @@
         <el-divider direction="vertical" />
         <router-link class="tab" to="/shippingrecord" replace>出荷実績入力</router-link>
         <el-divider direction="vertical" />
-        <router-link class="tab" to="/stockresultmodification" replace>在庫&実績修正</router-link>
+        <router-link class="tab" to="/goodsInventory" replace>在庫管理表(支給品)</router-link>
         <el-divider direction="vertical" />
         <router-link class="tab" to="/stockreport" replace>在庫管理表(工程別)</router-link>
         <el-divider direction="vertical" />
-        <router-link class="tab" to="/goodsInventory" replace>在庫管理表(支給品)</router-link>
+        <router-link class="tab" to="/stockresultmodification" replace>在庫&実績修正</router-link>
         <el-divider direction="vertical" />
         <router-link class="tab" to="/billofmaterials" replace>部品表</router-link>
         <el-divider direction="vertical" />
