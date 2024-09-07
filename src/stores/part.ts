@@ -89,16 +89,39 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
             }
         },
         async getListItems() {
-            try {
-                const sp = spfi(getSP());
-                const web = await sp.web();
+            let allItems: IPartMasterItem[] = [];
+            let hasNext = true;
+            let skip = 0;
+            const pageSize = 10;
+            while (hasNext) {
+                try {
+                    const sp = spfi(getSP());
+                    const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNamePARTMASTER}`).items.orderBy("MLNPartNo", true)();
-                this.parts = items;
+                    const items: IPartMasterItem[] = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNamePARTMASTER}`).items
+                        .select('ID', 'MLNPartNo', 'UDPartNo', 'ProcessType', 'Registered', 'Modified')
+                        .top(pageSize).skip(skip)();
+                    const selectedItems = items.map(item => ({
+                        ID: item.ID,
+                        MLNPartNo: item.MLNPartNo,
+                        UDPartNo: item.UDPartNo,
+                        ProcessType: item.ProcessType,
+                        Registered: item.Registered,
+                        Modified: item.Modified
+                    }))
+                    allItems = allItems.concat(selectedItems);
+                    skip += pageSize;
+                    hasNext = items.length === pageSize;
+                }
+                catch (error) {
+                    throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+                    hasNext = false;
+                }
             }
-            catch (error) {
-                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
-            }
+            const uniqueItems = Array.from(new Set(allItems.map(item => item.ID)))
+                .map(id => allItems.find(item => item.ID === id));
+            uniqueItems.sort((a, b) => a.MLNPartNo.localeCompare(b.MLNPartNo));
+            this.parts = uniqueItems;
 
         },
         async addListItem(item: IPartMasterItem): Promise<string> {
@@ -165,24 +188,24 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 throw new Error(`データの削除中にエラーが発生しました: ${error.message}`);
             }
         },
-        async getListItemsBySearchItems(date: string, processType: string, mlnPartNo: string, udPartNo: string ) {
+        async getListItemsBySearchItems(date: string, processType: string, mlnPartNo: string, udPartNo: string) {
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
 
                 let items = (await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNamePARTMASTER}`).items.orderBy("MLNPartNo", true)());
-                
+
                 //filter part list with process type
-                if(processType !== ""){
+                if (processType !== "") {
                     items = items.filter(item => {
                         let condition = true;
-                            //console.log(item.ID + "item.ProcessType-----------" + item.ProcessType);
-                            const isProcessTypeIn = (item.ProcessType !== null) && (item.ProcessType.indexOf(processType)>=0)
-                            if(isProcessTypeIn){
+                        //console.log(item.ID + "item.ProcessType-----------" + item.ProcessType);
+                        const isProcessTypeIn = (item.ProcessType !== null) && (item.ProcessType.indexOf(processType) >= 0)
+                        if (isProcessTypeIn) {
                             condition = condition && isProcessTypeIn
-                            }else{
+                        } else {
                             condition = false;
-                            }
+                        }
                         return condition;
                     });
                 }
@@ -192,23 +215,23 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 const UDPartNoValue = udPartNo.trim();
                 const isEmpty1 = MLNPartNoValue === "";
                 const isEmpty2 = UDPartNoValue === "";
-                if(isEmpty1 && isEmpty2){
+                if (isEmpty1 && isEmpty2) {
                     console.log("");
-                }else{
+                } else {
                     items = items.filter(item => {
                         let condition = true;
                         const filterByMLNPartNo = !isEmpty1 && item.MLNPartNo.indexOf(MLNPartNoValue) >= 0;
                         const filterByUDPartNo = !isEmpty2 && item.UDPartNo.indexOf(UDPartNoValue) >= 0;
-                      
-                        if(!isEmpty1 && !isEmpty2) {
+
+                        if (!isEmpty1 && !isEmpty2) {
                             condition = condition && filterByMLNPartNo
-                        }else{
-                            condition = condition && (filterByMLNPartNo|| filterByUDPartNo)
+                        } else {
+                            condition = condition && (filterByMLNPartNo || filterByUDPartNo)
                         }
-                        return condition; 
+                        return condition;
                     });
                 }
-                
+
                 //Beginning of caculation
                 const currentMonth = new Date(date).getFullYear() + "-" + (new Date(date).getMonth() + 1);
                 const stockHistoryStore = useStockHistoryStore();
