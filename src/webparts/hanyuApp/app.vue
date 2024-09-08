@@ -1,6 +1,7 @@
 <template>
 <div class="hanyuapp" v-loading="loading">
     <div class="nav">
+        <router-link class="tab" to="/" replace>フロントページ</router-link>
         <router-link class="tab" to="/goodsreceive" replace>支給品検収実績入力</router-link>
         <el-divider direction="vertical" />
         <router-link class="tab" to="/processcompletion" replace>内製工程完了実績入力</router-link>

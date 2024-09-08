@@ -3,7 +3,8 @@ import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
 const routes: RouteRecordRaw[] = [
     {
         path: '/',
-        redirect: '/processcompletion'
+        component: () => import(/* webpackChunkName: "home-chunk" */
+            '../webparts/hanyuApp/components/RouterComponents/Home.vue')
     },
     {
         path: '/stockresultmodification',

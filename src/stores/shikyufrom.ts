@@ -18,8 +18,14 @@ export const useSHIKYUFromStore = defineStore(FeatureKey.SHIKEYUFROM, {
                 const sp = spfi(getSP());
                 const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSHIKEYUFROM}`).items.orderBy("Title", true)();
-                this.shikyuFroms = items;
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSHIKEYUFROM}`).items
+                    .select('Title')
+                    .top(5)
+                    .orderBy("Title", true)();
+                this.shikyuFroms = items.map(i => ({
+                    ID: i.ID,
+                    Title: i.Title
+                }));
             }
             catch (error) {
                 throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);

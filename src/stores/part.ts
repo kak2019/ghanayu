@@ -25,7 +25,9 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 return item;
             }
             catch (error) {
-                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+                console.error(error);
+                throw new Error(`データの取得中にエラーが発生しました`);
+
             }
         },
         async getListItemByMLNPartNo(mlnPartNo: string): Promise<string> {
@@ -55,7 +57,8 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 }
             }
             catch (error) {
-                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+                console.error(error);
+                throw new Error(`データの取得中にエラーが発生しました`);
             }
         },
         async getItemCountByMLNPartNoProcessType(mlnPartNo: string, processType: string): Promise<number> {
@@ -85,14 +88,15 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNamePARTMASTER}`).getItemsByCAMLQuery(camlQuery);
                 return items.length;
             } catch (error) {
-                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+                console.error(error);
+                throw new Error(`データの取得中にエラーが発生しました`);
             }
         },
         async getListItems() {
             let allItems: IPartMasterItem[] = [];
             let hasNext = true;
             let skip = 0;
-            const pageSize = 10;
+            const pageSize = 1000;
             while (hasNext) {
                 try {
                     const sp = spfi(getSP());
@@ -114,7 +118,8 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                     hasNext = items.length === pageSize;
                 }
                 catch (error) {
-                    throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+                    console.error(error);
+                    throw new Error(`データの取得中にエラーが発生しました`);
                     hasNext = false;
                 }
             }
@@ -136,7 +141,12 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 return '登録完了。';
             }
             catch (error) {
-                throw new Error(`データの登録中にエラーが発生しました: ${error.message}`);
+                if (error.message.includes("duplicate value")) {
+                    throw new Error('重複値エラー');
+                } else {
+                    console.error(error);
+                    throw new Error(`データの登録中にエラーが発生しました`);
+                }
             }
         },
         async updateListItem(itemId: number, item: IPartMasterItem, processType: string = null, isUpdate: boolean = true): Promise<string> {
@@ -172,10 +182,13 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 return '登録完了。';
             }
             catch (error) {
-                throw new Error(`データの登録中にエラーが発生しました: ${error.message}`);
+                if (error.message.includes("duplicate value")) {
+                    throw new Error('重複値エラー');
+                } else {
+                    console.error(error);
+                    throw new Error(`データの登録中にエラーが発生しました`);
+                }
             }
-
-
         },
         async deleteListItem(itemId: number): Promise<string> {
             try {
@@ -185,7 +198,8 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 return '消去完了。';
             }
             catch (error) {
-                throw new Error(`データの削除中にエラーが発生しました: ${error.message}`);
+                console.error(error);
+                throw new Error(`データの削除中にエラーが発生しました`);
             }
         },
         async getListItemsBySearchItems(date: string, processType: string, mlnPartNo: string, udPartNo: string) {
