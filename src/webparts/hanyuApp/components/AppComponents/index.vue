@@ -1,5 +1,7 @@
 <template>
-<img :src="hanyuimg" alt="" />
+<el-scrollbar height="708px">
+    <el-image style="width: 100%" :src="hanyuimg" :fit="scale-down" />
+</el-scrollbar>
 </template>
 
 <script>
@@ -7,8 +9,5 @@ module.exports = require('./index');
 </script>
 
 <style scoped>
-img {
-    max-width: 100%;
-    height: auto;
-}
+
 </style>
