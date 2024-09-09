@@ -190,6 +190,73 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
             }
         },
+
+        async getCurrentMonthInQtyByMlnNo(mlnPartNo: string, processType: string, current: string): Promise<number> {
+            try {
+                const sp = spfi(getSP());
+                const web = await sp.web();
+
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`).items.orderBy("Registered", false)();
+                const newItems = items.filter(item => {
+                    let condition = true
+                    const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
+                    if (mlnPartNo) {
+                        condition = condition && mlnPartNo === item.MLNPartNo && item.ProcessType === processType && formatRegistered === current
+                    }
+                    return condition
+                });
+                console.log("get Current Month In Qty By MlnNo" + items);
+                if (newItems.length > 0) {
+                    let sumInOutQty = 0;
+                    newItems.forEach(i => {
+                        if ((i.FunctionID === "01" && i.Qty > 0) || i.FunctionID === "06") {
+                            sumInOutQty += i.Qty;
+                        }
+                    });
+                    return sumInOutQty
+                } else {
+                    return 0;
+                }
+
+            }
+            catch (error) {
+                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+            }
+        },
+
+        async getCurrentMonthOutQtyByMlnNo(mlnPartNo: string, processType: string, current: string): Promise<number> {
+            try {
+                const sp = spfi(getSP());
+                const web = await sp.web();
+
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`).items.orderBy("Registered", false)();
+                const newItems = items.filter(item => {
+                    let condition = true
+                    const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
+                    if (mlnPartNo) {
+                        condition = condition && mlnPartNo === item.MLNPartNo && item.ProcessType === processType && formatRegistered === current
+                    }
+                    return condition
+                });
+                console.log("get Current Month Out Qty By MlnNo" + items);
+                if (newItems.length > 0) {
+                    let sumInOutQty = 0;
+                    newItems.forEach(i => {
+                        if ((i.FunctionID === "02" && i.Qty < 0) || (i.FunctionID === "03" && i.Qty < 0) || i.FunctionID === "08") {
+                            sumInOutQty += i.Qty;
+                        }
+                    });
+                    return 0 - sumInOutQty
+                } else {
+                    return 0;
+                }
+
+            }
+            catch (error) {
+                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+            }
+        },
+
         async getCurrentMonthCompletionQtyByMlnNo(mlnPartNo: string, processType: string, current: string): Promise<number> {
             try {
                 const sp = spfi(getSP());
