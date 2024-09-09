@@ -16,13 +16,26 @@
       </div>
     </div>
     <div style="text-align: right; flex-shrink: 0;">
-      <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-bottom: 10px;" type="primary" @click="submitForm">検索</el-button>
+      <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-bottom: 10px;" type="primary" @click="searchForm">検索</el-button>
       <el-button style="width: 100px; height: 50px; margin-top: 1px;margin-bottom: 10px;" @click="resetForm">キャンセル</el-button>
       <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-right: 10px;margin-bottom: 10px;" @click="downloadTable">ダウンロード</el-button>
     </div>
   </el-row>
 
-  <TableShipping :tableData="tableData"></TableShipping>
+  <!-- <TableShipping :tableData="tableData"></TableShipping> -->
+  <el-table :data="tableData" stripe style="width: 100%; font-size:12px;" :header-cell-style="{backgroundColor: '#366093', color: '#fff'}" height="320px" v-loading="loading"
+  show-summary :summary-method="getSummaries" row-class-name="summary-row">
+    <!-- 第一层表头 -->
+    <el-table-column prop="MLNPartNo" label="MLN部品番号" width="180" rowspan="2" />
+    <el-table-column prop="UDPartNo" label="UD部品番号" width="180" rowspan="2" />
+    <el-table-column prop="lastLatestMonthQty" label="前月末在庫" colspan="2">
+    </el-table-column>
+    <el-table-column label="当月実績" colspan="3" header-align="center">
+      <el-table-column prop="currentMonthInQty" label="入庫" width="100" />
+      <el-table-column prop="currentMonthOutQty" label="出庫" width="100" />
+    </el-table-column>
+    <el-table-column prop="curentMonthStockQty" label="当月末在庫" width="100" rowspan="2" />
+  </el-table>
 </template>
 
 <script>
@@ -34,9 +47,13 @@ import InputRemoteData from './inputRemoteData.vue';
 import * as XLSX from 'xlsx';
 import { ref } from 'vue';
 import {useSHIKYUGoodsReceiveStore} from "../../../../stores/shikyugoodsreceive";
+import { usePartMasterStore } from "../../../../stores/part"
+import { useStockHistoryStore } from "../../../../stores/stockhistory"
 // 获取 Pinia store 实例
 
 const SHIKYUGoodsReceiveStore = useSHIKYUGoodsReceiveStore();
+const partMasterStore =  usePartMasterStore();
+const stockHistoryStore = useStockHistoryStore();
 export default {
   components: {
     TableShipping,
@@ -47,9 +64,10 @@ export default {
   data() {
     return {
       tableData: [],
+      summaries:[],
+      loading: true,
       form: {
-        date: new Date().toISOString(),
-        select: '',
+        date: new Date(),
         MLNPartNo: '',
         UDPartNo: '',
         // 其他表单字段
@@ -64,11 +82,11 @@ export default {
       const ws = XLSX.utils.json_to_sheet(this.tableData.map(val => ({
         MLNPartNo: val.MLNPartNo,
         UDPartNo: val.UDPartNo,
-        前月末在庫: val.前月末在庫,
-        BadProducts: val.BadProducts,
-        Completion: val.Completion,
-        VibrationSubstitution: val.VibrationSubstitution,
-        EndMonthStock: val.EndMonthStock
+        前月末在庫: val.lastLatestMonthQty,
+        BadProducts: val.currentMonthInQty,
+        Completion: val.currentMonthOutQty,
+        VibrationSubstitution: val.currentMonthShippingQty,
+        EndMonthStock: val.curentMonthStockQty
       })));
 
       const newData1 = [["工程区分", "MLN部品番号", "UD部品番号", "前月末在庫", "当月実績", "", "", "当月末在庫"]]
@@ -97,45 +115,70 @@ export default {
       // 将工作簿导出为 Excel 文件
       XLSX.writeFile(wb, "在庫管理表.xlsx");
     },
-    submitForm() {
-      const query = this.form
-      this.tableData = SHIKYUGoodsReceiveStore.shikyuGoodsReceiveItems
-          .filter(item => {
-            let condition = true
-            if(query.MLNPartNo) {
-              condition = condition && query.MLNPartNo === item.MLNPartNo
-            }
-            if(query.UDPartNo) {
-              condition = condition && query.UDPartNo === item.UDPartNo
-            }
-            return condition
-          });
+    async searchForm() {
+      await this.filterDataBySearchItems();
     },
-    resetForm() {
+    async resetForm() {
       // 重置表单字段并清空表格数据
       this.form = {
-        date: new Date().toISOString(),
-        select: '',
+        date: new Date(),
         MLNPartNo: '',
         UDPartNo: ''
       };
-      this.filteredData = this.tableData; // 重新设置过滤后的数据
+      await this.filterDataBySearchItems().then(() => {
+      }).catch(error => {
+            
+      });
     },
-    // async fetchTableData() {
-    //   // 模拟获取数据，你可以替换为真实的数据获取逻辑
-    //   await stockHistoryStore.getListItems();
-    //   this.tableData.value = stockHistoryStore.getListItems()
-    //   this.filteredData = this.tableData; // 初始化表格数据
-    // }
+    
+    async filterDataBySearchItems(){
+      const query = this.form
+    
+      const formatQueryDate = query.date.getFullYear() + '-' + (query.date.getMonth()+1);
+
+      try {
+        this.loading = true;
+        const date = this.form.date;
+        const processType = this.form.select;
+        const mlnPartNo = this.form.MLNPartNo;
+        const udPartNo = this.form.UDPartNo;
+        await partMasterStore.getListItemsBySearchItemsForGoodsInventory(date, 'F', mlnPartNo, udPartNo).then(() => {
+                  this.loading = false;
+                  // 对数据进行处理以匹配表格字段
+                  this.tableData = partMasterStore.partMasterItems;
+                  this.summaries = this.getSummaries();
+              }).catch(error => {
+                  this.loading = false;
+                  ElMessage.error(error.message);
+              });
+        console.log("Processed table data:", this.tableData);
+      } catch (error) {
+        console.error('Error fetching stock history:', error);
+      }
+    },
+
+    getSummaries() {
+      const summaries = [];
+      let [totalLastLatestMonthQty,totalCurrentMonthInQty,totalCurrentMonthOutQty,totalCurentMonthStockQty] = [0,0,0,0];
+
+      this.tableData.forEach(element => {
+          totalLastLatestMonthQty += element.lastLatestMonthQty;
+          totalCurrentMonthInQty += element.currentMonthInQty;
+          totalCurrentMonthOutQty += element.currentMonthOutQty;
+          totalCurentMonthStockQty += element.curentMonthStockQty;
+      });
+
+      const lastLatestMonthQty = totalLastLatestMonthQty;
+      const currentMonthInQty =  totalCurrentMonthInQty
+      const currentMonthOutQty =  totalCurrentMonthOutQty
+      const curentMonthStockQty = totalCurentMonthStockQty
+      return ['', `合計`, `${lastLatestMonthQty}`, `${currentMonthInQty}`, `${currentMonthOutQty}`,`${curentMonthStockQty}`,]
+    }
   },
+
   async mounted() {
     try {
-      // 调用 store 的方法获取数据
-      await SHIKYUGoodsReceiveStore.getListItems();
-      console.log("rtyrtyrtyr")
-      // 对数据进行处理以匹配表格字段
-      this.tableData = SHIKYUGoodsReceiveStore.shikyuGoodsReceiveItems
-
+      await this.filterDataBySearchItems();
       console.log("Processed table data:", this.tableData);
     } catch (error) {
       console.error('Error fetching stock history:', error);
