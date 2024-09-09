@@ -117,7 +117,16 @@ export default defineComponent({
                         .test('is-valid-value', 'MLN部品番号が無効です', value => partMasterStore.partMasterMLNItems.indexOf(value) !== -1)
                         .label('前工程 - MLN部品番号'),
                     ChildProcessType: yup.string().required().label('前工程 - 工程区分'),
-                    StructureQty: yup.number().integer().min(1).default(1).required().label('構成数量'),
+                    StructureQty: yup.number()
+                        .integer()
+                        .min(1)
+                        .default(1)
+                        .required()
+                        .transform((value, originalValue) => {
+                            const isValid = /^\d+$/.test(String(originalValue));
+                            return isValid ? value : NaN;
+                        })
+                        .label('構成数量'),
                 })
             ,
             initialValues: {
