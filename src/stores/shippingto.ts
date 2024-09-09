@@ -28,7 +28,8 @@ export const useShippingToStore = defineStore(FeatureKey.SHIPPINGTO, {
                 }));
             }
             catch (error) {
-                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+                console.error(error);
+                throw new Error(`データの取得中にエラーが発生しました`);
             }
 
         }

@@ -12,7 +12,7 @@
     <el-table-column prop="MLNPartNo" label="MLN部品番号" />
     <el-table-column prop="UDPartNo" label="UD部品番号" />
     <el-table-column prop="ModifiedQty" label="修正数" />
-    <el-table-column prop="EditorName" label="修正者" />
+    <el-table-column prop="Editor" label="修正者" />
     <el-table-column prop="ModifiedReasonName" label="修正理由" />
     <el-table-column prop="Despatchnote" label="Despatch note" />
     <el-table-column prop="Comment" label="コメント" />

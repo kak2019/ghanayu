@@ -10,6 +10,7 @@ import { IUser } from '../model/user';
 export const useUserStore = defineStore(FeatureKey.USER, {
     state: () => ({
         user: undefined as IUser,
+        users: [] as IUser[],
         groups: [] as string[],
         businesscontrolers: [] as IUser[],
         hanyutype1s: [] as IUser[],
@@ -17,14 +18,18 @@ export const useUserStore = defineStore(FeatureKey.USER, {
     }),
     getters: {
         userInfo: (state) => state.user,
-        groupInfo: (state) => state.groups
+        groupInfo: (state) => state.groups,
+        cachedUsers: (state) => state.users,
     },
     actions: {
-        async getUser(Id?: number): Promise<void> {
+        setUsers(newUsers: IUser[]) {
+            this.users = newUsers;
+        },
+        async getUser(Id?: number): Promise<IUser> {
             try {
                 const sp = spfi(getSP());
                 const u = Id ? await sp.web.getUserById(Id)() : await sp.web.currentUser();
-                this.user = {
+                const r = {
                     Id: u.Id,
                     LoginName: u.LoginName,
                     Title: u.Title,
@@ -32,11 +37,18 @@ export const useUserStore = defineStore(FeatureKey.USER, {
                     IsSiteAdmin: u.IsSiteAdmin,
                     UserPrincipalName: u.UserPrincipalName
                 } as IUser;
-                const gs = Id ? await sp.web.getUserById(Id).groups() : await sp.web.currentUser.groups();
-                this.groups = [...gs.map(group => group.Title)];
+                if (!Id) {
+                    this.user = r;
+                    //const gs = Id ? await sp.web.getUserById(Id).groups() : await sp.web.currentUser.groups();
+                    const gs = await sp.web.currentUser.groups();
+                    this.groups = [...gs.map(group => group.Title)];
+                }
+
+                return r;
             }
             catch (error) {
-                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+                console.error(error);
+                throw new Error(`データの取得中にエラーが発生しました`);
             }
 
         },
