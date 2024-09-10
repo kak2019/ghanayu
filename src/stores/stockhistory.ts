@@ -212,19 +212,15 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                     }
                     return condition
                 });
-                console.log("get Current Month Defects Qty By MlnNo" + items);
-                if (newItems.length > 0) {
-                    let sumInOutQty = 0;
-                    newItems.forEach(i => {
-                        if ((i.FunctionID === "03" && i.Qty > 0) || i.FunctionID === "07") {
-                            sumInOutQty += i.Qty;
-                        }
-                    });
-                    return sumInOutQty
-                } else {
-                    return 0;
-                }
 
+                const sumInOutQty = newItems.reduce((accumulator, currentItem) => {
+                    if ((currentItem.FunctionID === "03" && currentItem.Qty > 0) || currentItem.FunctionID === "07") {
+                      return accumulator + currentItem.Qty;
+                    }
+                    return accumulator;
+                }, 0);
+                //console.log("1. get Current Month Defects Qty By MlnNo ===================+++" + sumInOutQty);
+                return sumInOutQty
             }
             catch (error) {
                 console.error(error);
@@ -312,19 +308,14 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                     }
                     return condition
                 });
-                console.log("get Current Month Completion Qty By MlnNo" + items);
-                if (newItems.length > 0) {
-                    let sumInOutQty = 0;
-                    newItems.forEach(i => {
-                        if ((i.FunctionID === "02" && i.Qty > 0) || i.FunctionID === "06") {
-                            sumInOutQty += i.Qty;
-                        }
-                    });
-                    return sumInOutQty
-                } else {
-                    return 0;
-                }
 
+                const sumInOutQty = newItems.reduce((accumulator, currentItem) => {
+                    if ((currentItem.FunctionID === "02" && currentItem.Qty > 0) || currentItem.FunctionID === "06") {
+                      return accumulator + currentItem.Qty;
+                    }
+                    return accumulator;
+                }, 0);
+                return sumInOutQty;
             }
             catch (error) {
                 console.error(error);

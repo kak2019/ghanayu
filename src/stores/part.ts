@@ -5,6 +5,8 @@ import { FeatureKey } from '../config/keystrs';
 import { IPartMasterItem } from '../model';
 import { useStockHistoryStore } from '../stores/stockhistory'
 import { CONST } from '../config/const';
+import { useProcessMasterStore } from '../stores/process';
+import { computed} from 'vue';
 
 export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
     state: () => ({
@@ -202,6 +204,32 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 throw new Error(`データの削除中にエラーが発生しました`);
             }
         },
+        getProcessNameByType(ProcessType: string){
+
+            const processMasterStore = useProcessMasterStore();
+            
+            if(ProcessType ==="Z"){
+              return "支給"
+            }else if(ProcessType ==="CH"){
+              return "出荷"
+            }else{
+              const tableData = computed(() => processMasterStore.processMasterItems);
+              const newTableData = tableData.value;
+              const tableProcessName = newTableData.filter(item => {
+                if(item.ProcessType === ProcessType){
+                  return true
+                }else{
+                  return false
+                }
+              });
+              if(tableProcessName.length>0)
+              {
+                return tableProcessName[0].ProcessName
+              }else{
+                return "";
+              }
+            }
+        },
         async getListItemsBySearchItems(date: string, processType: string, mlnPartNo: string, udPartNo: string) {
             try {
                 const sp = spfi(getSP());
@@ -220,6 +248,7 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                         } else {
                             condition = false;
                         }
+                        item.ProcessTypeName = this.getProcessNameByType(processType);
                         return condition;
                     });
                 }
@@ -291,7 +320,7 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                     items[i].currentMonthShippingQty = listWithCurrentMonthShippingQty[i];
                     items[i].curentMonthStockQty = listWithCurentMonthStockQtyByMlnNo[i];
                 }
-                console.log("========" + items);
+                //console.log("========" + items);
                 this.parts = items;
             }
             catch (error) {
