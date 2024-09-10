@@ -206,14 +206,16 @@ export default {
             isInserting.value = true;
         }
         const deleteRow = (): void => {
+            loading.value = true;
             const data = (isFiltered.value) ? filteredData : tableData;
             partMasterStore.deleteListItem(+data.value[currentRowIndex.value].ID).then((data) => {
                 ElMessage.success(data);
                 fetchData();
-            }).catch(error => ElMessage.error(error.message));
+            }).catch(error => { ElMessage.error(error.message); loading.value = false; });
 
         }
         const onPartFormSubmit = partForm.handleSubmit((item): void => {
+            loading.value = true;
             if (isInserting.value) {
                 partMasterStore.addListItem(item).then((data) => {
                     ElMessage.success(data);
@@ -221,7 +223,7 @@ export default {
                     isInserting.value = false;
                     partForm.resetForm();
                     fetchData();
-                }).catch(error => ElMessage.error(error.message));
+                }).catch(error => { ElMessage.error(error.message); loading.value = false; });
             }
             else {
                 const data = (isFiltered.value) ? filteredData : tableData;
@@ -231,7 +233,7 @@ export default {
                     isInserting.value = false;
                     partForm.resetForm();
                     fetchData();
-                }).catch(error => ElMessage.error(error.message));
+                }).catch(error => { ElMessage.error(error.message); loading.value = false; });
             }
 
         });
@@ -254,7 +256,7 @@ export default {
             import( /* webpackChunkName: 'xlsx_chunk' */
                 'xlsx').then(XLSX => {
                     const data = (isFiltered.value) ? filteredData : tableData;
-                    const ws = XLSX.utils.json_to_sheet(data.value.map(({ MLNPartNo, UDPartNo }) => ({ MLNPartNo, UDPartNo })));
+                    const ws = XLSX.utils.json_to_sheet(data.value.map(({ MLNPartNo, UDPartNo }) => ({ MLN部品番号: MLNPartNo, UD部品番号: UDPartNo })));
                     const wb = XLSX.utils.book_new();
                     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
                     XLSX.writeFile(wb, 'part_mater_data.xlsx');

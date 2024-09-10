@@ -14,17 +14,54 @@ export const useShippingResultStore = defineStore(FeatureKey.SHIPPINGRESULT, {
     },
     actions: {
         async getListItems() {
-            try {
-                const sp = spfi(getSP());
-                const web = await sp.web();
+            let allItems: IShippingResultItem[] = [];
+            let hasNext = true;
+            let skip = 0;
+            const pageSize = 1000;
+            while (hasNext) {
+                try {
+                    const sp = spfi(getSP());
+                    const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSHIPPINGRESULT}`).items.orderBy("Registered", false)();
-                this.shippingResults = items;
+                    const items: IShippingResultItem[] = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSHIPPINGRESULT}`).items
+                        .select('ID',
+                            'MLNPartNo',
+                            'ProcessType',
+                            'UDPartNo',
+                            'ShipTo',
+                            'ShipQty',
+                            'Calloffid',
+                            'Despatchnote',
+                            'ShippingResultDate',
+                            'Registered',
+                            'Modified')
+                        .top(pageSize).skip(skip)();
+                    const selectedItems = items.map(item => ({
+                        ID: item.ID,
+                        MLNPartNo: item.MLNPartNo,
+                        ProcessType: item.ProcessType,
+                        UDPartNo: item.UDPartNo,
+                        ShipTo: item.ShipTo,
+                        ShipQty: item.ShipQty,
+                        Calloffid: item.Calloffid,
+                        Despatchnote: item.Despatchnote,
+                        ShippingResultDate: item.ShippingResultDate,
+                        Registered: item.Registered,
+                        Modified: item.Modified
+                    }))
+                    allItems = allItems.concat(selectedItems);
+                    skip += pageSize;
+                    hasNext = items.length === pageSize;
+                } catch (error) {
+                    console.error(error);
+                    throw new Error(`データの取得中にエラーが発生しました`);
+                }
             }
-            catch (error) {
-                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
-            }
-
+            const uniqueItems = Array.from(new Set(allItems.map(item => item.ID)))
+                .map(id => allItems.find(item => item.ID === id));
+            //orderBy Registered false
+            uniqueItems.sort((a, b) => new Date(b.Registered).getTime() - new Date(a.Registered).getTime());
+            this.shippingResults = uniqueItems;
         },
 
         async getLatestShippingResultDateByMLNPartNoDesc(mlnPartNo: string): Promise<string> {
@@ -45,7 +82,8 @@ export const useShippingResultStore = defineStore(FeatureKey.SHIPPINGRESULT, {
                 }
 
             } catch (error) {
-                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+                console.error(error);
+                throw new Error(`データの取得中にエラーが発生しました`);
             }
         },
 
@@ -65,7 +103,8 @@ export const useShippingResultStore = defineStore(FeatureKey.SHIPPINGRESULT, {
                 return '登録完了。';
             }
             catch (error) {
-                throw new Error(`データの登録中にエラーが発生しました: ${error.message}`);
+                console.error(error);
+                throw new Error(`データの登録中にエラーが発生しました`);
             }
         },
 

@@ -16,17 +16,54 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
     },
     actions: {
         async getListItems() {
-            try {
-                const sp = spfi(getSP());
-                const web = await sp.web();
+            let allItems: ISHIKYUGoodsReceiveItem[] = [];
+            let hasNext = true;
+            let skip = 0;
+            const pageSize = 1000;
+            while (hasNext) {
+                try {
+                    const sp = spfi(getSP());
+                    const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSHIKYUGOODSRECEIVE}`).items.orderBy("GoodsReceiveDate", false)();
-                this.shikyuGoodsReceives = items;
+                    const items: ISHIKYUGoodsReceiveItem[] = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSHIKYUGOODSRECEIVE}`).items
+                        .select('ID',
+                            'MLNPartNo',
+                            'UDPartNo',
+                            'ProcessType',
+                            'SHIKYUFrom',
+                            'GoodsReceiveQty',
+                            'Calloffid',
+                            'Despatchnote',
+                            'GoodsReceiveDate',
+                            'Registered',
+                            'Modified')
+                        .top(pageSize).skip(skip)();
+                    const selectedItems = items.map(item => ({
+                        ID: item.ID,
+                        MLNPartNo: item.MLNPartNo,
+                        UDPartNo: item.UDPartNo,
+                        ProcessType: item.ProcessType,
+                        SHIKYUFrom: item.SHIKYUFrom,
+                        GoodsReceiveQty: item.GoodsReceiveQty,
+                        Calloffid: item.Calloffid,
+                        Despatchnote: item.Despatchnote,
+                        GoodsReceiveDate: item.GoodsReceiveDate,
+                        Registered: item.Registered,
+                        Modified: item.Modified
+                    }))
+                    allItems = allItems.concat(selectedItems);
+                    skip += pageSize;
+                    hasNext = items.length === pageSize;
+                } catch (error) {
+                    console.error(error);
+                    throw new Error(`データの取得中にエラーが発生しました`);
+                }
             }
-            catch (error) {
-                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
-            }
-
+            const uniqueItems = Array.from(new Set(allItems.map(item => item.ID)))
+                .map(id => allItems.find(item => item.ID === id));
+            //orderBy GoodsReceiveDate false
+            uniqueItems.sort((a, b) => new Date(b.GoodsReceiveDate).getTime() - new Date(a.GoodsReceiveDate).getTime());
+            this.shikyuGoodsReceives = uniqueItems;
         },
         async addListItem(item: ISHIKYUGoodsReceiveItem): Promise<string> {
             try {
@@ -52,7 +89,7 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
 
                     //Add record to StockHistory table.
                     const stockHistoryStore = useStockHistoryStore();
-                    const latestStockQty = await stockHistoryStore.getListItemsByRegisteredDate(item.MLNPartNo,item.ProcessType);
+                    const latestStockQty = await stockHistoryStore.getListItemsByRegisteredDate(item.MLNPartNo, item.ProcessType);
                     const stockQty = latestStockQty + item.GoodsReceiveQty;
                     const billOfMaterialsItem = {
                         MLNPartNo: item.MLNPartNo,
@@ -70,7 +107,8 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
                 }
             }
             catch (error) {
-                throw new Error(`データの登録中にエラーが発生しました: ${error.message}`);
+                console.error(error);
+                throw new Error(`データの登録中にエラーが発生しました`);
             }
         }
 

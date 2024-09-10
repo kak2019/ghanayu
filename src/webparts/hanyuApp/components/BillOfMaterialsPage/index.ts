@@ -81,7 +81,7 @@ export default defineComponent({
 
         const windowHeight = ref(window.innerHeight);
         const tableHeight = computed(() => {
-            const spcHeight = (windowHeight.value < 640) ? 478 : 367;
+            const spcHeight = (windowHeight.value < 640) ? 524 : 413;
             const minHeight = (windowHeight.value < 640) ? 178 : 378;
             return windowHeight.value > minHeight + spcHeight ? windowHeight.value - spcHeight : minHeight;
         });
@@ -117,7 +117,16 @@ export default defineComponent({
                         .test('is-valid-value', 'MLN部品番号が無効です', value => partMasterStore.partMasterMLNItems.indexOf(value) !== -1)
                         .label('前工程 - MLN部品番号'),
                     ChildProcessType: yup.string().required().label('前工程 - 工程区分'),
-                    StructureQty: yup.number().integer().min(1).default(1).required().label('構成数量'),
+                    StructureQty: yup.number()
+                        .integer()
+                        .min(1)
+                        .default(1)
+                        .required()
+                        .transform((value, originalValue) => {
+                            const isValid = /^\d+$/.test(String(originalValue));
+                            return isValid ? value : NaN;
+                        })
+                        .label('構成数量'),
                 })
             ,
             initialValues: {
@@ -138,10 +147,10 @@ export default defineComponent({
         const refreshFilteredData = (): void => {
             currentRowIndex.value = -1;
             tableRef.value?.setCurrentRow(undefined);
-            const ParentPartNoValue = ParentPartNo.value.trim();
-            const ParentProcessTypeValue = ParentProcessType.value.trim();
-            const ChildPartNoValue = ChildPartNo.value.trim();
-            const ChildProcessTypeValue = ChildProcessType.value.trim();
+            const ParentPartNoValue = ParentPartNo.value || "";
+            const ParentProcessTypeValue = ParentProcessType.value || "";
+            const ChildPartNoValue = ChildPartNo.value || "";
+            const ChildProcessTypeValue = ChildProcessType.value || "";
 
             filteredData.value = billOfMaterialsStore.billOfMaterialsItems.filter(
                 function (value) {
@@ -297,6 +306,7 @@ export default defineComponent({
             }
             catch (error) {
                 ElMessage.error(error.message);
+                loading.value = false;
             }
         }
         const onbomFormSubmit = bomForm.handleSubmit((item): void => {
@@ -315,7 +325,10 @@ export default defineComponent({
 
                     ElMessage.success(data);
                     fetchData();
-                }).catch(error => ElMessage.error(error.message));
+                }).catch(error => {
+                    ElMessage.error(error.message);
+                    loading.value = false;
+                });
             }
             else {
                 const data = (isFiltered.value) ? filteredData : tableData;
@@ -330,7 +343,7 @@ export default defineComponent({
                         bomForm.resetForm();
                         ElMessage.success(data);
                         fetchData();
-                    }).catch(error => ElMessage.error(error.message));
+                    }).catch(error => { ElMessage.error(error.message); loading.value = false; });
                 }
                 else {
                     // Child update
@@ -352,8 +365,8 @@ export default defineComponent({
                             }).catch(error => ElMessage.error(error.message));
                             ElMessage.success(data);
                             fetchData();
-                        }).catch(error => ElMessage.error(error.message));
-                    }).catch(error => ElMessage.error(error.message));
+                        }).catch(error => { ElMessage.error(error.message); loading.value = false; });
+                    }).catch(error => { ElMessage.error(error.message); loading.value = false; });
                 }
             }
 
@@ -379,11 +392,11 @@ export default defineComponent({
                     const data = (isFiltered.value) ? filteredData : tableData;
                     const ws = XLSX.utils.json_to_sheet(data.value.map((
                         { ParentPartNo, ParentProcessType, ChildPartNo, ChildProcessType, StructureQty }) => ({
-                            ParentPartNo,
-                            ParentProcessType: processData.value.find(p => p.ProcessType === ParentProcessType).ProcessName,
-                            ChildPartNo,
-                            ChildProcessType: processData.value.find(p => p.ProcessType === ChildProcessType).ProcessName,
-                            StructureQty
+                            親部品番号: ParentPartNo,
+                            親工程区分: processData.value.find(p => p.ProcessType === ParentProcessType).ProcessName,
+                            子部品番号: ChildPartNo,
+                            子工程区分: processData.value.find(p => p.ProcessType === ChildProcessType).ProcessName,
+                            構成数量: StructureQty
                         })));
                     const wb = XLSX.utils.book_new();
                     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');

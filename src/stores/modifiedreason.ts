@@ -18,8 +18,14 @@ export const useModifiedReasonMasterStore = defineStore(FeatureKey.MODIFIEDREASO
                 const sp = spfi(getSP());
                 const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameMODIFIEDREASONMASTER}`).items.orderBy("ModifiedReasonID", true)();
-                this.modifiedreasons = items;
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameMODIFIEDREASONMASTER}`).items
+                    .select('ModifiedReasonID', 'ModifiedReasonName')
+                    .top(3)
+                    .orderBy("ModifiedReasonID", true)();
+                this.modifiedreasons = items.map(i => ({
+                    ModifiedReasonID: i.ModifiedReasonID,
+                    ModifiedReasonName: i.ModifiedReasonName
+                }));
             }
             catch (error) {
                 throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);

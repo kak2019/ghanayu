@@ -191,7 +191,7 @@ export default {
               element.ProcessName = this.getProcessNameByType(element.ProcessType);
               element.FunctionName = this.getFunctionNameById(element.FunctionID);
               element.ModifiedReasonName = this.getModifiedReasonNameById(element.ModifiedReason);
-              element.EditorName = this.getEditorNameById(element.EditorId);
+              //element.EditorName = this.getEditorNameById(element.EditorId);
               return condition;
           });
           this.tableData = filteredTable;
@@ -262,17 +262,17 @@ export default {
     },
     getEditorNameById(Editor){
 
-        const regularUser = computed(() => userStore.hanyutype1s);
-        const managerUser = computed(() => userStore.inventorymanagers);
+    //     const regularUser = computed(() => userStore.hanyutype1s);
+    //     const managerUser = computed(() => userStore.inventorymanagers);
 
-        let tempTableUserInfo = [];
-        regularUser.value.forEach(item => {
-          tempTableUserInfo.push({ Title: item.Title, Id: item.Id})
-        });
+    //     let tempTableUserInfo = [];
+    //     regularUser.value.forEach(item => {
+    //       tempTableUserInfo.push({ Title: item.Title, Id: item.Id})
+    //     });
 
-        managerUser.value.forEach(item => {
-          tempTableUserInfo.push({ label: item.Title, value: item.Id})
-        });
+    //     managerUser.value.forEach(item => {
+    //       tempTableUserInfo.push({ label: item.Title, value: item.Id})
+    //     });
 
         const tableEditorName = tempTableUserInfo.filter(item => {
           if(item.value === Editor){
@@ -330,7 +330,7 @@ export default {
         'MLN部品番号': item.MLNPartNo,
         'UD部品番号': item.UDPartNo,
         '修正数': item.ModifiedQty,
-        '修正者': item.EditorName,
+        '修正者': item.Editor,
         '修正理由': item.ModifiedReasonName,
         'Despatch note': item.Despatchnote,
         'コメント': item.Comment

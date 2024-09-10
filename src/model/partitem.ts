@@ -11,4 +11,6 @@ export interface IPartMasterItem {
     currentMonthCompletionQty?: string;
     currentMonthShippingQty?: string;
     curentMonthStockQty?: string;
+    currentMonthInQty?: string;
+    currentMonthOutQty?: string;
 }

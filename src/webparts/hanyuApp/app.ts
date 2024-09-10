@@ -5,7 +5,7 @@ import { useFunctionsMasterStore } from '../../stores/function';
 import { useSHIKYUFromStore } from '../../stores/shikyufrom';
 import { useShippingToStore } from '../../stores/shippingto';
 import { useUserStore } from '../../stores/user';
-import { useOperationCalendarStore } from '../../stores/operationcalendar';
+//import { useOperationCalendarStore } from '../../stores/operationcalendar';
 import { useModifiedReasonMasterStore } from '../../stores/modifiedreason';
 import { ElMessage } from 'element-plus';
 import { CONST } from '../../config/const';
@@ -14,7 +14,7 @@ export default defineComponent({
     name: "HanyuApp",
     setup() {
         const loading = ref(true);
-        useOperationCalendarStore();
+        //useOperationCalendarStore();
         const processMasterStore = useProcessMasterStore();
         const functionsMasterStore = useFunctionsMasterStore();
         const modifiedReasonMasterStore = useModifiedReasonMasterStore();

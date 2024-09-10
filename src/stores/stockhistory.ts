@@ -16,17 +16,52 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
     },
     actions: {
         async getListItems() {
-            try {
-                const sp = spfi(getSP());
-                const web = await sp.web();
+            let allItems: IStockHistoryItem[] = [];
+            let hasNext = true;
+            let skip = 0;
+            const pageSize = 1000;
+            while (hasNext) {
+                try {
+                    const sp = spfi(getSP());
+                    const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`).items.orderBy("Registered", false)();
-                this.stockHistories = items;
+                    const items: IStockHistoryItem[] = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`).items
+                        .select('ID',
+                            'MLNPartNo',
+                            'ProcessType',
+                            'UDPartNo',
+                            'Qty',
+                            'FunctionID',
+                            'StockQty',
+                            'Comment',
+                            'Registered',
+                            'Modified')
+                        .top(pageSize).skip(skip)();
+                    const selectedItems = items.map(item => ({
+                        ID: item.ID,
+                        MLNPartNo: item.MLNPartNo,
+                        ProcessType: item.ProcessType,
+                        UDPartNo: item.UDPartNo,
+                        Qty: item.Qty,
+                        FunctionID: item.FunctionID,
+                        StockQty: item.StockQty,
+                        Comment: item.Comment,
+                        Registered: item.Registered,
+                        Modified: item.Modified
+                    }))
+                    allItems = allItems.concat(selectedItems);
+                    skip += pageSize;
+                    hasNext = items.length === pageSize;
+                } catch (error) {
+                    console.error(error);
+                    throw new Error(`データの取得中にエラーが発生しました`);
+                }
             }
-            catch (error) {
-                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
-            }
-
+            const uniqueItems = Array.from(new Set(allItems.map(item => item.ID)))
+                .map(id => allItems.find(item => item.ID === id));
+            //orderBy Registered false
+            uniqueItems.sort((a, b) => new Date(b.Registered).getTime() - new Date(a.Registered).getTime());
+            this.stockHistories = uniqueItems;
         },
         async getCurrentMonthListItems() {
             try {
@@ -59,7 +94,8 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 this.currentMonthStockHistories = items;
             }
             catch (error) {
-                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+                console.error(error);
+                throw new Error(`データの取得中にエラーが発生しました`);
             }
 
         },
@@ -80,10 +116,11 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 return '登録完了。';
             }
             catch (error) {
-                throw new Error(`データの登録中にエラーが発生しました: ${error.message}`);
+                console.error(error);
+                throw new Error(`データの登録中にエラーが発生しました`);
             }
         },
-        async getListItemsByRegisteredDate(mlnPartNo: string, processType:string): Promise<number> {
+        async getListItemsByRegisteredDate(mlnPartNo: string, processType: string): Promise<number> {
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
@@ -105,7 +142,8 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
 
             }
             catch (error) {
-                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+                console.error(error);
+                throw new Error(`データの取得中にエラーが発生しました`);
             }
         },
 
@@ -127,7 +165,8 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 }
 
             } catch (error) {
-                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+                console.error(error);
+                throw new Error(`データの取得中にエラーが発生しました`);
             }
         },
 
@@ -155,7 +194,8 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
 
             }
             catch (error) {
-                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+                console.error(error);
+                throw new Error(`データの取得中にエラーが発生しました`);
             }
         },
         async getCurrentMonthDefectsQtyByMlnNo(mlnPartNo: string, processType: string, current: string): Promise<number> {
@@ -187,9 +227,77 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
 
             }
             catch (error) {
+                console.error(error);
+                throw new Error(`データの取得中にエラーが発生しました`);
+            }
+        },
+
+        async getCurrentMonthInQtyByMlnNo(mlnPartNo: string, processType: string, current: string): Promise<number> {
+            try {
+                const sp = spfi(getSP());
+                const web = await sp.web();
+
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`).items.orderBy("Registered", false)();
+                const newItems = items.filter(item => {
+                    let condition = true
+                    const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
+                    if (mlnPartNo) {
+                        condition = condition && mlnPartNo === item.MLNPartNo && item.ProcessType === processType && formatRegistered === current
+                    }
+                    return condition
+                });
+                console.log("get Current Month In Qty By MlnNo" + items);
+                if (newItems.length > 0) {
+                    let sumInOutQty = 0;
+                    newItems.forEach(i => {
+                        if ((i.FunctionID === "01" && i.Qty > 0) || i.FunctionID === "06") {
+                            sumInOutQty += i.Qty;
+                        }
+                    });
+                    return sumInOutQty
+                } else {
+                    return 0;
+                }
+
+            }
+            catch (error) {
                 throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
             }
         },
+
+        async getCurrentMonthOutQtyByMlnNo(mlnPartNo: string, processType: string, current: string): Promise<number> {
+            try {
+                const sp = spfi(getSP());
+                const web = await sp.web();
+
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`).items.orderBy("Registered", false)();
+                const newItems = items.filter(item => {
+                    let condition = true
+                    const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
+                    if (mlnPartNo) {
+                        condition = condition && mlnPartNo === item.MLNPartNo && item.ProcessType === processType && formatRegistered === current
+                    }
+                    return condition
+                });
+                console.log("get Current Month Out Qty By MlnNo" + items);
+                if (newItems.length > 0) {
+                    let sumInOutQty = 0;
+                    newItems.forEach(i => {
+                        if ((i.FunctionID === "02" && i.Qty < 0) || (i.FunctionID === "03" && i.Qty < 0) || i.FunctionID === "08") {
+                            sumInOutQty += i.Qty;
+                        }
+                    });
+                    return 0 - sumInOutQty
+                } else {
+                    return 0;
+                }
+
+            }
+            catch (error) {
+                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+            }
+        },
+
         async getCurrentMonthCompletionQtyByMlnNo(mlnPartNo: string, processType: string, current: string): Promise<number> {
             try {
                 const sp = spfi(getSP());
@@ -219,7 +327,8 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
 
             }
             catch (error) {
-                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+                console.error(error);
+                throw new Error(`データの取得中にエラーが発生しました`);
             }
         },
         async getCurrentMonthShippingQtyByMlnNo(mlnPartNo: string, processType: string, current: string): Promise<number> {
@@ -260,7 +369,8 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
 
             }
             catch (error) {
-                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+                console.error(error);
+                throw new Error(`データの取得中にエラーが発生しました`);
             }
         },
         async getCurentMonthStockQtyByMlnNo(mlnPartNo: string, processType: string, current: string): Promise<number> {
@@ -285,7 +395,8 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 }
             }
             catch (error) {
-                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+                console.error(error);
+                throw new Error(`データの取得中にエラーが発生しました`);
             }
         }
     }

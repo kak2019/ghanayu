@@ -18,11 +18,18 @@ export const useShippingToStore = defineStore(FeatureKey.SHIPPINGTO, {
                 const sp = spfi(getSP());
                 const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSHIPPINGTO}`).items.orderBy("Title", true)();
-                this.shippingTos = items;
+                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSHIPPINGTO}`).items
+                    .select('Title')
+                    .top(3)
+                    .orderBy("Title", true)();
+                this.shippingTos = items.map(i => ({
+                    ID: i.ID,
+                    Title: i.Title
+                }));
             }
             catch (error) {
-                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+                console.error(error);
+                throw new Error(`データの取得中にエラーが発生しました`);
             }
 
         }

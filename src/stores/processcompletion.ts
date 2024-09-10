@@ -14,15 +14,50 @@ export const useProcessCompletionResultStore = defineStore(FeatureKey.PROCESSCOM
   },
   actions: {
     async getListItems() {
-      try {
-        const sp = spfi(getSP());
-        const web = await sp.web();
+      let allItems: IProcessCompletionResultItem[] = [];
+      let hasNext = true;
+      let skip = 0;
+      const pageSize = 1000;
+      while (hasNext) {
+        try {
+          const sp = spfi(getSP());
+          const web = await sp.web();
 
-        const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNamePROCESSCOMPLETIONRESULT}`).items.orderBy("Registered", false)();
-        this.processCompletionResults = items;
-      } catch (error) {
-        throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+          const items: IProcessCompletionResultItem[] = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNamePROCESSCOMPLETIONRESULT}`).items
+            .select('ID',
+              'MLNPartNo',
+              'ProcessType',
+              'UDPartNo',
+              'DefectQty',
+              'CompletionQty',
+              'Registered',
+              'Modified',
+              'ProcessCompletion')
+            .top(pageSize).skip(skip)();
+          const selectedItems = items.map(item => ({
+            ID: item.ID,
+            MLNPartNo: item.MLNPartNo,
+            ProcessType: item.ProcessType,
+            UDPartNo: item.UDPartNo,
+            DefectQty: item.DefectQty,
+            CompletionQty: item.CompletionQty,
+            Registered: item.Registered,
+            Modified: item.Modified,
+            ProcessCompletion: item.ProcessCompletion
+          }))
+          allItems = allItems.concat(selectedItems);
+          skip += pageSize;
+          hasNext = items.length === pageSize;
+        } catch (error) {
+          console.error(error);
+          throw new Error(`データの取得中にエラーが発生しました`);
+        }
       }
+      const uniqueItems = Array.from(new Set(allItems.map(item => item.ID)))
+        .map(id => allItems.find(item => item.ID === id));
+      //orderBy Registered false
+      uniqueItems.sort((a, b) => new Date(b.Registered).getTime() - new Date(a.Registered).getTime());
+      this.processCompletionResults = uniqueItems;
 
     },
 
@@ -48,7 +83,8 @@ export const useProcessCompletionResultStore = defineStore(FeatureKey.PROCESSCOM
         this.processCompletionResults = items;
       }
       catch (error) {
-        throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+        console.error(error);
+        throw new Error(`データの取得中にエラーが発生しました`);
       }
     },
 
@@ -81,7 +117,8 @@ export const useProcessCompletionResultStore = defineStore(FeatureKey.PROCESSCOM
         const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNamePROCESSCOMPLETIONRESULT}`).getItemsByCAMLQuery(camlQuery);
         return items;
       } catch (error) {
-        throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+        console.error(error);
+        throw new Error(`データの取得中にエラーが発生しました`);
       }
 
     },
@@ -101,7 +138,8 @@ export const useProcessCompletionResultStore = defineStore(FeatureKey.PROCESSCOM
         });
         return '登録完了。';
       } catch (error) {
-        throw new Error(`データの登録中にエラーが発生しました: ${error.message}`);
+        console.error(error);
+        throw new Error(`データの登録中にエラーが発生しました`);
       }
     }
   }

@@ -14,34 +14,57 @@ export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
     },
     actions: {
         async getListItems() {
-            try {
-                const sp = spfi(getSP());
-                const web = await sp.web();
+            let allItems: IBillOfMaterialsItem[] = [];
+            let hasNext = true;
+            let skip = 0;
+            const pageSize = 1000;
+            while (hasNext) {
+                try {
+                    const sp = spfi(getSP());
+                    const web = await sp.web();
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameBILLOFMATERIALS}`).items.orderBy("ParentPartNo", true)();
-
-                const processTypeOrder: { [key: string]: number } = {
-                    'F': 1,
-                    'M': 2,
-                    'E': 3,
-                    'H': 4,
-                    'G': 5,
-                    'S': 6,
-                    'C': 7
-                };
-                items.sort((a: IBillOfMaterialsItem, b: IBillOfMaterialsItem) => {
-                    if (a.ParentPartNo === b.ParentPartNo) {
-                        return processTypeOrder[a.ParentProcessType as keyof typeof processTypeOrder] - processTypeOrder[b.ParentProcessType as keyof typeof processTypeOrder];
-                    }
-                    return a.ParentPartNo.localeCompare(b.ParentPartNo);
-                });
-
-                this.billOfMaterials = items;
+                    const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameBILLOFMATERIALS}`).items
+                        .select('ID', 'ParentPartNo', 'ParentProcessType', 'ChildPartNo', 'ChildProcessType', 'StructureQty', 'Registered', 'Modified', 'UniqueKey')
+                        .top(pageSize).skip(skip)();
+                    const selectedItems = items.map(item => ({
+                        ID: item.ID,
+                        ParentPartNo: item.ParentPartNo,
+                        ParentProcessType: item.ParentProcessType,
+                        ChildPartNo: item.ChildPartNo,
+                        ChildProcessType: item.ChildProcessType,
+                        StructureQty: item.StructureQty,
+                        Registered: item.Registered,
+                        Modified: item.Modified,
+                        UniqueKey: item.UniqueKey
+                    }))
+                    allItems = allItems.concat(selectedItems);
+                    skip += pageSize;
+                    hasNext = items.length === pageSize;
+                }
+                catch (error) {
+                    console.error(error);
+                    throw new Error(`データの取得中にエラーが発生しました`);
+                }
             }
-            catch (error) {
-                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
-            }
+            const uniqueItems = Array.from(new Set(allItems.map(item => item.ID)))
+                .map(id => allItems.find(item => item.ID === id));
+            const processTypeOrder: { [key: string]: number } = {
+                'F': 1,
+                'M': 2,
+                'E': 3,
+                'H': 4,
+                'G': 5,
+                'S': 6,
+                'C': 7
+            };
+            uniqueItems.sort((a: IBillOfMaterialsItem, b: IBillOfMaterialsItem) => {
+                if (a.ParentPartNo === b.ParentPartNo) {
+                    return processTypeOrder[a.ParentProcessType as keyof typeof processTypeOrder] - processTypeOrder[b.ParentProcessType as keyof typeof processTypeOrder];
+                }
+                return a.ParentPartNo.localeCompare(b.ParentPartNo);
+            });
 
+            this.billOfMaterials = uniqueItems;
         },
         async isUniqueKeyExists(uniqueKey: string, currentItemId: number = undefined): Promise<boolean> {
             try {
@@ -57,7 +80,8 @@ export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
                 }
             }
             catch (error) {
-                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+                console.error(error);
+                throw new Error(`データの取得中にエラーが発生しました`);
             }
             return true;
         },
@@ -81,7 +105,8 @@ export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
                 const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameBILLOFMATERIALS}`).getItemsByCAMLQuery(camlQuery);
                 return items.length;
             } catch (error) {
-                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+                console.error(error);
+                throw new Error(`データの取得中にエラーが発生しました`);
             }
         },
         async getItemCountByMLNPartNoProcessType(mlnPartNo: string, processType: string): Promise<number> {
@@ -89,7 +114,8 @@ export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
                 const items = await this.getItemsByChildMLNPartNoProcessType(mlnPartNo, processType);
                 return items.length;
             } catch (error) {
-                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+                console.error(error);
+                throw new Error(`データの取得中にエラーが発生しました`);
             }
         },
         async getItemsByChildMLNPartNoProcessType(mlnPartNo: string, processType: string): Promise<IBillOfMaterialsItem[]> {
@@ -118,7 +144,8 @@ export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
                 const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/BillOfMaterials`).getItemsByCAMLQuery(camlQuery);
                 return items;
             } catch (error) {
-                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+                console.error(error);
+                throw new Error(`データの取得中にエラーが発生しました`);
             }
         },
         async getItemsByMLNPartNoProcessType(mlnPartNo: string, processType: string): Promise<IBillOfMaterialsItem[]> {
@@ -147,7 +174,8 @@ export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
                 const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameBILLOFMATERIALS}`).getItemsByCAMLQuery(camlQuery);
                 return items;
             } catch (error) {
-                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+                console.error(error);
+                throw new Error(`データの取得中にエラーが発生しました`);
             }
         },
         async addListItem(item: IBillOfMaterialsItem): Promise<string> {
@@ -171,7 +199,12 @@ export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
                 return '登録完了。';
             }
             catch (error) {
-                throw new Error(`データの登録中にエラーが発生しました: ${error.message}`);
+                if (error.message.includes("duplicate value") || error.message.includes('一意性')) {
+                    throw new Error('重複値エラー');
+                } else {
+                    console.error(error);
+                    throw new Error(`データの登録中にエラーが発生しました`);
+                }
             }
         },
         async updateListItem(itemId: number, item: IBillOfMaterialsItem): Promise<string> {
@@ -193,7 +226,12 @@ export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
                 return '登録完了。';
             }
             catch (error) {
-                throw new Error(`データの登録中にエラーが発生しました: ${error.message}`);
+                if (error.message.includes("duplicate value") || error.message.includes('一意性')) {
+                    throw new Error('重複値エラー');
+                } else {
+                    console.error(error);
+                    throw new Error(`データの登録中にエラーが発生しました`);
+                }
             }
 
 
@@ -207,7 +245,8 @@ export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
                 return '消去完了。';
             }
             catch (error) {
-                throw new Error(`データの削除中にエラーが発生しました: ${error.message}`);
+                console.error(error);
+                throw new Error(`データの削除中にエラーが発生しました`);
             }
         }
 

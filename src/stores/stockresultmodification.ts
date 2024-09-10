@@ -2,11 +2,12 @@ import { defineStore } from 'pinia';
 import { spfi } from '@pnp/sp';
 import { getSP } from '../pnpjsConfig';
 import { FeatureKey } from '../config/keystrs';
-import { IStockResultModificationItem,IStockHistoryItem } from '../model';
+import { IStockResultModificationItem, IStockHistoryItem } from '../model';
 import { CONST } from '../config/const';
 import { useStockHistoryStore } from '../stores/stockhistory';
 import { useBillOfMaterialsStore } from './billofmaterials';
 import { usePartMasterStore } from '../stores/part';
+import { useUserStore } from '../stores/user';
 
 export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESULTMODIFICATION, {
     state: () => ({
@@ -17,30 +18,97 @@ export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESUL
     },
     actions: {
         async getListItems() {
-            try {
-                const sp = spfi(getSP());
-                const web = await sp.web();
+            let allItems: IStockResultModificationItem[] = [];
+            let hasNext = true;
+            let skip = 0;
+            const pageSize = 1000;
 
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKRESULTMODIFICATION}`).items.orderBy("Modified", false)();
-                this.stockResultModifications = items;
+            while (hasNext) {
+                try {
+                    const sp = spfi(getSP());
+                    const web = await sp.web();
+
+                    const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKRESULTMODIFICATION}`).items
+                        .select('ID',
+                            'MLNPartNo',
+                            'ProcessType',
+                            'UDPartNo',
+                            'FunctionID',
+                            'ModifiedQty',
+                            'ModifiedReason',
+                            'Despatchnote',
+                            'Comment',
+                            'EditorId',
+                            'Registered',
+                            'Modified'
+                        )
+                        .top(pageSize).skip(skip)();
+                    const selectedItems = items.map(item => ({
+                        ID: item.ID,
+                        MLNPartNo: item.MLNPartNo,
+                        ProcessType: item.ProcessType,
+                        UDPartNo: item.UDPartNo,
+                        FunctionID: item.FunctionID,
+                        ModifiedQty: item.ModifiedQty,
+                        ModifiedReason: item.ModifiedReason,
+                        Despatchnote: item.Despatchnote,
+                        Comment: item.Comment,
+                        Editor: item.EditorId,
+                        Registered: item.Registered,
+                        Modified: item.Modified
+                    }));
+                    allItems = allItems.concat(selectedItems);
+                    skip += pageSize;
+                    hasNext = items.length === pageSize;
+                } catch (error) {
+                    console.error(error);
+                    throw new Error(`データの取得中にエラーが発生しました`);
+                }
             }
-            catch (error) {
-                throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);
+            const uniqueItems = Array.from(new Set(allItems.map(item => item.ID)))
+                .map(id => allItems.find(item => item.ID === id));
+            //orderBy Registered false
+            uniqueItems.sort((a, b) => new Date(b.Registered).getTime() - new Date(a.Registered).getTime());
+            //change editor value
+            const userStore = useUserStore();
+            const results = [];
+
+            for (const { Editor, ...rest } of uniqueItems) {
+                let result = Editor;
+                if (Editor) {
+                    const user = userStore.cachedUsers.find(u => u.Id === +Editor);
+                    if (user) {
+                        result = user.Title;
+                    } else {
+                        const remoteUser = await userStore.getUser(+Editor);
+                        if (remoteUser) {
+                            result = remoteUser.Title;
+                            userStore.setUsers([remoteUser, ...userStore.cachedUsers]);
+                        }
+                    }
+                }
+
+                results.push({
+                    ...rest,
+                    Editor: result,
+                });
             }
 
+            this.stockResultModifications = results;
         },
         async addListItem(item: IStockResultModificationItem): Promise<string> {
             console.log("++++++++++++++++++++++++++++++++++++++++++++------")
-            let ModifiedById = "";
+            //let ModifiedById = "";
             const Comment = item.Comment || "";
-            if (item.ModifiedBy?.length > 0) {
-                try {
-                    ModifiedById = JSON.parse(item.ModifiedBy).Id;
-                } catch (e) { console.log(e) }
-            }
-            const itemForAdd = { ...item, ModifiedById, Comment };
-            delete itemForAdd.ModifiedBy;
-            if (itemForAdd.ModifiedById === "") delete itemForAdd.ModifiedById;
+            // if (item.ModifiedBy?.length > 0) {
+            //     try {
+            //         ModifiedById = JSON.parse(item.ModifiedBy).Id;
+            //     } catch (e) { console.log(e) }
+            // }
+            // const itemForAdd = { ...item, ModifiedById, Comment };
+            const itemForAdd = { ...item, Comment };
+            //delete itemForAdd.ModifiedBy;
+            //if (itemForAdd.ModifiedById === "") delete itemForAdd.ModifiedById;
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
@@ -50,12 +118,12 @@ export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESUL
                 const stockHistoryStore = useStockHistoryStore();
                 const latestStockQty = await stockHistoryStore.getListItemsByRegisteredDate(item.MLNPartNo, item.ProcessType);
                 let stockQty;
-                if(itemForAdd.FunctionID !=="07"){
+                if (itemForAdd.FunctionID !== "07") {
                     stockQty = Number(latestStockQty) + Number(item.ModifiedQty);
-                }else{
+                } else {
                     stockQty = Number(latestStockQty);
                 }
-                
+
 
                 const billOfMaterialsItem = {
                     MLNPartNo: itemForAdd.MLNPartNo,
@@ -67,7 +135,7 @@ export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESUL
                 } as IStockHistoryItem;
                 await stockHistoryStore.addListItem(billOfMaterialsItem);
 
-                if(itemForAdd.FunctionID==="06" || itemForAdd.FunctionID ==="07"){
+                if (itemForAdd.FunctionID === "06" || itemForAdd.FunctionID === "07") {
 
                     //Get UD part number in the part master table that corresponds to the entered MLN part number
                     const partMasterStore = usePartMasterStore();
@@ -82,11 +150,11 @@ export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESUL
                     let ChildPartNo;
                     let ChildProcessType;
                     let lastProcessStockQty;
-                    for (const record of partRecords) { 
-                      //const { ChildPartNo, ChildProcessType } = record;
-                      ChildPartNo = record.ChildPartNo;
-                      ChildProcessType = record.ChildProcessType;
-                      structureQty = Number(record.StructureQty);
+                    for (const record of partRecords) {
+                        //const { ChildPartNo, ChildProcessType } = record;
+                        ChildPartNo = record.ChildPartNo;
+                        ChildProcessType = record.ChildProcessType;
+                        structureQty = Number(record.StructureQty);
                     }
                     lastProcessStockQty = await stockHistoryStore.getLatestStockQtyByMLNPartNoProcessTypeDesc(ChildPartNo, ChildProcessType);
                     lastProcessStockQty = Number(lastProcessStockQty) + Number(item.ModifiedQty) * -1
