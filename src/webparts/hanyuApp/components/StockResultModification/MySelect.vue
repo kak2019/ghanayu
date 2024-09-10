@@ -37,36 +37,19 @@ export default {
   methods: {
     handleChange(value) {
       this.$emit('update:modelValue', value);
-    },
-    async fetchOptions() {
-      const shiYueFromStore = useSHIKYUFromStore();
-      try {
-       await  shiYueFromStore.getListItems(); // 获取数据
-        console.log(shiYueFromStore.shikyuFromItems ,"res")
-
-        this.options = shiYueFromStore.shikyuFromItems.map(item => ({
-          value: item.Title,
-          label: item.Title
-        }));
-      } catch (error) {
-        console.error('Error fetching options:', error);
-      }
     }
   },
   watch: {
     modelValue(newValue) 
     {
-      console.log("+++++++++++++++++++++++ ==========")
       this.innerValue = newValue;
     },
     innerValue(newValue) {
-      console.log("+++++++++++++++++++++++ ==========")
       this.$emit('update:modelValue', newValue);
     }
   },
   mounted() {
     //this.fetchOptions(); // 在组件挂载时获取数据
-    console.log("+++++++++++++++++++++++ ==========")
     //this.$emit('update:modelValue', value);
   }
 };

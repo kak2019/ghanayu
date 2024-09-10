@@ -1,6 +1,9 @@
 <template>
+
 <el-row class="background-layer main">
-    <div class="background-layer" label="1213">
+<div class="background-layer">
+  </div>
+    <div class="background-layer">
       <my-select v-model="form.selectedFunction" label="修正領域" :options="tableFunctions"></my-select>
     </div>
     <div class="background-layer">
@@ -51,7 +54,6 @@ import './App.css';
 import { computed } from 'vue';
 import DatePickerWithLabel from './labelPlusDateSelecter.vue';
 import TableShipping from './TableShipping.vue';
-import Selecter from './selecter.vue';
 import MySelect from './MySelect.vue';
 import InputRemoteData from './inputRemoteData.vue';
 import Input from './input.vue';
@@ -63,7 +65,6 @@ import { useModifiedReasonMasterStore } from '../../../../stores/modifiedreason'
 import { useFunctionsMasterStore } from '../../../../stores/function';
 import { useUserStore } from '../../../../stores/user';
 import { useProcessMasterStore } from '../../../../stores/process';
-
 
 // 获取 Pinia store 实例
 const stockResultModificationStore = useStockResultModificationStore();
@@ -77,7 +78,6 @@ export default {
   components: {
     TableShipping,
     DatePickerWithLabel,
-    Selecter,
     InputRemoteData,
     Input,
     MySelect
@@ -99,10 +99,16 @@ export default {
         modifiedReason: '01',
         note: '',
         comment: ''
-      }
+      },
+      selectedProvince: '',
+      selectedCity: '',
+      provinces: [
+        { value: 'guangdong', label: '广东' },
+        { value: 'jiangsu', label: '江苏' }
+      ],
+      cities: []
     };
   },
-
   methods: {
     async submitForm() {
       try {
@@ -159,6 +165,19 @@ export default {
         this.resetForm(); // 调用 reset 方法重置表单
       } catch (error) {
         this.$message.error('登録に失敗しました: ' + error.message);
+      }
+    },
+    handleProvinceChange(value) {
+      if (value === 'guangdong') {
+        this.cities = [
+          { value: 'guangzhou', label: '广州' },
+          { value: 'shenzhen', label: '深圳' }
+        ];
+      } else if (value === 'jiangsu') {
+        this.cities = [
+          { value: 'nanjing', label: '南京' },
+          { value: 'suzhou', label: '宿州' }
+        ];
       }
     },
     async fetchTableData() {
@@ -269,7 +288,7 @@ export default {
           return "";
         }
     },
-    resetForm() {      
+    resetForm() {
       this.form = {
         selectedFunction: '05',
         selectedProcess: 'Z',
@@ -279,8 +298,28 @@ export default {
         modifiedReason: '01',
         note: '',
         comment: ''
-      };
+      };      
       this.refreshFunctionName();
+      /*const processMasterItems = computed(() => processMasterStore.processMasterItems);
+      this.refreshProcessName(processMasterItems, this.form.selectedFunction);*/
+
+      const processMasterItems = computed(() => processMasterStore.processMasterItems);
+      let tempTableRrocess = [];
+      tempTableRrocess.push({ label: "支給", value: "Z"});
+
+      processMasterItems.value.forEach(item => {
+        tempTableRrocess.push({ label: item.ProcessName, value: item.ProcessType})
+      });
+      //tempTableRrocess.push({ label: "出荷", value: "CH"})
+  
+      tempTableRrocess = tempTableRrocess.filter(item=>{
+        let condition = true;
+        condition = condition && (item.value !== "F")
+        return condition;
+      });
+
+     this.tableRrocess = tempTableRrocess;
+
     },
 
     downloadExcel() {
@@ -330,25 +369,67 @@ export default {
         return condition;
       });
       this.tableFunctions = tempTableFunctions;
+    },
+    refreshProcessName(refreshedProcessMasterItems, functionId){
+      //工程区分
+      const processMasterItems = refreshedProcessMasterItems;
+      let tempTableRrocess = [];
+      if(functionId !=="07"){
+        tempTableRrocess.push({ label: "支給", value: "Z"});
+      }
+      processMasterItems.value.forEach(item => {
+        tempTableRrocess.push({ label: item.ProcessName, value: item.ProcessType})
+      });
+      if(functionId ==="06"){
+        tempTableRrocess.push({ label: "出荷", value: "CH"})
+      }
+      //if(functionId==="07"){
+       
+      //}
+      tempTableRrocess = tempTableRrocess.filter(item=>{
+        let condition = true;
+        condition = condition && (item.value !== "F")
+        return condition;
+      });
+     this.form.selectedProcess = tempTableRrocess[0].value;
+     this.tableRrocess = tempTableRrocess;
+     
+    }
+  },
+  watch: {
+    'form.selectedFunction': {
+      handler: function(newVal, oldVal) {
+        const processMasterItems = computed(() => processMasterStore.processMasterItems);
+        //let tempTableProcssWithoutSupply = tempTableProcssWithSupply.shift();
+        //if(newVal.selectedFunction ==="05"){
+          //this.refreshProcessName(processMasterItems, false, newVal.selectedFunction);
+        //}else if(newVal.selectedFunction ==="06"){
+          this.refreshProcessName(processMasterItems, newVal);
+        //}else{
+          //this.refreshProcessName(processMasterItems, true);
+        //}
+      },
+      deep: true // 开启深度监听
     }
   },
   async mounted() {
 
-    this.refreshFunctionName();
-    //工程区分
-     const processMasterItems = computed(() => processMasterStore.processMasterItems);
-     let tempTableRrocess = [{ label: "支給", value: "Z"}];
-     processMasterItems.value.forEach(item => {
-      tempTableRrocess.push({ label: item.ProcessName, value: item.ProcessType})
-     });
+      this.refreshFunctionName();
 
-     tempTableRrocess.push({ label: "出荷", value: "CH"})
+      const processMasterItems = computed(() => processMasterStore.processMasterItems);
+      let tempTableRrocess = [];
+      tempTableRrocess.push({ label: "支給", value: "Z"});
 
-     tempTableRrocess = tempTableRrocess.filter(item=>{
-       let condition = true;
-       condition = condition && (item.value !== "F")
-       return condition;
-     });
+      processMasterItems.value.forEach(item => {
+        tempTableRrocess.push({ label: item.ProcessName, value: item.ProcessType})
+      });
+      //tempTableRrocess.push({ label: "出荷", value: "CH"})
+  
+      tempTableRrocess = tempTableRrocess.filter(item=>{
+        let condition = true;
+        condition = condition && (item.value !== "F")
+        return condition;
+      });
 
      this.tableRrocess = tempTableRrocess;
 
@@ -374,6 +455,8 @@ export default {
      this.tableUsers = tempTableUserInfo;
 
     await this.fetchTableData();
+
+    console.log("------------------------------- mounted updatted= ");
   }
 };
 </script>
