@@ -13,7 +13,7 @@
     <el-table-column prop="MLNPartNo" label="MLN部品番号" />
     <el-table-column prop="UDPartNo" label="UD部品番号" />
     <el-table-column prop="GoodsReceiveQty" label="受入数" />
-    <el-table-column prop="Created" label="実績登録日"  :formatter="formatDate" />
+    <el-table-column prop="Registered" label="実績登録日"  :formatter="formatDate" />
   </el-table>
 </template>
 

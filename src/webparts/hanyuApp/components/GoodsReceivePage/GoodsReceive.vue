@@ -7,7 +7,7 @@
       <Selecter v-model="form.select" label="支給元"></Selecter>
     </div>
     <div class="background-layer">
-      <Input v-model="form.id" label="Call off id" labelColor="#92cddc"></Input>
+      <Input v-model="form.id" label="Call off id" labelColor="#fbf4f4"></Input>
     </div>
     <div class="background-layer">
       <Input v-model="form.note" label="Despatch note" labelColor="#92cddc"></Input>

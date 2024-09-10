@@ -9,7 +9,7 @@
     <el-input type="number"
         v-model="innerValue"
         clearable
-        style="width: 118px;border: 1px solid #000; border-top:none; font-size:12px"
+        style="width: 118px;"
         placeholder="Please Input"
         @input="handleChange"
         size="small"
@@ -72,7 +72,8 @@ export default {
   font-size: 12px;
   width: 117px;
   text-align: center;
-  border: 1px solid #000;
+  border:solid 1px #dbdbdb;
+  border-radius: 50px 0 50px 0;
 }
 
 .custom-date-picker {

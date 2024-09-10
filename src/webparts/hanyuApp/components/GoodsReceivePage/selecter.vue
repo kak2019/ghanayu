@@ -5,7 +5,7 @@
         v-model="innerValue"
         placeholder="Please select"
         @change="handleChange"
-        style="max-width: 128px; border: 1px solid #000; border-top:none;"
+        style="max-width: 128px;"
         size="small"
     >
       <el-option
@@ -84,7 +84,8 @@ export default {
   font-size: 12px;
   padding-left: 25px; /* 调整label文字位置 */
   padding-right: 30px;
-  border: 1px solid #000; /* 添加边框 */
+    /*border: 1px solid #000; *//* 添加边框 */
+  border-radius: 50px 0 50px 0;
   background-color: #fabf8f;
 }
 
