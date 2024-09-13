@@ -8,13 +8,12 @@
 
     <el-table-column prop="CompletionQty" label="完成数" width="100" />
 
-    <el-table-column prop="Created" label="実績登録日" width="180" :formatter="formatDate" />
+    <el-table-column prop="Registered" label="実績登録日" width="180" :formatter="formatDate" />
   </el-table>
 </template>
 
 <script setup>
 import { onMounted, ref, defineProps } from 'vue';
-import { useSHIKYUGoodsReceiveStore } from '../../../../stores/shikyugoodsreceive'; // 更新为你的实际路径
 
 const { tableData } = defineProps(['tableData'])
 
@@ -24,7 +23,7 @@ const formatDate = (row, column) => {
   const month = String(date.getMonth() + 1).padStart(1, '0'); // 月份从0开始
   const day = String(date.getDate()).padStart(2, '0');
   const year = date.getFullYear();
-  return `${month}/${day}/${year}`;
+  return `${year}/${month}/${day}`;
 };
 </script>
 

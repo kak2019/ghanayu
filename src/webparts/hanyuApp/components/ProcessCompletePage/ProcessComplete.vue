@@ -10,9 +10,6 @@
       <div class="background-layer" style="margin-right: 20px;">
         <InputRemoteData v-model="form.MLNPartNo" label="MLN部品番号" searchField="MLN" @confirmMethod="confirmMethod" />
       </div>
-      <!-- <div class="background-layer">
-        <InputRemoteData v-model="form.UDPartNo" label="UD部品番号" searchField="UD" />
-      </div> -->
       <div class="background-layer">
         <Input v-model="form.AbnormalNumber" label="不良数"></Input>
       </div>
@@ -21,8 +18,8 @@
       </div>
     </div>
     <div style="text-align: right; flex-shrink: 0;">
-      <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-bottom: 10px;" @click="submitForm">登录</el-button>
-      <el-button style="width: 100px; height: 50px; margin-top: 1px;margin-bottom: 10px;" @click="resetForm">キャンセル</el-button>
+      <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-bottom: 10px;" @click="submitForm" :disabled="!isBusinessControler">登録</el-button>
+      <el-button style="width: 100px; height: 50px; margin-top: 1px;margin-bottom: 10px;" @click="resetForm" :disabled="!isBusinessControler">キャンセル</el-button>
       <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-right: 10px;margin-bottom: 10px;" @click="downloadTable">ダウンロード</el-button>
     </div>
   </el-row>
@@ -37,13 +34,14 @@ import TableShipping from './TableShipping.vue';
 import Selecter from './selecter.vue';
 import InputRemoteData from './inputRemoteData.vue';
 import * as XLSX from 'xlsx';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import Input from './input.vue';
 import { useProcessCompletionResultStore } from "../../../../stores/processcompletion";
 import { useProcessMasterStore } from '../../../../stores/process';
 import { usePartMasterStore } from '../../../../stores/part';
 import { useBillOfMaterialsStore } from '../../../../stores/billofmaterials';
 import { useStockHistoryStore } from "../../../../stores/stockhistory"
+import { useUserStore } from '../../../../stores/user';
 
 const ProcessMasterStore = useProcessMasterStore();
 const ProcessCompletionResultStore = useProcessCompletionResultStore();
@@ -58,6 +56,15 @@ export default {
     InputRemoteData,
     Input
   },
+
+  setup() { 
+    const userStore = useUserStore();
+    const isBusinessControler = computed(() => userStore.groupInfo.indexOf('Business Controler') >= 0);
+    return {
+      isBusinessControler
+    };
+  },
+
   data() {
     return {
       processOptions: [],
@@ -73,6 +80,9 @@ export default {
       },
     };
   },
+
+  
+
   methods: {
     async submitForm() {
       debugger
