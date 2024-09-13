@@ -1,12 +1,5 @@
-export interface IStockHistoryItem {
-    ID?: string;
-    MLNPartNo?: string;
-    ProcessType?: string;
-    UDPartNo?: string;
-    Qty?: number;
-    FunctionID?: string;
+import { IEventItem } from "./eventitem";
+
+export interface IStockHistoryItem extends IEventItem {
     StockQty?: number;
-    Comment?: string;
-    Registered?: string;
-    Modified?: string;
 }

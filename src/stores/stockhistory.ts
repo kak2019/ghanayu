@@ -3,6 +3,7 @@ import { spfi } from '@pnp/sp';
 import { getSP } from '../pnpjsConfig';
 import { FeatureKey } from '../config/keystrs';
 import { IStockHistoryItem } from '../model';
+import { IItem } from '@pnp/sp/items/types';
 import { CONST } from '../config/const';
 
 export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
@@ -35,7 +36,8 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                             'StockQty',
                             'Comment',
                             'Registered',
-                            'Modified')
+                            'Modified',
+                            'SourceItemID')
                         .top(pageSize).skip(skip)();
                     const selectedItems = items.map(item => ({
                         ID: item.ID,
@@ -47,7 +49,8 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                         StockQty: item.StockQty,
                         Comment: item.Comment,
                         Registered: item.Registered,
-                        Modified: item.Modified
+                        Modified: item.Modified,
+                        SourceItemID: item.SourceItemID
                     }))
                     allItems = allItems.concat(selectedItems);
                     skip += pageSize;
@@ -111,8 +114,41 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                     FunctionID: item.FunctionID,
                     StockQty: item.StockQty,
                     Comment: item.Comment || "",
-                    Registered: new Date()
+                    Registered: new Date(),
+                    SourceItemID: item.SourceItemID || "",
                 });
+                return '登録完了。';
+            }
+            catch (error) {
+                console.error(error);
+                throw new Error(`データの登録中にエラーが発生しました`);
+            }
+        },
+        async addListItems(items: IStockHistoryItem[]): Promise<string> {
+            try {
+                const sp = spfi(getSP());
+                const [batchedSP, execute] = sp.batched();
+                const web = await sp.web();
+                const list = batchedSP.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`)
+
+                const res: IItem[] = [];
+                const errors: Error[] = [];
+                items.forEach(item =>
+                    list.items.add({
+                        MLNPartNo: item.MLNPartNo,
+                        ProcessType: item.ProcessType,
+                        UDPartNo: item.UDPartNo,
+                        Qty: item.Qty,
+                        FunctionID: item.FunctionID,
+                        StockQty: item.StockQty,
+                        Comment: item.Comment || "",
+                        Registered: new Date(),
+                        SourceItemID: item.SourceItemID || "",
+                    }).then(r => res.push(r)).catch(e => errors.push(e))
+                );
+                await execute();
+                if (res.length) console.log(res);
+                if (errors.length) console.error(errors);
                 return '登録完了。';
             }
             catch (error) {
@@ -215,7 +251,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
 
                 const sumInOutQty = newItems.reduce((accumulator, currentItem) => {
                     if ((currentItem.FunctionID === "03" && currentItem.Qty > 0) || currentItem.FunctionID === "07") {
-                      return accumulator + currentItem.Qty;
+                        return accumulator + currentItem.Qty;
                     }
                     return accumulator;
                 }, 0);
@@ -311,7 +347,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
 
                 const sumInOutQty = newItems.reduce((accumulator, currentItem) => {
                     if ((currentItem.FunctionID === "02" && currentItem.Qty > 0) || currentItem.FunctionID === "06") {
-                      return accumulator + currentItem.Qty;
+                        return accumulator + currentItem.Qty;
                     }
                     return accumulator;
                 }, 0);

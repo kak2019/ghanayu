@@ -5,6 +5,7 @@ import { usePartMasterStore } from '../../../../stores/part';
 import { useProcessMasterStore } from '../../../../stores/process';
 import { useBillOfMaterialsStore } from '../../../../stores/billofmaterials';
 import { useUserStore } from '../../../../stores/user';
+import { useFileName } from '../../../../stores/usefilename';
 import { useForm } from 'vee-validate';
 import * as yup from 'yup';
 import { Check, Close } from '@element-plus/icons-vue';
@@ -71,6 +72,7 @@ export default defineComponent({
         const partMasterStore = usePartMasterStore();
         const billOfMaterialsStore = useBillOfMaterialsStore();
         const userStore = useUserStore();
+        const { fileName, generateFileName } = useFileName();
         const isInventoryManager = computed(() => userStore.groupInfo.indexOf('Inventory Manager') >= 0);
         const isBusinessControler = computed(() => userStore.groupInfo.indexOf('Business Controler') >= 0);
         const currentRowIndex = ref(-1);
@@ -400,7 +402,8 @@ export default defineComponent({
                         })));
                     const wb = XLSX.utils.book_new();
                     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-                    XLSX.writeFile(wb, 'billOfMaterials_data.xlsx');
+                    generateFileName('部品表');
+                    XLSX.writeFile(wb, fileName.value);
                 }).catch(error => ElMessage.error(error.message));
         }
         return {

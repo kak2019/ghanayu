@@ -12,3 +12,4 @@ export * from './modifiedreasonmasteritem';
 export * from './stockresultmodificationitem';
 export * from './user';
 export * from './operationcalendaritem';
+export * from './eventitem';
