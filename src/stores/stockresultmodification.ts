@@ -5,8 +5,8 @@ import { FeatureKey } from '../config/keystrs';
 import { IStockResultModificationItem, IStockHistoryItem } from '../model';
 import { CONST } from '../config/const';
 import { useStockHistoryStore } from '../stores/stockhistory';
-import { useBillOfMaterialsStore } from './billofmaterials';
-import { usePartMasterStore } from '../stores/part';
+//import { useBillOfMaterialsStore } from './billofmaterials';
+//import { usePartMasterStore } from '../stores/part';
 import { useUserStore } from '../stores/user';
 
 export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESULTMODIFICATION, {
@@ -96,8 +96,7 @@ export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESUL
 
             this.stockResultModifications = results;
         },
-        async addListItem(item: IStockResultModificationItem): Promise<string> {
-            console.log("++++++++++++++++++++++++++++++++++++++++++++------")
+        async addListItem(item: IStockResultModificationItem, LatestStockQty:number,childProcessNItemToStock:[]): Promise<string> {
             //let ModifiedById = "";
             const Comment = item.Comment || "";
             // if (item.ModifiedBy?.length > 0) {
@@ -116,14 +115,16 @@ export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESUL
 
                 //Add record to StockHistory table.
                 const stockHistoryStore = useStockHistoryStore();
-                const latestStockQty = await stockHistoryStore.getListItemsByRegisteredDate(item.MLNPartNo, item.ProcessType);
+                //const latestStockQty = await stockHistoryStore.getListItemsByRegisteredDate(item.MLNPartNo, item.ProcessType);
                 let stockQty;
                 if (itemForAdd.FunctionID !== "07") {
-                    stockQty = Number(latestStockQty) + Number(item.ModifiedQty);
+                    stockQty = Number(LatestStockQty) + Number(itemForAdd.ModifiedQty);
+                    if(itemForAdd.ProcessType === "CH"){
+                        stockQty = 0;
+                    }
                 } else {
-                    stockQty = Number(latestStockQty);
+                    stockQty = Number(LatestStockQty);
                 }
-
 
                 const billOfMaterialsItem = {
                     MLNPartNo: itemForAdd.MLNPartNo,
@@ -135,39 +136,49 @@ export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESUL
                 } as IStockHistoryItem;
                 await stockHistoryStore.addListItem(billOfMaterialsItem);
 
-                if (itemForAdd.FunctionID === "06" || itemForAdd.FunctionID === "07") {
-
-                    //Get UD part number in the part master table that corresponds to the entered MLN part number
-                    const partMasterStore = usePartMasterStore();
-                    const udPartNo = await partMasterStore.getListItemByMLNPartNo(itemForAdd.MLNPartNo);
-                    //itemForAdd.UDPartNo = udPartNo;
-
-                    const billOfMaterialsStore = useBillOfMaterialsStore();
-                    const stockHistoryStore = useStockHistoryStore();
-                    const partRecords = await billOfMaterialsStore.getItemsByMLNPartNoProcessType(item.MLNPartNo, item.ProcessType)
-                    // Get item information for front process
-                    let structureQty;
-                    let ChildPartNo;
-                    let ChildProcessType;
+                if ((itemForAdd.FunctionID === "06" && itemForAdd.ProcessType !=="Z") || itemForAdd.FunctionID === "07") {
+                    
                     let lastProcessStockQty;
-                    for (const record of partRecords) {
-                        //const { ChildPartNo, ChildProcessType } = record;
-                        ChildPartNo = record.ChildPartNo;
-                        ChildProcessType = record.ChildProcessType;
-                        structureQty = Number(record.StructureQty);
-                    }
-                    lastProcessStockQty = await stockHistoryStore.getLatestStockQtyByMLNPartNoProcessTypeDesc(ChildPartNo, ChildProcessType);
-                    lastProcessStockQty = Number(lastProcessStockQty) + Number(item.ModifiedQty) * -1
-                    // Get item information for front process
-                    const bomItemLastProcess = {
-                        MLNPartNo: ChildPartNo,
-                        ProcessType: ChildProcessType,
-                        UDPartNo: udPartNo,
-                        Qty: Number(itemForAdd.ModifiedQty) * -1 * structureQty, //Number of corrections entered × -1 * Structured Quantity in BOM table
-                        FunctionID: "08", // it's only "08" in this process.
-                        StockQty: lastProcessStockQty, //Latest stock quantity + entered correction quantity × -1																	
-                    } as IStockHistoryItem;
-                    await stockHistoryStore.addListItem(bomItemLastProcess);
+                    childProcessNItemToStock.forEach(async (item) => {
+                        const { ChildPartNo, UdPartNo, ChildProcessType, StockQty, StructureQty} = item;
+                        lastProcessStockQty = Number(StockQty) + Number(itemForAdd.ModifiedQty) * -1;//Latest stock quantity + entered correction quantity × -1
+                        let inOutQty = 0;
+                        if(itemForAdd.ProcessType === "CH"){
+                            inOutQty = Number(itemForAdd.ModifiedQty) * -1;
+                        }else{
+                            inOutQty =  Number(itemForAdd.ModifiedQty) * -1 * Number(StructureQty);//Number of corrections entered × -1 * Structured Quantity in BOM table
+                        }
+                        // Get item information for front process
+                        const bomItemLastProcess = {
+                            MLNPartNo: ChildPartNo,
+                            ProcessType: ChildProcessType,
+                            UDPartNo: UdPartNo,
+                            Qty: inOutQty, 
+                            FunctionID: "08", // it's only "08" in this process.
+                            StockQty: lastProcessStockQty, 																	
+                        } as IStockHistoryItem;
+                        await stockHistoryStore.addListItem(bomItemLastProcess);
+                    });
+                    /*for (const record of childProcessNItemToStock) { 
+                        const { ChildPartNo, UdPartNo, ChildProcessType, StockQty, StructureQty} = record;
+                        lastProcessStockQty = Number(StockQty) + Number(itemForAdd.ModifiedQty) * -1;//Latest stock quantity + entered correction quantity × -1
+                        let inOutQty = 0;
+                        if(itemForAdd.ProcessType === "CH"){
+                            inOutQty = Number(itemForAdd.ModifiedQty) * -1;
+                        }else{
+                            inOutQty =  Number(itemForAdd.ModifiedQty) * -1 * Number(StructureQty);//Number of corrections entered × -1 * Structured Quantity in BOM table
+                        }
+                        // Get item information for front process
+                        const bomItemLastProcess = {
+                            MLNPartNo: ChildPartNo,
+                            ProcessType: ChildProcessType,
+                            UDPartNo: UdPartNo,
+                            Qty: inOutQty, 
+                            FunctionID: "08", // it's only "08" in this process.
+                            StockQty: lastProcessStockQty, 																	
+                        } as IStockHistoryItem;
+                        await stockHistoryStore.addListItem(bomItemLastProcess);
+                    }*/
                 }
                 return '登録完了。';
             }
