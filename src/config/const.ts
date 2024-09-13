@@ -16,6 +16,7 @@ const CONST = {
     listNameSHIKEYUFROM: "SHIKYUFrom",
     listNamePROCESSMASTER: "ProcessMaster",
     listNameSTOCKHISTORY: "StockHistory",
+    listNameEVENTS: "Events",
     listNameSHIPPINGRESULT: "ShippingResult",
     listNameSHIPPINGTO: "ShippingTo",
     listNamePROCESSCOMPLETIONRESULT: "ProcessCompletionResult",

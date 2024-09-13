@@ -2,6 +2,7 @@ import { IPartMasterItem } from '../../../../model/partitem';
 import { nextTick, computed, onMounted, onBeforeUnmount, ref } from 'vue';
 import { usePartMasterStore } from '../../../../stores/part';
 import { useUserStore } from '../../../../stores/user';
+import { useFileName } from '../../../../stores/usefilename';
 import { useForm } from 'vee-validate';
 import * as yup from 'yup';
 import { Check, Close } from '@element-plus/icons-vue';
@@ -51,6 +52,8 @@ export default {
         const partMasterStore = usePartMasterStore();
         const tableData = computed(() => partMasterStore.partMasterItems);
         const userStore = useUserStore();
+
+        const { fileName, generateFileName } = useFileName();
         const isInventoryManager = computed(() => userStore.groupInfo.indexOf('Inventory Manager') >= 0);
         const currentRowIndex = ref(-1);
         const isEditing = ref(false);
@@ -259,7 +262,8 @@ export default {
                     const ws = XLSX.utils.json_to_sheet(data.value.map(({ MLNPartNo, UDPartNo }) => ({ MLN部品番号: MLNPartNo, UD部品番号: UDPartNo })));
                     const wb = XLSX.utils.book_new();
                     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-                    XLSX.writeFile(wb, 'part_mater_data.xlsx');
+                    generateFileName('部品マスター');
+                    XLSX.writeFile(wb, fileName.value);
                 }).catch(error => ElMessage.error(error.message));
         }
         return {

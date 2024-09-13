@@ -12,7 +12,7 @@
     <el-table-column prop="MLNPartNo" label="MLN部品番号" />
     <el-table-column prop="UDPartNo" label="UD部品番号" />
     <el-table-column prop="ShipQty" label="出荷数" />
-    <el-table-column prop="Created" label="実績登録日"  :formatter="formatDate" />
+    <el-table-column prop="Registered" label="実績登録日"  :formatter="formatDate" />
   </el-table>
 </template>
 
@@ -44,7 +44,7 @@ const formatDate = (row, column) => {
   const month = String(date.getMonth() + 1).padStart(1, '0'); // 月份从0开始
   const day = String(date.getDate()).padStart(2, '0');
   const year = date.getFullYear();
-  return `${month}/${day}/${year}`;
+  return `${year}/${month}/${day}`;
 };
 </script>
 

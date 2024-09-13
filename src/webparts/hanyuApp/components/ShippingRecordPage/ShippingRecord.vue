@@ -18,16 +18,8 @@
     <div class="background-layer">
       <Input v-model="form.count" label="出荷数"/>
     </div>
-    <el-button
-        style="width: 100px; height: 50px; margin-top: 1px; margin-bottom: 10px;"
-        @click="submitForm"
-    >
-      登录
-    </el-button>
-    <el-button style="width: 100px; height: 50px; margin-top: 1px"
-               @click="cancel"
-    >キャンセル
-    </el-button>
+    <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-bottom: 10px;" @click="submitForm" :disabled="!isBusinessControler">登録</el-button>
+    <el-button style="width: 100px; height: 50px; margin-top: 1px;" @click="cancel" :disabled="!isBusinessControler">キャンセル</el-button>
     <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-right: 10px;margin-bottom: 10px;"
     @click="downloadExcel"
     >
@@ -44,11 +36,13 @@ import TableShipping from './TableShipping.vue';
 import Selecter from './selecter.vue';
 import InputRemoteData from './inputRemoteData.vue';
 import Input from './input.vue';
+import { ref, computed } from 'vue';
 import {useShippingResultStore} from '../../../../stores/shippingresult';
 import * as XLSX from 'xlsx';
 import {ElMessage} from "element-plus"; // 更新为你的实际路径
 import { usePartMasterStore } from '../../../../stores/part';
 import { useStockHistoryStore } from "../../../../stores/stockhistory"
+import { useUserStore } from '../../../../stores/user';
 
 
 // 获取 Pinia store 实例
@@ -63,6 +57,15 @@ export default {
     InputRemoteData,
     Input
   },
+
+  setup() { 
+    const userStore = useUserStore();
+    const isBusinessControler = computed(() => userStore.groupInfo.indexOf('Business Controler') >= 0);
+    return {
+      isBusinessControler
+    };
+  },
+
   data() {
     return {
       form: {
