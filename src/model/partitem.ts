@@ -5,6 +5,7 @@ export interface IPartMasterItem {
     ProcessType?: string;
     Registered?: string;
     Modified?: string;
+    ProcessTypeName?:string;
     
     lastLatestMonthQty?:string;
     currentMonthDefectsQty?: string;

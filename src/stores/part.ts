@@ -11,11 +11,13 @@ import { computed} from 'vue';
 export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
     state: () => ({
         parts: [] as IPartMasterItem[],
+        filteredParts: [] as IPartMasterItem[],
     }),
     getters: {
         partMasterItems: (state) => state.parts,
         partMasterMLNItems: (state) => state.parts.map(part => part.MLNPartNo),
-        partMasterUDItems: (state) => state.parts.map(part => part.UDPartNo)
+        partMasterUDItems: (state) => state.parts.map(part => part.UDPartNo),
+        filteredPartMasterItems:(state) => state.filteredParts,
     },
     actions: {
         async getListItemById(itemId: number): Promise<IPartMasterItem> {
@@ -232,14 +234,13 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
         },
         async getListItemsBySearchItems(date: string, processType: string, mlnPartNo: string, udPartNo: string) {
             try {
-                const sp = spfi(getSP());
-                const web = await sp.web();
-
-                let items = (await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNamePARTMASTER}`).items.orderBy("MLNPartNo", true)());
-
+                //let items = [];
+                const tableData = computed(() => this.partMasterItems);
+                let items = tableData;
+                let tempItems: any[] = []
                 //filter part list with process type
                 if (processType !== "") {
-                    items = items.filter(item => {
+                    tempItems = items.value.filter(item => {
                         let condition = true;
                         //console.log(item.ID + "item.ProcessType-----------" + item.ProcessType);
                         const isProcessTypeIn = (item.ProcessType !== null) && (item.ProcessType.indexOf(processType) >= 0)
@@ -261,7 +262,7 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 if (isEmpty1 && isEmpty2) {
                     console.log("");
                 } else {
-                    items = items.filter(item => {
+                    tempItems = tempItems.filter(item => {
                         let condition = true;
                         const filterByMLNPartNo = !isEmpty1 && item.MLNPartNo.indexOf(MLNPartNoValue) >= 0;
                         const filterByUDPartNo = !isEmpty2 && item.UDPartNo.indexOf(UDPartNoValue) >= 0;
@@ -279,49 +280,47 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 const currentMonth = new Date(date).getFullYear() + "-" + (new Date(date).getMonth() + 1);
                 const stockHistoryStore = useStockHistoryStore();
                 //前月末在庫
-                const listWithAllLastMonthQty = await Promise.all(items.map(async item => {
+                const listWithAllLastMonthQty = await Promise.all(tempItems.map(async item => {
                     return await stockHistoryStore.getLastMonthsLatestStockQtyByMln(item.MLNPartNo, processType, currentMonth);
                 }));
                 //console.log("----------" + listWithAllLastMonthQty);
                 //console.log("----------length" + listWithAllLastMonthQty.length);
 
                 //当月実績 - 不良
-                const listWithCurrentMonthDefectsQty = await Promise.all(items.map(async item => {
+                const listWithCurrentMonthDefectsQty = await Promise.all(tempItems.map(async item => {
                     return await stockHistoryStore.getCurrentMonthDefectsQtyByMlnNo(item.MLNPartNo, processType, currentMonth);
                 }));
                 //console.log("----------" + listWithCurrentMonthDefectsQty);
                 //console.log("----------length" + listWithCurrentMonthDefectsQty.length);
 
                 //当月実績 - 完成
-                const listWithCurrentMonthCompletionQty = await Promise.all(items.map(async item => {
+                const listWithCurrentMonthCompletionQty = await Promise.all(tempItems.map(async item => {
                     return await stockHistoryStore.getCurrentMonthCompletionQtyByMlnNo(item.MLNPartNo, processType, currentMonth);
                 }));
                 //console.log("----------" + listWithCurrentMonthCompletionQty);
                 //console.log("----------length" + listWithCurrentMonthCompletionQty.length);
 
                 //当月実績 - 振替
-                const listWithCurrentMonthShippingQty = await Promise.all(items.map(async item => {
+                const listWithCurrentMonthShippingQty = await Promise.all(tempItems.map(async item => {
                     return await stockHistoryStore.getCurrentMonthShippingQtyByMlnNo(item.MLNPartNo, processType, currentMonth);
                 }));
                 //console.log("----------" + listWithCurrentMonthShippingQty);
                 //console.log("----------length" + listWithCurrentMonthShippingQty.length);
 
                 //当月末在庫
-                const listWithCurentMonthStockQtyByMlnNo = await Promise.all(items.map(async item => {
+                const listWithCurentMonthStockQtyByMlnNo = await Promise.all(tempItems.map(async item => {
                     return await stockHistoryStore.getCurentMonthStockQtyByMlnNo(item.MLNPartNo, processType, currentMonth);
                 }));
-                //console.log("----------" + listWithCurentMonthStockQtyByMlnNo);
-                //console.log("----------length" + listWithCurentMonthStockQtyByMlnNo.length);
 
-                for (let i = 0; i < items.length; i++) {
-                    items[i].lastLatestMonthQty = listWithAllLastMonthQty[i];
-                    items[i].currentMonthDefectsQty = listWithCurrentMonthDefectsQty[i];
-                    items[i].currentMonthCompletionQty = listWithCurrentMonthCompletionQty[i];
-                    items[i].currentMonthShippingQty = listWithCurrentMonthShippingQty[i];
-                    items[i].curentMonthStockQty = listWithCurentMonthStockQtyByMlnNo[i];
+                for (let i = 0; i < tempItems.length; i++) {
+                    tempItems[i].lastLatestMonthQty = listWithAllLastMonthQty[i].toString();
+                    tempItems[i].currentMonthDefectsQty = listWithCurrentMonthDefectsQty[i].toString();
+                    tempItems[i].currentMonthCompletionQty = listWithCurrentMonthCompletionQty[i].toString();
+                    tempItems[i].currentMonthShippingQty = listWithCurrentMonthShippingQty[i].toString();
+                    tempItems[i].curentMonthStockQty = listWithCurentMonthStockQtyByMlnNo[i].toString();
                 }
-                //console.log("========" + items);
-                this.parts = items;
+                console.log("========" + tempItems);
+                this.filteredParts = tempItems;
             }
             catch (error) {
                 throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);

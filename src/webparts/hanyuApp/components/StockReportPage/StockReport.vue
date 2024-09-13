@@ -156,7 +156,7 @@ export default {
       await partMasterStore.getListItemsBySearchItems(date, processType, mlnPartNo, udPartNo).then(() => {
                 this.loading = false;
                 // 对数据进行处理以匹配表格字段
-                this.tableData = partMasterStore.partMasterItems;
+                this.tableData = partMasterStore.filteredParts;
                 this.summaries = this.getSummaries();
             }).catch(error => {
                 this.loading = false;
@@ -217,11 +217,11 @@ export default {
       let [totalLastLatestMonthQty,totalCurrentMonthDefectsQty,totalCurrentMonthCompletionQty,totalCurrentMonthShippingQty,totalCurentMonthStockQty] = [0,0,0,0,0];
 
       this.tableData.forEach(element => {
-         totalLastLatestMonthQty += element.lastLatestMonthQty;
-         totalCurrentMonthDefectsQty += element.currentMonthDefectsQty;
-         totalCurrentMonthCompletionQty += element.currentMonthCompletionQty;
-         totalCurrentMonthShippingQty += element.currentMonthShippingQty;
-         totalCurentMonthStockQty += element.curentMonthStockQty;
+         totalLastLatestMonthQty += Number(element.lastLatestMonthQty);
+         totalCurrentMonthDefectsQty += Number(element.currentMonthDefectsQty);
+         totalCurrentMonthCompletionQty += Number(element.currentMonthCompletionQty);
+         totalCurrentMonthShippingQty += Number(element.currentMonthShippingQty);
+         totalCurentMonthStockQty += Number(element.curentMonthStockQty);
       });
 
       const lastLatestMonthQty = totalLastLatestMonthQty;
