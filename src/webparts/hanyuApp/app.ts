@@ -9,6 +9,7 @@ import { useUserStore } from '../../stores/user';
 import { useModifiedReasonMasterStore } from '../../stores/modifiedreason';
 import { ElMessage } from 'element-plus';
 import { CONST } from '../../config/const';
+import { useStockHistoryStore } from '../../stores/stockhistory';
 
 export default defineComponent({
     name: "HanyuApp",
@@ -22,6 +23,7 @@ export default defineComponent({
         const shippingToStore = useShippingToStore();
         const partMasterStore = usePartMasterStore();
         const userStore = useUserStore();
+        const stockHistoryStore = useStockHistoryStore();
 
 
         onMounted(async (): Promise<void> => {
@@ -34,6 +36,7 @@ export default defineComponent({
                 await shikyuFromStore.getListItems();
                 await shippingToStore.getListItems();
                 await partMasterStore.getListItems();
+                await stockHistoryStore.getListItems();
                 await userStore.getUser();
                 await userStore.getMembersByGroupName('Business Controler');
                 await userStore.getMembersByGroupName('Hanyu type 1');

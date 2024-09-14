@@ -5,6 +5,7 @@ import { FeatureKey } from '../config/keystrs';
 import { IStockHistoryItem } from '../model';
 import { IItem } from '@pnp/sp/items/types';
 import { CONST } from '../config/const';
+import { computed } from 'vue';
 
 export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
     state: () => ({
@@ -208,20 +209,16 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
 
         async getLastMonthsLatestStockQtyByMln(mlnPartNo: string, processType: string, current: string): Promise<number> {
             try {
-                const sp = spfi(getSP());
-                const web = await sp.web();
-
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`).items.orderBy("Registered", false)();
-                const newItems = items.filter(item => {
+                const items = computed(() => this.stockHistoryItems);
+                const newItems = items.value.filter(item => {
                     let condition = true;
-                    //?????????????????????????? 前月末的库存需要改一下时间上的比较
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
                     if (mlnPartNo) {
                         condition = condition && mlnPartNo === item.MLNPartNo && item.ProcessType === processType && formatRegistered !== current
                     }
                     return condition
                 });
-                //console.log("get Last Months Latest Stock Qty ByMln" + newItems);
+
                 if (newItems.length > 0) {
                     return newItems[0].StockQty
                 } else {
@@ -236,11 +233,8 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
         },
         async getCurrentMonthDefectsQtyByMlnNo(mlnPartNo: string, processType: string, current: string): Promise<number> {
             try {
-                const sp = spfi(getSP());
-                const web = await sp.web();
-
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`).items.orderBy("Registered", false)();
-                const newItems = items.filter(item => {
+                const items = computed(() => this.stockHistoryItems);
+                const newItems = items.value.filter(item => {
                     let condition = true
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
                     if (mlnPartNo) {
@@ -332,11 +326,8 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
 
         async getCurrentMonthCompletionQtyByMlnNo(mlnPartNo: string, processType: string, current: string): Promise<number> {
             try {
-                const sp = spfi(getSP());
-                const web = await sp.web();
-
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`).items.orderBy("Registered", false)();
-                const newItems = items.filter(item => {
+                const items = computed(() => this.stockHistoryItems);
+                const newItems = items.value.filter(item => {
                     let condition = true;
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
                     if (mlnPartNo) {
@@ -360,11 +351,8 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
         },
         async getCurrentMonthShippingQtyByMlnNo(mlnPartNo: string, processType: string, current: string): Promise<number> {
             try {
-                const sp = spfi(getSP());
-                const web = await sp.web();
-
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`).items.orderBy("Registered", false)();
-                const newItems = items.filter(item => {
+                const items = computed(() => this.stockHistoryItems);
+                const newItems = items.value.filter(item => {
                     let condition = true;
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
                     if (mlnPartNo) {
@@ -372,7 +360,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                     }
                     return condition
                 });
-                console.log("get Current Month Shipping Qty By MlnNo" + items);
+
                 if (newItems.length > 0) {
                     let sumInOutQty = 0;
                     if (processType !== "C") {
@@ -402,11 +390,8 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
         },
         async getCurentMonthStockQtyByMlnNo(mlnPartNo: string, processType: string, current: string): Promise<number> {
             try {
-                const sp = spfi(getSP());
-                const web = await sp.web();
-
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`).items.orderBy("Registered", false)();
-                const newItems = items.filter(item => {
+                const items = computed(() => this.stockHistoryItems);
+                const newItems = items.value.filter(item => {
                     let condition = true;
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
                     if (mlnPartNo) {
@@ -414,7 +399,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                     }
                     return condition
                 });
-                //console.log("get Curent Month Stoc kQty By MlnNo " + items);
+
                 if (newItems.length > 0) {
                     return newItems[0].StockQty
                 } else {
