@@ -109,7 +109,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 const web = await sp.web();
                 await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`).items.add({
                     MLNPartNo: item.MLNPartNo,
-                    ProcessType: item.ProcessType, // Need to check if it's only F?
+                    ProcessType: item.ProcessType, 
                     UDPartNo: item.UDPartNo,
                     Qty: item.Qty,
                     FunctionID: item.FunctionID,
