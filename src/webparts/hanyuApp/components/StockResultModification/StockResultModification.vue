@@ -93,6 +93,7 @@ import { useUserStore } from "../../../../stores/user";
 import { useProcessMasterStore } from "../../../../stores/process";
 import { useBillOfMaterialsStore } from "../../../../stores/billofmaterials";
 import { useStockHistoryStore } from "../../../../stores/stockhistory";
+import { useFileName } from '../../../../stores/usefilename';
 // 获取 Pinia store 实例
 const stockResultModificationStore = useStockResultModificationStore();
 const modifiedReasonMasterStore = useModifiedReasonMasterStore();
@@ -467,7 +468,10 @@ export default {
         "stock result modification"
       );
 
-      XLSX.writeFile(workbook, "stock_result_modification.xlsx");
+      const { fileName, generateFileName } = useFileName();
+      generateFileName('在庫&実績修正');
+
+      XLSX.writeFile(workbook, fileName.value);
     },
 
     formatDate(row, column) {
