@@ -86,7 +86,7 @@ export default {
     downloadTable() {
       // 创建一个新的工作表
       const ws = XLSX.utils.json_to_sheet(this.tableData.map(val => ({
-        ProcessType: val.ProcessType,
+        ProcessType: val.ProcessTypeName,
         MLNPartNo: val.MLNPartNo,
         UDPartNo: val.UDPartNo,
         前月末在庫: val.lastLatestMonthQty,
@@ -122,9 +122,9 @@ export default {
 
       // 将工作簿导出为 Excel 文件
       const { fileName, generateFileName } = useFileName();
-       generateFileName('支給品検収実績入力');
+       generateFileName('在庫管理表(工程別)');
 
-      XLSX.writeFile(wb, "在庫管理表.xlsx");
+      XLSX.writeFile(wb, fileName.value);
     },
     async searchForm() {
       //this.tableData = this.filterDataBySearchItems();

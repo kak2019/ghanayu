@@ -1,75 +1,72 @@
 <template>
-  <el-row class="background-layer main" style="display: flex; justify-content: space-between; align-items: center;">
-    <div style="display: flex; flex-grow: 1;">
-      <div class="background-layer">
-        <my-select
-          v-model="form.selectedFunction"
-          label="修正領域"
-          :options="tableFunctions"
-        ></my-select>
-      </div>
-      <div class="background-layer">
-        <my-select
-          label="工程区分"
-          v-model="form.selectedProcess"
-          :options="tableRrocess"
-        ></my-select>
-      </div>
-      <div class="background-layer">
-        <InputRemoteData v-model="form.num" label="MLN部品番号" />
-      </div>
-      <div class="background-layer">
-        <Input v-model="form.count" label="修正数" />
-      </div>
-      <!---- <div class="background-layer">
-        <my-select label="修正者" v-model="form.ModifiedBy" :options="tableUsers"></my-select>
-      </div>-->
-      <div class="background-layer">
-        <my-select
-          label="修正理由"
-          v-model="form.modifiedReason"
-          :options="tableModifiedReason"
-        ></my-select>
-      </div>
-      <div class="background-layer">
-        <Input
-          v-model="form.note"
-          label="Despatch note"
-          labelColor="#92cddc"
-        ></Input>
-      </div>
-      <div class="background-layer">
-        <InputRemoteData
-          v-model="form.comment"
-          label="コメント"
-          labelColor="#92cddc"
-        ></InputRemoteData>
-      </div>
+  <el-row class="background-layer main">
+    <div class="background-layer"></div>
+    <div class="background-layer">
+      <my-select
+        v-model="form.selectedFunction"
+        label="修正領域"
+        :options="tableFunctions"
+      ></my-select>
     </div>
-    <div style="text-align: right; flex-shrink: 0;">
-      <el-button
-        plain
-        size="large"
-        type="primary"
-        style="width: 100px;"
-        @click="submitForm"
-      >
-        登録
-      </el-button>
-      <el-button
-        plain size="large"
-        style="width: 100px;"
-        @click="resetForm"
-        >キャンセル
-      </el-button>
-      <el-button
-        plain size="large"
-        style="width: 100px;"
-        @click="downloadExcel"
-      >
-        ダウンロード
-      </el-button>
+    <div class="background-layer">
+      <my-select
+        label="工程区分"
+        v-model="form.selectedProcess"
+        :options="tableRrocess"
+      ></my-select>
     </div>
+    <div class="background-layer">
+      <InputRemoteData v-model="form.num" label="MLN部品番号" />
+    </div>
+    <div class="background-layer">
+      <Input v-model="form.count" label="修正数" />
+    </div>
+    <!---- <div class="background-layer">
+      <my-select label="修正者" v-model="form.ModifiedBy" :options="tableUsers"></my-select>
+    </div>-->
+    <div class="background-layer">
+      <my-select
+        label="修正理由"
+        v-model="form.modifiedReason"
+        :options="tableModifiedReason"
+      ></my-select>
+    </div>
+    <div class="background-layer">
+      <Input
+        v-model="form.note"
+        label="Despatch note"
+        labelColor="#92cddc"
+      ></Input>
+    </div>
+    <div class="background-layer">
+      <InputRemoteData
+        v-model="form.comment"
+        label="コメント"
+        labelColor="#92cddc"
+      ></InputRemoteData>
+    </div>
+
+    <el-button
+      plain size="large"
+      type="primary"
+      style="width: 100px;"
+      @click="submitForm"
+    >
+      登録
+    </el-button>
+    <el-button
+      plain size="large"
+      style="width: 100px;"
+      @click="resetForm"
+      >キャンセル
+    </el-button>
+    <el-button
+      plain size="large"
+      style="width: 100px;"
+      @click="downloadExcel"
+    >
+      ダウンロード
+    </el-button>
   </el-row>
 
   <TableShipping :tableData="tableData" :loading="loading"></TableShipping>
