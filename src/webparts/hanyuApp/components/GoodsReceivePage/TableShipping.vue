@@ -1,8 +1,6 @@
 <template>
   <el-table
-      :data="tableData"
-      stripe
-      border 
+      :data="tableData" stripe border 
       style="width: 100%; font-size:12px;"
       :header-cell-style="{ backgroundColor: '#366093', color: '#fff' }"
       height="800px"

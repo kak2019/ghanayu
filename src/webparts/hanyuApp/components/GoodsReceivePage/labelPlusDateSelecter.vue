@@ -11,6 +11,7 @@
         :editable="false"
         :clearable="false"
         size="small"
+        :disabled-date="disabledDate"
     ></el-date-picker>
   </div>
 </template>
@@ -44,6 +45,11 @@ export default {
   methods: {
     handleChange(value) {
       this.$emit('update:modelValue', value);
+    },
+    disabledDate(date) {
+      const start = new Date('2024-01'); // 2024-08-01
+      const end = new Date('2025-12'); // 2024-08-31
+      return date < start || date > end;
     }
   }
 };
