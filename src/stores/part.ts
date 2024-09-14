@@ -238,8 +238,8 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
             try {
                 //let items = [];
                 const tableData = computed(() => this.partMasterItems);
-                let items = tableData;
-                let tempItems: any[] = []
+                const items = tableData;
+                let tempItems;
                 //filter part list with process type
                 if (processType !== "") {
                     tempItems = items.value.filter(item => {
@@ -332,8 +332,8 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
         async getListItemsBySearchItemsForGoodsInventory(date: string, processType: string, mlnPartNo: string, udPartNo: string) {
             try {
                 const tableData = computed(() => this.partMasterItems);
-                let items = tableData;
-                let tempItems: any[] = []
+                const items = tableData;
+                let tempItems;
                 //filter part list with process type
                 if (processType !== "") {
                     tempItems = items.value.filter(item => {
@@ -403,10 +403,10 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 //console.log("----------length" + listWithCurentMonthStockQtyByMlnNo.length);
 
                 for (let i = 0; i < tempItems.length; i++) {
-                    tempItems[i].lastLatestMonthQty = listWithAllLastMonthQty[i];
-                    tempItems[i].currentMonthInQty = listWithCurrentMonthInQty[i];
-                    tempItems[i].currentMonthOutQty = listWithCurrentMonthOutQty[i];
-                    tempItems[i].curentMonthStockQty = listWithCurentMonthStockQtyByMlnNo[i];
+                    tempItems[i].lastLatestMonthQty = listWithAllLastMonthQty[i].toString();
+                    tempItems[i].currentMonthInQty = listWithCurrentMonthInQty[i].toString();
+                    tempItems[i].currentMonthOutQty = listWithCurrentMonthOutQty[i].toString();
+                    tempItems[i].curentMonthStockQty = listWithCurentMonthStockQtyByMlnNo[i].toString();
                 }
                 console.log("========" + tempItems);
                 this.filteredPartsForGoodsInventory = tempItems;
