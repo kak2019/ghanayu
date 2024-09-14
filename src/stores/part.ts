@@ -12,12 +12,14 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
     state: () => ({
         parts: [] as IPartMasterItem[],
         filteredParts: [] as IPartMasterItem[],
+        filteredPartsForGoodsInventory: [] as IPartMasterItem[],
     }),
     getters: {
         partMasterItems: (state) => state.parts,
         partMasterMLNItems: (state) => state.parts.map(part => part.MLNPartNo),
         partMasterUDItems: (state) => state.parts.map(part => part.UDPartNo),
         filteredPartMasterItems:(state) => state.filteredParts,
+        filteredPartMasterForGoodsInventoryItems:(state) => state.filteredParts,
     },
     actions: {
         async getListItemById(itemId: number): Promise<IPartMasterItem> {
@@ -329,14 +331,12 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
 
         async getListItemsBySearchItemsForGoodsInventory(date: string, processType: string, mlnPartNo: string, udPartNo: string) {
             try {
-                const sp = spfi(getSP());
-                const web = await sp.web();
-
-                let items = (await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNamePARTMASTER}`).items.orderBy("MLNPartNo", true)());
-
+                const tableData = computed(() => this.partMasterItems);
+                let items = tableData;
+                let tempItems: any[] = []
                 //filter part list with process type
                 if (processType !== "") {
-                    items = items.filter(item => {
+                    tempItems = items.value.filter(item => {
                         let condition = true;
                         //console.log(item.ID + "item.ProcessType-----------" + item.ProcessType);
                         const isProcessTypeIn = (item.ProcessType !== null) && (item.ProcessType.indexOf(processType) >= 0)
@@ -357,7 +357,7 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 if (isEmpty1 && isEmpty2) {
                     console.log("");
                 } else {
-                    items = items.filter(item => {
+                    tempItems = tempItems.filter(item => {
                         let condition = true;
                         const filterByMLNPartNo = !isEmpty1 && item.MLNPartNo.indexOf(MLNPartNoValue) >= 0;
                         const filterByUDPartNo = !isEmpty2 && item.UDPartNo.indexOf(UDPartNoValue) >= 0;
@@ -375,41 +375,41 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 const currentMonth = new Date(date).getFullYear() + "-" + (new Date(date).getMonth() + 1);
                 const stockHistoryStore = useStockHistoryStore();
                 //前月末在庫
-                const listWithAllLastMonthQty = await Promise.all(items.map(async item => {
+                const listWithAllLastMonthQty = await Promise.all(tempItems.map(async item => {
                     return await stockHistoryStore.getLastMonthsLatestStockQtyByMln(item.MLNPartNo, processType, currentMonth);
                 }));
                 //console.log("----------" + listWithAllLastMonthQty);
                 //console.log("----------length" + listWithAllLastMonthQty.length);
 
                 //当月実績 - 入库
-                const listWithCurrentMonthInQty = await Promise.all(items.map(async item => {
+                const listWithCurrentMonthInQty = await Promise.all(tempItems.map(async item => {
                     return await stockHistoryStore.getCurrentMonthInQtyByMlnNo(item.MLNPartNo, 'F', currentMonth);
                 }));
                 //console.log("----------" + listWithCurrentMonthCompletionQty);
                 //console.log("----------length" + listWithCurrentMonthCompletionQty.length);
 
                 //当月実績 - 出库
-                const listWithCurrentMonthOutQty = await Promise.all(items.map(async item => {
+                const listWithCurrentMonthOutQty = await Promise.all(tempItems.map(async item => {
                     return await stockHistoryStore.getCurrentMonthOutQtyByMlnNo(item.MLNPartNo, 'F', currentMonth);
                 }));
                 //console.log("----------" + listWithCurrentMonthShippingQty);
                 //console.log("----------length" + listWithCurrentMonthShippingQty.length);
 
                 //当月末在庫
-                const listWithCurentMonthStockQtyByMlnNo = await Promise.all(items.map(async item => {
+                const listWithCurentMonthStockQtyByMlnNo = await Promise.all(tempItems.map(async item => {
                     return await stockHistoryStore.getCurentMonthStockQtyByMlnNo(item.MLNPartNo, processType, currentMonth);
                 }));
                 //console.log("----------" + listWithCurentMonthStockQtyByMlnNo);
                 //console.log("----------length" + listWithCurentMonthStockQtyByMlnNo.length);
 
-                for (let i = 0; i < items.length; i++) {
-                    items[i].lastLatestMonthQty = listWithAllLastMonthQty[i];
-                    items[i].currentMonthInQty = listWithCurrentMonthInQty[i];
-                    items[i].currentMonthOutQty = listWithCurrentMonthOutQty[i];
-                    items[i].curentMonthStockQty = listWithCurentMonthStockQtyByMlnNo[i];
+                for (let i = 0; i < tempItems.length; i++) {
+                    tempItems[i].lastLatestMonthQty = listWithAllLastMonthQty[i];
+                    tempItems[i].currentMonthInQty = listWithCurrentMonthInQty[i];
+                    tempItems[i].currentMonthOutQty = listWithCurrentMonthOutQty[i];
+                    tempItems[i].curentMonthStockQty = listWithCurentMonthStockQtyByMlnNo[i];
                 }
-                console.log("========" + items);
-                this.parts = items;
+                console.log("========" + tempItems);
+                this.filteredPartsForGoodsInventory = tempItems;
             }
             catch (error) {
                 throw new Error(`データの取得中にエラーが発生しました: ${error.message}`);

@@ -18,8 +18,8 @@
     <div class="background-layer">
       <Input v-model="form.count" label="出荷数"/>
     </div>
-    <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-bottom: 10px;" @click="submitForm" :disabled="!isBusinessControler">登録</el-button>
-    <el-button style="width: 100px; height: 50px; margin-top: 1px;" @click="cancel" :disabled="!isBusinessControler">キャンセル</el-button>
+    <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-bottom: 10px;" @click="submitForm" :disabled="isBusinessControler">登録</el-button>
+    <el-button style="width: 100px; height: 50px; margin-top: 1px;" @click="cancel" :disabled="isBusinessControler">キャンセル</el-button>
     <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-right: 10px;margin-bottom: 10px;"
     @click="downloadExcel"
     >
@@ -107,7 +107,7 @@ export default {
         const partMasterStore = usePartMasterStore();
         const curPartCount = await partMasterStore.getItemCountByMLNPartNoProcessType(this.form.num,'C');
         if (curPartCount <= 0) {
-          this.$message.error('Part不存在');
+          this.$message.error('部品表なしエラー');
           return;
         }
 

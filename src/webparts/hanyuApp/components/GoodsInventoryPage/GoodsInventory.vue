@@ -44,6 +44,7 @@ import DatePickerWithLabel from './labelPlusDateSelecter.vue';
 import TableShipping from './TableShipping.vue';
 import Selecter from './selecter.vue';
 import InputRemoteData from './inputRemoteData.vue';
+import { useFileName } from '../../../../stores/usefilename';
 import * as XLSX from 'xlsx';
 import { ref } from 'vue';
 import {useSHIKYUGoodsReceiveStore} from "../../../../stores/shikyugoodsreceive";
@@ -51,9 +52,8 @@ import { usePartMasterStore } from "../../../../stores/part"
 import { useStockHistoryStore } from "../../../../stores/stockhistory"
 // 获取 Pinia store 实例
 
-const SHIKYUGoodsReceiveStore = useSHIKYUGoodsReceiveStore();
+const { fileName, generateFileName } = useFileName();
 const partMasterStore =  usePartMasterStore();
-const stockHistoryStore = useStockHistoryStore();
 export default {
   components: {
     TableShipping,
@@ -61,6 +61,7 @@ export default {
     Selecter,
     InputRemoteData,
   },
+  
   data() {
     return {
       tableData: [],
@@ -113,7 +114,8 @@ export default {
       XLSX.utils.book_append_sheet(wb, newWs, 'Sheet1', true);
 
       // 将工作簿导出为 Excel 文件
-      XLSX.writeFile(wb, "在庫管理表.xlsx");
+      generateFileName('在庫管理表 (支給品)');
+      XLSX.writeFile(wb, fileName.value);
     },
     async searchForm() {
       await this.filterDataBySearchItems();
@@ -145,7 +147,7 @@ export default {
         await partMasterStore.getListItemsBySearchItemsForGoodsInventory(date, 'F', mlnPartNo, udPartNo).then(() => {
                   this.loading = false;
                   // 对数据进行处理以匹配表格字段
-                  this.tableData = partMasterStore.partMasterItems;
+                  this.tableData = partMasterStore.filteredPartsForGoodsInventory;
                   this.summaries = this.getSummaries();
               }).catch(error => {
                   this.loading = false;

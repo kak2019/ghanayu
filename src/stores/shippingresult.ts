@@ -93,12 +93,14 @@ export const useShippingResultStore = defineStore(FeatureKey.SHIPPINGRESULT, {
                 const web = await sp.web();
                 await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSHIPPINGRESULT}`).items.add({
                     MLNPartNo: item.MLNPartNo,
+                    ProcessType: 'C',
                     UDPartNo: item.UDPartNo,
                     ShipTo: item.ShipTo,
                     ShipQty: item.ShipQty,
                     Calloffid: item.Calloffid || "",
                     Despatchnote: item.Despatchnote || "",
                     ShippingResultDate: item.ShippingResultDate || "",
+                    Registered: new Date(),
                 });
                 return '登録完了。';
             }
