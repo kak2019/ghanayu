@@ -18,8 +18,8 @@
       </div>
     </div>
     <div style="text-align: right; flex-shrink: 0;">
-      <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-bottom: 10px;" @click="submitForm" :disabled="!isBusinessControler">登録</el-button>
-      <el-button style="width: 100px; height: 50px; margin-top: 1px;margin-bottom: 10px;" @click="resetForm" :disabled="!isBusinessControler">キャンセル</el-button>
+      <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-bottom: 10px;" @click="submitForm" :disabled="isBusinessControler">登録</el-button>
+      <el-button style="width: 100px; height: 50px; margin-top: 1px;margin-bottom: 10px;" @click="resetForm" :disabled="isBusinessControler">キャンセル</el-button>
       <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-right: 10px;margin-bottom: 10px;" @click="downloadTable">ダウンロード</el-button>
     </div>
   </el-row>
@@ -80,8 +80,6 @@ export default {
       },
     };
   },
-
-  
 
   methods: {
     async submitForm() {
@@ -167,7 +165,7 @@ export default {
           }
         }
 
-        if (this.form.FinishedNumber >  minimumCount) {
+        if ((Number(this.form.FinishedNumber) + Number(this.form.AbnormalNumber)) >  minimumCount) {
           this.$message.error('完成数が前工程の在庫数より多くなっています');
           return;
         }
@@ -259,11 +257,12 @@ export default {
 
     downloadTable() {
       const data = this.tableData.map(item => ({
-        "工程完了日": item.ProcessCompletion,
+        "工程完了日": this.formatDate({ ProcessCompletion: item.ProcessCompletion }, { property: 'ProcessCompletion' }),
         'MLN部品番号': item.MLNPartNo,
+        'UD部品番号': item.UDPartNo,
         '不良数': item.DefectQty,
         '完成数': item.CompletionQty,
-        '実績登録日': this.formatDate({ Created: item.Registered }, { property: 'Created' }),
+        '実績登録日': this.formatDate({ Registered: item.Registered }, { property: 'Registered' }),
       }));
 
       const ws = XLSX.utils.json_to_sheet(data);
@@ -278,7 +277,7 @@ export default {
       const month = String(date.getMonth() + 1).padStart(2, '0');
       const day = String(date.getDate()).padStart(2, '0');
       const year = date.getFullYear();
-      return `${month}/${day}/${year}`;
+      return `${year}/${month}/${day}`;
     },
 
     confirmMethod({ value, relatedText }) {

@@ -48,8 +48,8 @@ export default {
     },
 
     disabledDate(date) {
-      const start = this.getFirstDayOfCurrentMonth(); // 2024-08-01
-      const end = new Date(); // 2024-08-31
+      const start = new Date('2023-12-31'); // need to change to 2025-01-01
+      const end = new Date();
       return date < start || date > end;
     },
 
