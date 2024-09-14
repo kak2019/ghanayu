@@ -18,8 +18,8 @@
       </div>
     </div>
     <div style="text-align: right; flex-shrink: 0;">
-      <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-bottom: 10px;" @click="submitForm" :disabled="isBusinessControler">登録</el-button>
-      <el-button style="width: 100px; height: 50px; margin-top: 1px;margin-bottom: 10px;" @click="resetForm" :disabled="isBusinessControler">キャンセル</el-button>
+      <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-bottom: 10px;" @click="submitForm" >登録</el-button>
+      <el-button style="width: 100px; height: 50px; margin-top: 1px;margin-bottom: 10px;" @click="resetForm" >キャンセル</el-button>
       <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-right: 10px;margin-bottom: 10px;" @click="downloadTable">ダウンロード</el-button>
     </div>
   </el-row>
@@ -69,6 +69,7 @@ export default {
     return {
       processOptions: [],
       tableData: [],
+      needToSyncItems: [],
       form: {
         ProcessCompletion: new Date().toISOString(),
         selectProcessName: '生加工',
@@ -156,9 +157,33 @@ export default {
         // const month = (date.getMonth() + 1).toString.padStart(2, '0');
         let minimumCount = Infinity;
         for (const record of partRecords) { 
-          const { ChildPartNo, ChildProcessType } = record;
+          const { ChildPartNo, ChildProcessType, StructureQty } = record;
 
           const stockQty = await stockHistoryStore.getLatestStockQtyByMLNPartNoProcessTypeDesc(ChildPartNo, ChildProcessType);
+          const childUDPartNo = await partMasterStore.getListItemByMLNPartNo(ChildPartNo);
+          this.form.UDPartNo = curUDPartNo;
+          const childFinalFinishedQty = Number(this.form.FinishedNumber) * StructureQty;
+          const childFinalAbnormalQty = Number(this.form.AbnormalNumber) * StructureQty;
+          const childPartFinished = {
+            MLNPartNo: ChildPartNo,
+            ProcessType: ChildProcessType,
+            UDPartNo: childUDPartNo,
+            Qty: childFinalFinishedQty,
+            FunctionID: '02',
+            StockQty:(childFinalFinishedQty + stockQty).toString() //获取最新库存
+          };
+
+          const childPartAbnormal = {
+            MLNPartNo: ChildPartNo,
+            ProcessType: ChildProcessType,
+            UDPartNo: childUDPartNo,
+            Qty: childFinalAbnormalQty,
+            FunctionID: '03',
+            StockQty: (childFinalFinishedQty + stockQty).toString() //获取最新库存
+          };
+
+          this.needToSyncItems.push(childPartFinished);
+          this.needToSyncItems.push(childPartAbnormal);
 
           if (stockQty < minimumCount) {
               minimumCount = stockQty;
@@ -166,6 +191,7 @@ export default {
         }
 
         if ((Number(this.form.FinishedNumber) + Number(this.form.AbnormalNumber)) >  minimumCount) {
+          this.needToSyncItems = [];
           this.$message.error('完成数が前工程の在庫数より多くなっています');
           return;
         }
@@ -203,12 +229,12 @@ export default {
           StockQty: (Number(this.form.FinishedNumber) + latestStockQty).toString() //获取最新库存
         };
 
-        const addFinishedStockMsg = await stockHistoryStore.addListItem(newStockItemFinished);
-        this.$message.success(addFinishedStockMsg);
+        this.needToSyncItems.push(newStockItemAbnormal);
+        this.needToSyncItems.push(newStockItemFinished);
 
-        const addAbnormalStockMsg = await stockHistoryStore.addListItem(newStockItemAbnormal);
-        this.$message.success(addAbnormalStockMsg);
-
+        const syncStockMsg = await stockHistoryStore.addListItems(this.needToSyncItems);
+        this.$message.success(syncStockMsg);
+        this.needToSyncItems = [];
 
         this.resetForm(); // 调用 resetForm 方法重置表单
       } catch (error) {
