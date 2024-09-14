@@ -399,8 +399,6 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 const listWithCurentMonthStockQtyByMlnNo = await Promise.all(tempItems.map(async item => {
                     return await stockHistoryStore.getCurentMonthStockQtyByMlnNo(item.MLNPartNo, processType, currentMonth);
                 }));
-                //console.log("----------" + listWithCurentMonthStockQtyByMlnNo);
-                //console.log("----------length" + listWithCurentMonthStockQtyByMlnNo.length);
 
                 for (let i = 0; i < tempItems.length; i++) {
                     tempItems[i].lastLatestMonthQty = listWithAllLastMonthQty[i].toString();
