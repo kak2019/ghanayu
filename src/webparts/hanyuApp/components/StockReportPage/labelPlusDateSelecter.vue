@@ -7,7 +7,7 @@
         placeholder="选择日期"
         class="custom-date-picker"
         @change="handleChange"
-        style="max-width: 127px ; border: 1px solid #000;border-top:none"
+        style="max-width: 127px ;"
         :editable="false"
         :clearable="false"
         size="small"
@@ -64,7 +64,7 @@ export default {
   font-size: 12px;
   padding-left: 25px; /* 调整label文字位置 */
   padding-right: 30px;
-  border: 1px solid #000; /* 添加边框 */
+  /*border: 1px solid #000; /* 添加边框 */
   background-color: #fabf8f;
 }
 

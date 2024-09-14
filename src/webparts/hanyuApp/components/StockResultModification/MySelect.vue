@@ -1,7 +1,7 @@
 <template>
 <div class="date-picker-with-label">
   <label class="custom-label">{{ label }}</label>
-  <el-select v-model="innerValue" placeholder="Please select" @change="handleChange" style="max-width: 128px; border: 1px solid #000; border-top:none;"
+  <el-select v-model="innerValue" placeholder="Please select" @change="handleChange" style="max-width: 128px;"
         size="small">
     <el-option
       v-for="item in options"
@@ -66,7 +66,7 @@ export default {
   font-size: 12px;
   padding-left: 25px; /* 调整label文字位置 */
   padding-right: 30px;
-  border: 1px solid #000; /* 添加边框 */
+  /* border: 1px solid #000; /* 添加边框 */
   background-color: #fabf8f;
 }
 

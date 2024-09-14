@@ -5,7 +5,7 @@
         v-model="innerValue"
         placeholder="Please select"
         @change="handleChange" 
-        style="max-width: 128px; border: 1px solid #000; border-top:none;"
+        style="max-width: 128px;"
         size="small"
     >
       <el-option
@@ -76,7 +76,6 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  border: 1px;
   margin-right: 10px;
 }
 
@@ -84,8 +83,10 @@ export default {
   font-size: 12px;
   padding-left: 25px;
   padding-right: 30px;
-  border: 1px solid #000;
+  /*border: 1px solid #000;*/
   background-color: #fabf8f;
+  padding-top:1px;
+  padding-bottom:1px;
 }
 
 .custom-date-picker {

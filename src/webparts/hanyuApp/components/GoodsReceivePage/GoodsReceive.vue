@@ -1,5 +1,5 @@
 <template>
-    <el-row class="background-layer main" style="display: flex; justify-content: space-between; align-items: center;">
+  <el-row class="background-layer main" style="display: flex; justify-content: space-between; align-items: center;">
     <div style="display: flex; flex-grow: 1;">
       <div class="background-layer">
         <date-picker-with-label
@@ -30,7 +30,7 @@
       <div class="background-layer">
         <Input v-model="form.count" label="受入数" />
       </div>
-      </div>
+    </div>
       <div style="text-align: right; flex-shrink: 0;">
         <el-button
           plain
@@ -41,7 +41,7 @@
         >
           登録
         </el-button>
-        <el-button plain size="large" @click="resetForm" style="width: 100px"
+        <el-button plain size="large" style="width: 100px" @click="resetForm" 
           >キャンセル
         </el-button>
         <el-button plain size="large" style="width: 100px" @click="downloadExcel">

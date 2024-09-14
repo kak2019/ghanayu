@@ -1,13 +1,13 @@
 <template>
-  <el-row class="background-layer main" style="display: flex; justify-content: space-between; align-items: center;">
+    <el-row class="background-layer main" style="display: flex; justify-content: space-between; align-items: center;">
     <div style="display: flex; flex-grow: 1;">
-      <div class="background-layer" style="margin-right: 20px;">
+      <div class="background-layer">
         <date-picker-with-label v-model="form.date" label="当月年月"></date-picker-with-label>
       </div>
-      <div class="background-layer" style="margin-right: 20px;">
+      <div class="background-layer">
         <Selecter v-model="form.select" label="工程区分"></Selecter>
       </div>
-      <div class="background-layer" style="margin-right: 20px;">
+      <div class="background-layer">
         <InputRemoteData v-model="form.MLNPartNo" label="MLN部品番号" searchField="MLN" />
       </div>
       <div class="background-layer">
@@ -15,15 +15,15 @@
       </div>
     </div>
     <div style="text-align: right; flex-shrink: 0;">
-      <el-button style="width: 100px; height: 40px; margin-top: 1px; margin-bottom: 10px;" @click="searchForm">検索</el-button>
-      <el-button style="width: 100px; height: 40px; margin-top: 1px;margin-bottom: 10px;" @click="resetForm">キャンセル</el-button>
-      <el-button style="width: 100px; height: 40px; margin-top: 1px; margin-right: 10px;margin-bottom: 10px;" @click="downloadTable">ダウンロード</el-button>
+      <el-button plain type="primary" size="large" style="width: 100px;" @click="searchForm">検索</el-button>
+      <el-button plain size="large" style="width: 100px;" @click="resetForm">キャンセル</el-button>
+      <el-button plain size="large" style="width: 100px;" @click="downloadTable">ダウンロード</el-button>
     </div>
   </el-row>
 
   <!-- <TableShipping :tableData="tableData" :loading="loading" :summaries="summaries"></TableShipping> -->
 
-  <el-table :data="tableData" style="width: 100%; font-size:12px;" :header-cell-style="{backgroundColor: '#366093', color: '#fff'}" height="600px" v-loading="loading"
+  <el-table :data="tableData" stripe border style="width: 100%; font-size:12px;" :header-cell-style="{backgroundColor: '#366093', color: '#fff'}" height="500px" v-loading="loading"
   show-summary :summary-method="getSummaries" row-class-name="summary-row">
     <!-- 第一层表头 -->
     <el-table-column prop="ProcessTypeName" label="工程区分" width="100" rowspan="2" />
@@ -52,6 +52,7 @@ import { useSHIKYUGoodsReceiveStore } from "../../../../stores/shikyugoodsreceiv
 import { usePartMasterStore } from "../../../../stores/part"
 import { useStockHistoryStore } from "../../../../stores/stockhistory"
 import { ElMessage } from 'element-plus';
+import { useFileName } from '../../../../stores/usefilename';
 // 获取 Pinia store 实例
 
 const SHIKYUGoodsReceiveStore = useSHIKYUGoodsReceiveStore();
@@ -120,6 +121,9 @@ export default {
       XLSX.utils.book_append_sheet(wb, newWs, 'Sheet1', true);
 
       // 将工作簿导出为 Excel 文件
+      const { fileName, generateFileName } = useFileName();
+       generateFileName('支給品検収実績入力');
+
       XLSX.writeFile(wb, "在庫管理表.xlsx");
     },
     async searchForm() {
@@ -273,11 +277,10 @@ export default {
 }
 
 .main {
-  padding: 20px;
+  padding: 10px;
 }
 
 .main .background-layer {
-  margin-bottom: 10px;
 }
 .el-table .el-table_footer-wrapper tbody td{
   background:#c4d79b;

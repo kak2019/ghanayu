@@ -5,7 +5,7 @@
         v-model="innerValue"
         :fetch-suggestions="querySearch"
         clearable
-        style="width: 120px; border: 1px solid #000000; border-radius: 0; border-top:none"
+        style="width: 120px;"
         size="small"
         placeholder="Please Input"
         @select="handleChange"
@@ -98,7 +98,7 @@ export default {
   font-size: 12px;
   width: 120px;
   text-align: center;
-  border: 1px solid #000; /* 添加边框 */
+  /*border: 1px solid #000; /* 添加边框 */
   background-color: #92cddc;
 }
 

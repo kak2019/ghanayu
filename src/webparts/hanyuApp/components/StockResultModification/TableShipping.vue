@@ -3,16 +3,17 @@
       :data="tableData"
       style="width: 100%; font-size:12px;"
       :header-cell-style="{ backgroundColor: '#366093', color: '#fff' }"
-      height="320px"
+      height="600px"
       v-loading="loading"
+      border
   >
-    <el-table-column prop="Modified" label="修正年月日" width="100%" :formatter="formatDate" />
-    <el-table-column prop="FunctionName" label="修正領域" width="100%"/>
-    <el-table-column prop="ProcessName" label="工程区分" width="100%"/>
-    <el-table-column prop="MLNPartNo" label="MLN部品番号" />
-    <el-table-column prop="UDPartNo" label="UD部品番号" />
-    <el-table-column prop="ModifiedQty" label="修正数" />
-    <el-table-column prop="Editor" label="修正者" />
+    <el-table-column prop="Modified" label="修正年月日" width="100%" :formatter="formatDate" align="center"/>
+    <el-table-column prop="FunctionName" label="修正領域" width="100%" align="center"/>
+    <el-table-column prop="ProcessName" label="工程区分" width="100%" align="center"/>
+    <el-table-column prop="MLNPartNo" label="MLN部品番号" width="100%" align="center"/>
+    <el-table-column prop="UDPartNo" label="UD部品番号" width="100%" align="center"/>
+    <el-table-column prop="ModifiedQty" label="修正数" width="100%" align="center"/>
+    <el-table-column prop="Editor" label="修正者" align="center"/>
     <el-table-column prop="ModifiedReasonName" label="修正理由" />
     <el-table-column prop="Despatchnote" label="Despatch note" />
     <el-table-column prop="Comment" label="コメント" />
@@ -33,7 +34,7 @@ const formatDate = (row, column) => {
   const month = String(date.getMonth() + 1).padStart(1, '0'); // 月份从0开始
   const day = String(date.getDate()).padStart(2, '0');
   const year = date.getFullYear();
-  return `${month}/${day}/${year}`;
+  return `${year}/${month}/${day}`;
 };
 </script>
 
