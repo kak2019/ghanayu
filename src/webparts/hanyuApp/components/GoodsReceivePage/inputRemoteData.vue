@@ -98,8 +98,10 @@ export default {
   font-size: 12px;
   width: 120px;
   text-align: center;
-  border-radius: 50px 0 50px 0;
-  background-color: #92cddc;
+  /*border-radius: 50px 0 50px 0;*/
+  background-color: #fabf8f;
+  padding-top:1px;
+  padding-bottom:1px;
 }
 
 .custom-date-picker {

@@ -71,3 +71,10 @@ div[data-automation-id="CanvasControl"] {
 #DeltaPlaceHolderPageDescription {
     display: none;
 }
+
+
+/*Table style*/
+.tableStyle {
+    width: 100%; 
+    font-size:12px;
+}

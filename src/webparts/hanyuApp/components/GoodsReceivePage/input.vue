@@ -72,8 +72,10 @@ export default {
   font-size: 12px;
   width: 117px;
   text-align: center;
-  border:solid 1px #dbdbdb;
-  border-radius: 50px 0 50px 0;
+ /* border:solid 1px #dbdbdb;
+  border-radius: 50px 0 50px 0;*/
+  padding-top:1px;
+  padding-bottom:1px;
 }
 
 .custom-date-picker {

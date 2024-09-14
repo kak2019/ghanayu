@@ -64,12 +64,14 @@ export default {
   font-size: 12px;
   padding-left: 25px; /* 调整label文字位置 */
   padding-right: 25px;
-  /*border: 1px solid #000; *//* 添加边框 */
+  /*border: 1px solid #000; 
   border-radius: 50px 0 50px 0;
-  background-color: #932227;
+  /*background-color: #932227;
+  color:#fff;*//* 添加边框 */
+  background-color: #fabf8f;
   padding-top:1px;
   padding-bottom:1px;
-  color:#fff;
+  
 }
 
 .custom-date-picker {
