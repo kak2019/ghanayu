@@ -83,15 +83,14 @@ export default {
       const ws = XLSX.utils.json_to_sheet(this.tableData.map(val => ({
         MLNPartNo: val.MLNPartNo,
         UDPartNo: val.UDPartNo,
-        前月末在庫: val.lastLatestMonthQty,
-        BadProducts: val.currentMonthInQty,
-        Completion: val.currentMonthOutQty,
-        VibrationSubstitution: val.currentMonthShippingQty,
+        lastLatestMonthQty: val.lastLatestMonthQty,
+        currentMonthInQty: val.currentMonthInQty,
+        currentMonthOutQty: val.currentMonthOutQty,
         EndMonthStock: val.curentMonthStockQty
       })));
 
-      const newData1 = [["工程区分", "MLN部品番号", "UD部品番号", "前月末在庫", "当月実績", "", "", "当月末在庫"]]
-      const newData2 = [["", "", "", "", "不良", "完成", "振替", ""]]
+      const newData1 = [["MLN部品番号", "UD部品番号", "前月末在庫", "当月実績", "", "当月末在庫"]]
+      const newData2 = [["", "", "", "入库", "出库", ""]]
 
       const originalData = XLSX.utils.sheet_to_json(ws, { header: 1 });
       originalData.shift()
@@ -103,12 +102,11 @@ export default {
 
       // 合并单元格以符合复杂表头结构
       newWs['!merges'] = [
-        { s: { r: 0, c: 0 }, e: { r: 1, c: 0 } }, // 合并 "工程区分" 列
-        { s: { r: 0, c: 1 }, e: { r: 1, c: 1 } }, // 合并 "MLN部品番号" 列
-        { s: { r: 0, c: 2 }, e: { r: 1, c: 2 } }, // 合并 "UD部品番号" 列
-        { s: { r: 0, c: 3 }, e: { r: 1, c: 3 } }, // 合并 "前月末在庫" 列
-        { s: { r: 0, c: 4 }, e: { r: 0, c: 6 } }, // 合并 "当月実績" 列
-        { s: { r: 0, c: 7 }, e: { r: 1, c: 7 } }  // 合并 "当月末在庫" 列
+        { s: { r: 0, c: 0 }, e: { r: 1, c: 0 } }, // 合并 "MLN部品番号" 列
+        { s: { r: 0, c: 1 }, e: { r: 1, c: 1 } }, // 合并 "UD部品番号" 列
+        { s: { r: 0, c: 2 }, e: { r: 1, c: 2 } }, // 合并 "前月末在庫" 列
+        { s: { r: 0, c: 3 }, e: { r: 0, c: 4 } }, // 合并 "当月実績" 列
+        { s: { r: 0, c: 5 }, e: { r: 1, c: 5 } }  // 合并 "当月末在庫" 列
       ];
 
       XLSX.utils.book_append_sheet(wb, newWs, 'Sheet1', true);
@@ -164,10 +162,10 @@ export default {
       let [totalLastLatestMonthQty,totalCurrentMonthInQty,totalCurrentMonthOutQty,totalCurentMonthStockQty] = [0,0,0,0];
 
       this.tableData.forEach(element => {
-          totalLastLatestMonthQty += element.lastLatestMonthQty;
-          totalCurrentMonthInQty += element.currentMonthInQty;
-          totalCurrentMonthOutQty += element.currentMonthOutQty;
-          totalCurentMonthStockQty += element.curentMonthStockQty;
+          totalLastLatestMonthQty += Number(element.lastLatestMonthQty);
+          totalCurrentMonthInQty += Number(element.currentMonthInQty);
+          totalCurrentMonthOutQty += Number(element.currentMonthOutQty);
+          totalCurentMonthStockQty += Number(element.curentMonthStockQty);
       });
 
       const lastLatestMonthQty = totalLastLatestMonthQty;
