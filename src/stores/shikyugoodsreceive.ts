@@ -115,8 +115,8 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
         },
         async checkItemsInStockHistory(mlnPartNo: string, processType: string, goodsReceiveDate:string): Promise<boolean> {
             try {
-                const stockHistoryStore = useStockHistoryStore();
-                const items = computed(() => stockHistoryStore.stockHistoryItems.filter(i => i.MLNPartNo === mlnPartNo && i.ProcessType === processType && new Date(i.Registered).getTime() >= new Date(goodsReceiveDate).getTime()));
+                //const stockHistoryStore = useStockHistoryStore();
+                const items = computed(() => this.shikyuGoodsReceiveItems.filter(i => i.MLNPartNo === mlnPartNo && i.ProcessType === processType && new Date(i.GoodsReceiveDate).getTime() >= new Date(goodsReceiveDate).getTime()));
                 
                 let isLengthZero: boolean = (items.value.length as number) > 0? true : false;
                 /*if (items.value.length > 0) {
