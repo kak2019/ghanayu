@@ -9,8 +9,9 @@
     <el-input
         v-model="innerValue"
         clearable
-        style="width: 120px; border: 1px solid #000;"
+        style="width: 120px;"
         placeholder="Please Input"
+        size="small"
         @input="handleChange"
     />
   </div>
@@ -63,11 +64,9 @@ export default {
 }
 
 .custom-label {
-  font-size: 14px;
-  font-weight: bold;
-  width: 117px;
+  font-size: 12px;
+  width: 120px;
   text-align: center;
-  border: 1px solid #000;
 }
 
 .custom-date-picker {

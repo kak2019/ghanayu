@@ -62,7 +62,6 @@ export default {
   align-items: flex-start;
   border: 1px;
   margin-right: 10px;
-
 }
 
 .custom-label {

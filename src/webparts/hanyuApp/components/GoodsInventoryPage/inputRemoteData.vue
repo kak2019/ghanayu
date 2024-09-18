@@ -5,7 +5,8 @@
         v-model="innerValue"
         :fetch-suggestions="querySearch"
         clearable
-        style="width: 120px; border: 1px solid #000000; border-radius: 0;"
+        style="width: 120px; border-radius: 0;"
+        size="small"
         placeholder=""
         @select="handleChange"
         :props="{
@@ -94,13 +95,11 @@ export default {
 }
 
 .custom-label {
-  font-size: 14px;
-  font-weight: bold;
+  font-size: 12px;
   width: 120px;
   text-align: center;
-  border: 1px solid #000; /* 添加边框 */
-  background-color: skyblue;
-  height: 20px;
+  /*border: 1px solid #000; /* 添加边框 */
+  background-color: #92cddc;
 }
 
 .custom-date-picker {

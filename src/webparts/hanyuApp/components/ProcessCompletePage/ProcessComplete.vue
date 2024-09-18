@@ -1,20 +1,20 @@
 <template>
   <el-row class="background-layer main" style="display: flex; justify-content: space-between; align-items: center;">
     <div style="display: flex; flex-grow: 1;">
-      <div class="background-layer" style="margin-right: 20px;">
+      <div class="background-layer">
         <date-picker-with-label v-model="form.ProcessCompletion" label="工程完了日"></date-picker-with-label>
       </div>
-      <div class="background-layer" style="margin-right: 20px;">
+      <div class="background-layer">
         <Selecter v-model="form.selectProcessType" label="工程区分" :processOptions="processOptions"></Selecter>
       </div>
-      <div class="background-layer" style="margin-right: 20px;">
+      <div class="background-layer">
         <InputRemoteData v-model="form.MLNPartNo" label="MLN部品番号" searchField="MLN" @confirmMethod="confirmMethod" />
       </div>
       <div class="background-layer">
-        <Input v-model="form.AbnormalNumber" label="不良数"></Input>
+        <Input v-model="form.AbnormalNumber" label="不良数" labelColor="#fabf8f"></Input>
       </div>
       <div class="background-layer">
-        <Input v-model="form.FinishedNumber" label="完成数"></Input>
+        <Input v-model="form.FinishedNumber" label="完成数" labelColor="#fabf8f"></Input>
       </div>
     </div>
     <div style="text-align: right; flex-shrink: 0;">
