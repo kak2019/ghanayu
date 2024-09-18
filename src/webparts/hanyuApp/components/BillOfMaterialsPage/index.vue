@@ -44,9 +44,9 @@
                     </table>
                 <div class="flex-grow"></div>
                 <div class="buttons">
-                    <el-button plain size="large" type="primary" native-type="submit">検索</el-button>
-                    <el-button plain size="large" @click="onResetQuery">キャンセル</el-button>
-                    <el-button plain size="large" @click="onDownloadClick">ダウンロード</el-button>
+                    <el-button plain size="large" style="width: 100px;" type="primary" native-type="submit">検索</el-button>
+                    <el-button plain size="large" style="width: 100px;" @click="onResetQuery">キャンセル</el-button>
+                    <el-button plain size="large" style="width: 100px;" @click="onDownloadClick">ダウンロード</el-button>
                 </div>
                 <div class="small-space"></div>
             </div>
@@ -151,7 +151,7 @@ module.exports = require('./index');
 
 <style scoped>
 .tbQueryForm {
-    border-collapse: collapse !important;
+    /*border-collapse: collapse !important;*/
 }
 
 .tbQueryForm tr {
@@ -163,7 +163,6 @@ module.exports = require('./index');
 
 .tbQueryForm td,
 th {
-    border: 1px solid;
 }
 
 .el-row {
@@ -180,7 +179,7 @@ th {
 
 .row-bg {
 
-    background-color: #DDDDDD;
+    background-color: #f4f4f4;
     display: flex;
     align-items: center;
     justify-content: space-between;

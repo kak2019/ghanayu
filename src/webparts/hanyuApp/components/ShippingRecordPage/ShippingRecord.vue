@@ -1,30 +1,34 @@
 <template>
-  <el-row class="background-layer main">
-    <div class="background-layer">
-      <date-picker-with-label v-model="form.date" label="出荷実績日"></date-picker-with-label>
+  <el-row class="background-layer main" style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; flex-grow: 1;">
+      <div class="background-layer">
+        <date-picker-with-label v-model="form.date" label="出荷実績日"></date-picker-with-label>
+      </div>
+      <div class="background-layer">
+        <Selecter v-model="form.select" label="出荷先"></Selecter>
+      </div>
+      <div class="background-layer">
+        <Input v-model="form.id" label="Call off id" labelColor="#92cddc"></Input>
+      </div>
+      <div class="background-layer">
+        <Input v-model="form.note" label="Despatch note" labelColor="#92cddc"></Input>
+      </div>
+      <div class="background-layer">
+        <InputRemoteData v-model="form.num" label="MLN部品番号"/>
+      </div>
+      <div class="background-layer">
+        <Input v-model="form.count" label="出荷数" labelColor="#fabf8f"/>
+      </div>
     </div>
-    <div class="background-layer">
-      <Selecter v-model="form.select" label="出荷先"></Selecter>
+    <div style="text-align: right; flex-shrink: 0;">
+      <el-button type="primary" plain size="large" style="width: 100px;" @click="submitForm" :disabled="isBusinessControler">登録</el-button>
+      <el-button plain size="large" style="width: 100px;" @click="cancel" :disabled="isBusinessControler">キャンセル</el-button>
+      <el-button plain size="large" style="width: 100px;"
+      @click="downloadExcel"
+      >
+        ダウンロード
+      </el-button>
     </div>
-    <div class="background-layer">
-      <Input v-model="form.id" label="Call off id" labelColor="skyblue"></Input>
-    </div>
-    <div class="background-layer">
-      <Input v-model="form.note" label="Despatch note" labelColor="skyblue"></Input>
-    </div>
-    <div class="background-layer">
-      <InputRemoteData v-model="form.num" label="MLN部品番号"/>
-    </div>
-    <div class="background-layer">
-      <Input v-model="form.count" label="出荷数"/>
-    </div>
-    <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-bottom: 10px;" @click="submitForm" :disabled="isBusinessControler">登録</el-button>
-    <el-button style="width: 100px; height: 50px; margin-top: 1px;" @click="cancel" :disabled="isBusinessControler">キャンセル</el-button>
-    <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-right: 10px;margin-bottom: 10px;"
-    @click="downloadExcel"
-    >
-      ダウンロード
-    </el-button>
   </el-row>
   <TableShipping></TableShipping>
 </template>
@@ -224,10 +228,9 @@ export default {
 }
 
 .main {
-  padding: 20px;
+  padding: 10px;
 }
 
 .main .background-layer {
-  margin-bottom: 10px;
 }
 </style>

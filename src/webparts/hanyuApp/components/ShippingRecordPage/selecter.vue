@@ -5,7 +5,8 @@
         v-model="innerValue"
         placeholder="请选择"
         @change="handleChange"
-        style="max-width: 130px; border: 1px solid #000;"
+        style="max-width: 130px;"
+        size="small"
     >
       <el-option
           v-for="item in options"
@@ -80,12 +81,13 @@ export default {
 }
 
 .custom-label {
-  font-size: 14px;
-  font-weight: bold;
+  font-size: 12px;
   padding-left: 25px; /* 调整label文字位置 */
   padding-right: 30px;
-  border: 1px solid #000; /* 添加边框 */
-  background-color: orange;
+  /*border: 1px solid #000; /* 添加边框 */
+  background-color: #fabf8f;
+  padding-top:1px;
+  padding-bottom:1px;
 }
 
 .custom-date-picker {

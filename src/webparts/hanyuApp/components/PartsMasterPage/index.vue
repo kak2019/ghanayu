@@ -12,9 +12,9 @@
                 </el-form-item>
                 <div class="flex-grow"></div>
                 <div class="buttons">
-                    <el-button plain size="large" type="primary" native-type="submit">検索</el-button>
-                    <el-button plain size="large" @click="onResetQuery">キャンセル</el-button>
-                    <el-button plain size="large" @click="onDownloadClick">ダウンロード</el-button>
+                    <el-button plain size="large" style="width: 100px;" type="primary" native-type="submit">検索</el-button>
+                    <el-button plain size="large" style="width: 100px;" @click="onResetQuery">キャンセル</el-button>
+                    <el-button plain size="large" style="width: 100px;" @click="onDownloadClick">ダウンロード</el-button>
                 </div>
                 <div class="small-space"></div>
             </div>
@@ -22,7 +22,7 @@
     </el-header>
     <el-main :style="{paddingLeft:0,paddingRight:0}">
         <el-form size="small" @submit="onPartFormSubmit" :inline-message="false" :status-icon="true" :scroll-to-error="true">
-            <el-table :header-cell-style="{ backgroundColor: '#366093', color: '#fff', textAlign: 'center' }" :data="isFiltered?filteredData:tableData" :highlight-current-row="!isEditing" @current-change="handleRowClick" v-loading="loading" ref="tableRef" :height="tableHeight">
+            <el-table stripe border :header-cell-style="{ backgroundColor: '#366093', color: '#fff', textAlign: 'center' }" :data="isFiltered?filteredData:tableData" :highlight-current-row="!isEditing" @current-change="handleRowClick" v-loading="loading" ref="tableRef" :height="tableHeight">
                 <el-table-column fixed prop="MLNPartNo" label="MLN部品番号" width="140" align="center">
                     <template #default="scope">
                         <el-form-item v-if="isInserting && currentRowIndex === scope.$index" v-bind="partFormMLNPartNoProps">
@@ -88,7 +88,7 @@ module.exports = require('./index');
 <style scoped>
 .row-bg {
 
-    background-color: #DDDDDD;
+    background-color: #f4f4f4;
     display: flex;
     align-items: center;
     justify-content: space-between;

@@ -18,9 +18,9 @@
       </div>
     </div>
     <div style="text-align: right; flex-shrink: 0;">
-      <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-bottom: 10px;" @click="submitForm" >登録</el-button>
-      <el-button style="width: 100px; height: 50px; margin-top: 1px;margin-bottom: 10px;" @click="resetForm" >キャンセル</el-button>
-      <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-right: 10px;margin-bottom: 10px;" @click="downloadTable">ダウンロード</el-button>
+      <el-button type="primary" plain size="large" style="width: 100px;" @click="submitForm" >登録</el-button>
+      <el-button plain size="large" style="width: 100px;" @click="resetForm" >キャンセル</el-button>
+      <el-button plain size="large" style="width: 100px;" @click="downloadTable">ダウンロード</el-button>
     </div>
   </el-row>
 
@@ -351,6 +351,8 @@ export default {
   padding: 10px;
   font-size: 16px;
   text-align: left;
+  padding-top:1px;
+  padding-bottom:1px;
 }
 
 .background-layer {
@@ -358,10 +360,14 @@ export default {
 }
 
 .main {
-  padding: 20px;
+  padding: 10px;
 }
 
 .main .background-layer {
-  margin-bottom: 10px;
+  /*margin-bottom: 10px;*/
+}
+
+.el-input__inner {
+  font-size: 12px;
 }
 </style>

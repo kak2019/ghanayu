@@ -16,9 +16,9 @@
       </div>
     </div>
     <div style="text-align: right; flex-shrink: 0;">
-      <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-bottom: 10px;" type="primary" @click="searchForm">検索</el-button>
-      <el-button style="width: 100px; height: 50px; margin-top: 1px;margin-bottom: 10px;" @click="resetForm">キャンセル</el-button>
-      <el-button style="width: 100px; height: 50px; margin-top: 1px; margin-right: 10px;margin-bottom: 10px;" @click="downloadTable">ダウンロード</el-button>
+      <el-button plain size="large" style="width: 100px;" type="primary" @click="searchForm">検索</el-button>
+      <el-button plain size="large" style="width: 100px;" @click="resetForm">キャンセル</el-button>
+      <el-button plain size="large" style="width: 100px;" @click="downloadTable">ダウンロード</el-button>
     </div>
   </el-row>
 
@@ -201,10 +201,9 @@ export default {
 }
 
 .main {
-  padding: 20px;
+  padding: 10px;
 }
 
 .main .background-layer {
-  margin-bottom: 10px;
 }
 </style>
