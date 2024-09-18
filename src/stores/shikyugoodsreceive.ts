@@ -118,7 +118,7 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
                 //const stockHistoryStore = useStockHistoryStore();
                 const items = computed(() => this.shikyuGoodsReceiveItems.filter(i => i.MLNPartNo === mlnPartNo && i.ProcessType === processType && new Date(i.GoodsReceiveDate).getTime() >= new Date(goodsReceiveDate).getTime()));
                 
-                let isLengthZero: boolean = (items.value.length as number) > 0? true : false;
+                const isLengthZero: boolean = (items.value.length as number) > 0? true : false;
                 /*if (items.value.length > 0) {
                     return true
                 } else {
