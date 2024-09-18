@@ -84,7 +84,7 @@ export default {
       loading: true,
       form: {
         date: curentDate,
-        select: "",
+        select: defaultShikyufrom,
         id: "",
         note: "",
         num: "",
@@ -150,7 +150,11 @@ export default {
 
         this.resetForm(); // 调用 reset 方法重置表单
       } catch (error) {
-        this.$message.error("登録に失敗しました: " + error.message);
+        if(error.message==="部品表なしラエー"){
+          this.$message.error(error.message);
+        }else{
+          this.$message.error("登録に失敗しました: " + error.message);
+        }
       }
     },
     async fetchTableData() {

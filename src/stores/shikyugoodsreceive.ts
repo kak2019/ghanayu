@@ -72,7 +72,7 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
                 const billOfMaterialsStore = useBillOfMaterialsStore();
 
                 const isMlnNumInBom = await billOfMaterialsStore.getItemCountByMLNPartNoProcessType(item.MLNPartNo, item.ProcessType);
-                if (isMlnNumInBom) {
+                if (isMlnNumInBom>0) {
                     //Add shikyyuan to good receive table
                     const sp = spfi(getSP());
                     const web = await sp.web();
@@ -105,17 +105,24 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
 
                     return '登録完了。';
                 } else {
-                    throw new Error(`存在チェックに失敗しました`);//
+                    //return '部品表なしラエー';
+                    throw new Error(`部品表なしラエー`);
                 }
             }
             catch (error) {
                 console.error(error);
-                throw new Error(`データの登録中にエラーが発生しました`);
+                if(error.message==="部品表なしラエー"){
+                    throw new Error(`部品表なしラエー`);
+                }else{
+                    throw new Error(`データの登録中にエラーが発生しました`);
+                }
+               
             }
         },
         async checkItemsInStockHistory(mlnPartNo: string, processType: string, goodsReceiveDate:string): Promise<boolean> {
             try {
                 //const stockHistoryStore = useStockHistoryStore();
+                console.log("1 ---goodsReceiveDate" + goodsReceiveDate + "------------------------")
                 const items = computed(() => this.shikyuGoodsReceiveItems.filter(i => i.MLNPartNo === mlnPartNo && i.ProcessType === processType && new Date(i.GoodsReceiveDate).getTime() >= new Date(goodsReceiveDate).getTime()));
                 
                 const isLengthZero: boolean = (items.value.length as number) > 0? true : false;
@@ -124,6 +131,10 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
                 } else {
                     return false;
                 }*/
+                const tempItems = items.value.filter(item => {
+                    console.log("2222.-----goodsReceiveDate" + new Date(item.GoodsReceiveDate).getTime() + "------------------------")
+                })
+                console.log("goodsReceiveDate" + tempItems);
                 return isLengthZero;
             }
             catch (error) {

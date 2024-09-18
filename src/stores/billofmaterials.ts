@@ -115,7 +115,7 @@ export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
                 return items.length;
             } catch (error) {
                 console.error(error);
-                throw new Error(`データの取得中にエラーが発生しました`);
+                throw new Error(`部品表なしラエー`);
             }
         },
         async getItemsByChildMLNPartNoProcessType(mlnPartNo: string, processType: string): Promise<IBillOfMaterialsItem[]> {

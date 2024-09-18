@@ -9,7 +9,7 @@
     <el-input
         v-model="innerValue"
         clearable
-        style="width: 118px;"
+        style="width: 125px;"
         placeholder="Please Input"
         @input="handleChange"
         size="small"
@@ -75,7 +75,7 @@ export default {
 
 .custom-label {
   font-size: 12px;
-  width: 117px;
+  width: 122px;
   text-align: center;
  /* border:solid 1px #dbdbdb;
   border-radius: 50px 0 50px 0;*/
