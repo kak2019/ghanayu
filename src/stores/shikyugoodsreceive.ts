@@ -98,6 +98,7 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
                         Qty: item.GoodsReceiveQty,
                         FunctionID: "01", // it's only "01" in this process.
                         StockQty: stockQty, //Latest QTY  +  受入数, need to caculate
+                        Registered: item.GoodsReceiveDate || ""
                     } as IStockHistoryItem;
                     await stockHistoryStore.addListItem(billOfMaterialsItem);
 

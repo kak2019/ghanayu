@@ -115,7 +115,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                     FunctionID: item.FunctionID,
                     StockQty: item.StockQty,
                     Comment: item.Comment || "",
-                    Registered: new Date(),
+                    Registered: item.Registered || "",
                     SourceItemID: item.SourceItemID || "",
                 });
                 return '登録完了。';
@@ -214,7 +214,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                     let condition = true;
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
                     if (mlnPartNo) {
-                        condition = condition && mlnPartNo === item.MLNPartNo && item.ProcessType === processType && formatRegistered !== current
+                        condition = condition && mlnPartNo === item.MLNPartNo && item.ProcessType === processType && formatRegistered < current
                     }
                     return condition
                 });
@@ -260,11 +260,8 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
 
         async getCurrentMonthInQtyByMlnNo(mlnPartNo: string, processType: string, current: string): Promise<number> {
             try {
-                const sp = spfi(getSP());
-                const web = await sp.web();
-
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`).items.orderBy("Registered", false)();
-                const newItems = items.filter(item => {
+                const items = computed(() => this.stockHistoryItems);
+                const newItems = items.value.filter(item => {
                     let condition = true
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
                     if (mlnPartNo) {
@@ -272,7 +269,6 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                     }
                     return condition
                 });
-                console.log("get Current Month In Qty By MlnNo" + items);
                 if (newItems.length > 0) {
                     let sumInOutQty = 0;
                     newItems.forEach(i => {
@@ -293,11 +289,8 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
 
         async getCurrentMonthOutQtyByMlnNo(mlnPartNo: string, processType: string, current: string): Promise<number> {
             try {
-                const sp = spfi(getSP());
-                const web = await sp.web();
-
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`).items.orderBy("Registered", false)();
-                const newItems = items.filter(item => {
+                const items = computed(() => this.stockHistoryItems);
+                const newItems = items.value.filter(item => {
                     let condition = true
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
                     if (mlnPartNo) {
