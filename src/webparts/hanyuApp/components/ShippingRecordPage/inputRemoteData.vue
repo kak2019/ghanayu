@@ -92,7 +92,7 @@ export default {
   width: 120px;
   text-align: center;
   /*border: 1px solid #000; /* 添加边框 */
-  background-color: #92cddc;
+  background-color: #fabf8f;
   padding-top:1px;
   padding-bottom:1px;
 }

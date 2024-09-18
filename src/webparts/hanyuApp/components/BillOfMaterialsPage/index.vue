@@ -54,7 +54,7 @@
     </el-header>
     <el-main :style="{paddingLeft:0,paddingRight:0}">
         <el-form size="small" @submit="onbomFormSubmit" :inline-message="false" :status-icon="true" :scroll-to-error="true">
-            <el-table :header-cell-style="{ backgroundColor: '#366093', color: '#fff', textAlign: 'center' }" :data="isFiltered?filteredData:tableData" :highlight-current-row="!isEditing" @current-change="handleRowClick" v-loading="loading" ref="tableRef" :height="tableHeight">
+            <el-table stripe border :header-cell-style="{ backgroundColor: '#366093', color: '#fff', textAlign: 'center' }" :data="isFiltered?filteredData:tableData" :highlight-current-row="!isEditing" @current-change="handleRowClick" v-loading="loading" ref="tableRef" :height="tableHeight">
                 <el-table-column label="当工程">
                     <el-table-column fixed prop="ParentPartNo" label="MLN部品番号" width="140" align="center">
                         <template #default="scope">

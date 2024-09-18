@@ -14,7 +14,7 @@
         <Input v-model="form.note" label="Despatch note" labelColor="#92cddc"></Input>
       </div>
       <div class="background-layer">
-        <InputRemoteData v-model="form.num" label="MLN部品番号"/>
+        <InputRemoteData v-model="form.num" label="MLN部品番号" labelColor="#fabf8f"/>
       </div>
       <div class="background-layer">
         <Input v-model="form.count" label="出荷数" labelColor="#fabf8f"/>
