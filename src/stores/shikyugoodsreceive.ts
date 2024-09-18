@@ -6,6 +6,7 @@ import { ISHIKYUGoodsReceiveItem, IStockHistoryItem } from '../model';
 import { useStockHistoryStore } from '../stores/stockhistory';
 import { useBillOfMaterialsStore } from '../stores/billofmaterials';
 import { CONST } from '../config/const';
+import { computed } from 'vue';
 
 export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECEIVE, {
     state: () => ({
@@ -111,7 +112,33 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
                 console.error(error);
                 throw new Error(`データの登録中にエラーが発生しました`);
             }
+        },
+        async checkItemsInStockHistory(mlnPartNo: string, processType: string, goodsReceiveDate:string): Promise<boolean> {
+            try {
+                const stockHistoryStore = useStockHistoryStore();
+                const items = computed(() => stockHistoryStore.stockHistoryItems.filter(i => i.MLNPartNo === mlnPartNo && i.ProcessType === processType && new Date(i.Registered).getTime() >= new Date(goodsReceiveDate).getTime()));
+                
+                let isLengthZero: boolean = (items.value.length as number) > 0? true : false;
+                /*if (items.value.length > 0) {
+                    return true
+                } else {
+                    return false;
+                }*/
+                return isLengthZero;
+            }
+            catch (error) {
+                console.error(error);
+                throw new Error(`データの取得中にエラーが発生しました`);
+            }
+        },
+        getCurrentTimeStampMillis(date:string): string {
+            /*const now = new Date();
+            // 将毫秒转换为毫秒和毫秒的格式
+            const millis = now.getMilliseconds().toString().padStart(3, '0');
+            // 将Date对象转换为ISO字符串并截取毫秒部分
+            const isoString = now.toISOString();
+            return isoString.substring(0, isoString.length - 1) + '.' + millis + 'Z';*/
+            return "0";
         }
-
     },
 });

@@ -6,13 +6,14 @@
     >
       {{ label }}
     </label>
-    <el-input type="number"
+    <el-input
         v-model="innerValue"
         clearable
         style="width: 118px;"
         placeholder="Please Input"
         @input="handleChange"
         size="small"
+        :maxlength="maxLength"
     />
   </div>
 </template>
@@ -32,6 +33,10 @@ export default {
     labelColor: {
       type: String,
       default: '#fabf8f' // 设置默认颜色
+    },
+    maxLength:{
+      type: Number,
+      default : 10
     }
   },
   data() {

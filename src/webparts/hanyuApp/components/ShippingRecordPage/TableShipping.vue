@@ -3,7 +3,8 @@
       :data="shippingResultStore.shippingResultItems"
       stripe
       border
-      style="width: 100%"
+      style="width: 100%;font-size:12px;"
+      height="320px"
       :header-cell-style="{ backgroundColor: '#366093', color: 'white' }"
   >
     <el-table-column prop="ShippingResultDate" label="出荷実績日" width="180" :formatter="formatDate" />

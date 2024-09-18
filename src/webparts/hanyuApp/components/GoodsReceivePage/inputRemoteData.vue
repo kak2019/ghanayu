@@ -54,12 +54,6 @@ export default {
       this.selectedText = value.text; // 更新显示文本
       this.$emit('update:modelValue', value.value);
     },
-    handleInput(value){
-      //只允许字母和数字
-      this.innerValue = value.replace(/[^a-zA-Z0-9]/g, '');
-      this.selectedText = value.replace(/[^a-zA-Z0-9]/g, ''); // 更新显示文本
-      this.$emit('update:modelValue', value.replace(/[^a-zA-Z0-9]/g, ''));
-    },
     querySearch(queryString, cb) {
       let results = [];
       if (queryString) {

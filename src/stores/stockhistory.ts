@@ -159,18 +159,16 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
         },
         async getListItemsByRegisteredDate(mlnPartNo: string, processType: string): Promise<number> {
             try {
-                const sp = spfi(getSP());
-                const web = await sp.web();
+                const items = computed(() => this.stockHistoryItems);
                 let tempItems = [];
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/StockHistory`).items.orderBy("Registered", false)();
-                tempItems = items.filter(item => {
+                tempItems = items.value.filter(item => {
                     let condition = true
                     if (mlnPartNo) {
                         condition = condition && mlnPartNo === item.MLNPartNo && processType === item.ProcessType
                     }
                     return condition
                 });
-                console.log("items order by register date" + items);
+                
                 if (tempItems.length > 0) {
                     return tempItems[0].StockQty
                 } else {

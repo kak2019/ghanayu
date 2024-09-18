@@ -1,5 +1,5 @@
 <template>
-  <el-table :data="tableData" stripe style="width: 100%; font-size:12px;" :header-cell-style="{backgroundColor: '#366093', color: '#fff'}" height="800px" v-loading="loading"
+  <el-table :data="tableData" stripe style="width: 100%; font-size:12px;" :header-cell-style="{backgroundColor: '#366093', color: '#fff'}" height="320px" v-loading="loading"
   show-summary :summary-method="getSummaries">
     <!-- 第一层表头 -->
     <el-table-column prop="ProcessType" label="工程区分" width="100" rowspan="2" />

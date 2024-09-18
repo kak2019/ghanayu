@@ -15,6 +15,7 @@
           v-model="form.id"
           label="Call off id"
           labelColor="#92cddc"
+          :max-length="10"
         ></Input>
       </div>
       <div class="background-layer">
@@ -22,6 +23,7 @@
           v-model="form.note"
           label="Despatch note"
           labelColor="#92cddc"
+          :max-length="17"
         ></Input>
       </div>
       <div class="background-layer">
@@ -95,6 +97,24 @@ export default {
     async submitForm() {
       try {
         //Add new record to good receive page
+        if (!this.form.num) {
+          this.$message.error('MLNPartNo不能为空');
+          return;
+        }
+
+        // 校验 MLNPartNo 的格式（10 位，由数字和英文组成）
+        const mlnPartNoPattern = /^[a-zA-Z0-9]{10}$/;
+        if (!mlnPartNoPattern.test(this.form.num)) {
+          this.$message.error('请输入有效的MLNPartNo');
+          return;
+        }
+
+        const goodsReceiveQty = Number(this.form.count);
+        if (isNaN(goodsReceiveQty) || goodsReceiveQty <= 0) {
+          this.$message.error('请输入有效的受入数');
+          return;
+        }
+
         const newItem = {
           MLNPartNo: this.form.num,
           UDPartNo: "",
@@ -106,6 +126,16 @@ export default {
           GoodsReceiveDate: this.form.date,
         };
 
+        //Check if user is already input goods after selected date.
+        const hasData = await shiKYUGoodsReceiveStore.checkItemsInStockHistory(
+          newItem.MLNPartNo,
+          newItem.ProcessType,
+          newItem.GoodsReceiveDate
+        );
+        if (isNaN(hasData) || hasData > 0) {
+          this.$message.error('用户已输入过数据，请重新输入数据');
+          return;
+        }
         //Get UD part number in the part master table that corresponds to the entered MLN part number
         const partMasterStore = usePartMasterStore();
         const udPartNo = await partMasterStore.getListItemByMLNPartNo(
