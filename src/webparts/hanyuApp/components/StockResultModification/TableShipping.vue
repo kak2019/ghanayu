@@ -4,7 +4,7 @@
       :data="tableData"
       style="width: 100%; font-size:12px;"
       :header-cell-style="{ backgroundColor: '#366093', color: '#fff' }"
-      height="600px"
+      height="320px"
       v-loading="loading"
       border
   >

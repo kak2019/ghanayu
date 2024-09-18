@@ -23,7 +23,7 @@
 
   <!-- <TableShipping :tableData="tableData" :loading="loading" :summaries="summaries"></TableShipping> -->
 
-  <el-table :data="tableData" stripe border style="width: 100%; font-size:12px;" :header-cell-style="{backgroundColor: '#366093', color: '#fff'}" height="500px" v-loading="loading"
+  <el-table :data="tableData" stripe border style="width: 100%; font-size:12px;" :header-cell-style="{backgroundColor: '#366093', color: '#fff'}" height="320px" v-loading="loading"
   show-summary :summary-method="getSummaries" row-class-name="summary-row">
     <!-- 第一层表头 -->
     <el-table-column prop="ProcessTypeName" label="工程区分" width="100" rowspan="2" />

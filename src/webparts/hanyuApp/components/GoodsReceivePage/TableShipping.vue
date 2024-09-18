@@ -3,7 +3,7 @@
       :data="tableData" stripe border 
       style="width: 100%; font-size:12px;"
       :header-cell-style="{ backgroundColor: '#366093', color: '#fff' }"
-      height="800px"
+      height="320px"
       v-loading="loading"
   >
     <el-table-column prop="GoodsReceiveDate" label="検収実績日"  :formatter="formatDate" align="center"/>
