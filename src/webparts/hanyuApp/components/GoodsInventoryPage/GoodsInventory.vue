@@ -91,10 +91,11 @@ export default {
 
       const newData1 = [["MLN部品番号", "UD部品番号", "前月末在庫", "当月実績", "", "当月末在庫"]]
       const newData2 = [["", "", "", "入库", "出库", ""]]
+      const newData3 = [[ "", "合計", this.summaries[2],this.summaries[3],this.summaries[4], this.summaries[5], this.summaries[6]]];
 
       const originalData = XLSX.utils.sheet_to_json(ws, { header: 1 });
       originalData.shift()
-      const shiftedData = newData1.concat(newData2).concat(originalData); // 插入两个空行
+      const shiftedData = newData1.concat(newData2).concat(originalData).concat(newData3); // 插入两个空行
 
 
       const wb = XLSX.utils.book_new();
@@ -133,7 +134,6 @@ export default {
     
     async filterDataBySearchItems(){
       const query = this.form
-    
       const formatQueryDate = query.date.getFullYear() + '-' + (query.date.getMonth()+1);
 
       try {

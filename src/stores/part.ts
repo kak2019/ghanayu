@@ -237,7 +237,12 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
         async getListItemsBySearchItems(date: string, processType: string, mlnPartNo: string, udPartNo: string) {
             try {
                 //let items = [];
-                const tableData = computed(() => this.partMasterItems);
+                let tableData = computed(() => this.partMasterItems);
+                if(tableData.value.length<=0){
+                    await this.getListItems().then(() => {
+                        tableData = computed(() => this.partMasterItems);
+                    });
+                }
                 const items = tableData;
                 let tempItems;
                 //filter part list with process type
@@ -331,7 +336,12 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
 
         async getListItemsBySearchItemsForGoodsInventory(date: string, processType: string, mlnPartNo: string, udPartNo: string) {
             try {
-                const tableData = computed(() => this.partMasterItems);
+                let tableData = computed(() => this.partMasterItems);
+                if(tableData.value.length<=0){
+                    await this.getListItems().then(() => {
+                        tableData = computed(() => this.partMasterItems);
+                    });
+                }
                 const items = tableData;
                 let tempItems;
                 //filter part list with process type

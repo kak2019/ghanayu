@@ -207,7 +207,13 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
 
         async getLastMonthsLatestStockQtyByMln(mlnPartNo: string, processType: string, current: string): Promise<number> {
             try {
-                const items = computed(() => this.stockHistoryItems);
+                let items = computed(() => this.stockHistoryItems);
+
+                if(items.value.length<=0){
+                    await this.getListItems();
+                    items = computed(() => this.stockHistoryItems);
+                }
+
                 const newItems = items.value.filter(item => {
                     let condition = true;
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
@@ -231,7 +237,11 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
         },
         async getCurrentMonthDefectsQtyByMlnNo(mlnPartNo: string, processType: string, current: string): Promise<number> {
             try {
-                const items = computed(() => this.stockHistoryItems);
+                let items = computed(() => this.stockHistoryItems);
+                if(items.value.length<=0){
+                    await this.getListItems();
+                    items = computed(() => this.stockHistoryItems);
+                }
                 const newItems = items.value.filter(item => {
                     let condition = true
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);

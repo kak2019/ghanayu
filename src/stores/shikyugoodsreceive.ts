@@ -106,13 +106,13 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
                     return '登録完了。';
                 } else {
                     //return '部品表なしラエー';
-                    throw new Error(`部品表なしラエー`);
+                    throw new Error(`部品表なしエラー`);
                 }
             }
             catch (error) {
                 console.error(error);
-                if(error.message==="部品表なしラエー"){
-                    throw new Error(`部品表なしラエー`);
+                if(error.message==="部品表なしエラー"){
+                    throw new Error(`部品表なしエラー`);
                 }else{
                     throw new Error(`データの登録中にエラーが発生しました`);
                 }
@@ -121,18 +121,13 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
         },
         async checkItemsInStockHistory(mlnPartNo: string, processType: string, goodsReceiveDate:string): Promise<boolean> {
             try {
-                //const stockHistoryStore = useStockHistoryStore();
-                console.log("1 ---goodsReceiveDate" + goodsReceiveDate + "------------------------")
-                const items = computed(() => this.shikyuGoodsReceiveItems.filter(i => i.MLNPartNo === mlnPartNo && i.ProcessType === processType && new Date(i.GoodsReceiveDate).getTime() >= new Date(goodsReceiveDate).getTime()));
+
+                const items = computed(() => this.shikyuGoodsReceiveItems.filter(i => i.MLNPartNo === mlnPartNo && i.ProcessType === processType));
                 
                 const isLengthZero: boolean = (items.value.length as number) > 0? true : false;
-                /*if (items.value.length > 0) {
-                    return true
-                } else {
-                    return false;
-                }*/
+
                 const tempItems = items.value.filter(item => {
-                    console.log("2222.-----goodsReceiveDate" + new Date(item.GoodsReceiveDate).getTime() + "------------------------")
+                    //console.log("2222.-----goodsReceiveDate" + new Date(item.GoodsReceiveDate).getTime() + "------------------------")
                 })
                 console.log("goodsReceiveDate" + tempItems);
                 return isLengthZero;
