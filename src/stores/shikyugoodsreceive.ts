@@ -7,6 +7,7 @@ import { useStockHistoryStore } from '../stores/stockhistory';
 import { useBillOfMaterialsStore } from '../stores/billofmaterials';
 import { CONST } from '../config/const';
 import { computed } from 'vue';
+import { isDateBefore } from '../common/utils';
 
 export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECEIVE, {
     state: () => ({
@@ -119,17 +120,16 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
                
             }
         },
-        async checkItemsInStockHistory(mlnPartNo: string, processType: string, goodsReceiveDate:string): Promise<boolean> {
-            try {
 
-                const items = computed(() => this.shikyuGoodsReceiveItems.filter(i => i.MLNPartNo === mlnPartNo && i.ProcessType === processType));
+        async checkItemsAlreadyInGoodReceive(mlnPartNo: string, processType: string, goodsReceiveDate:string): Promise<boolean> {
+            try {
+                
+                const goodsReceiveDateForDate = new Date(goodsReceiveDate);
+                await this.getListItems();
+                const items = computed(() => this.shikyuGoodsReceiveItems.filter(i => i.MLNPartNo === mlnPartNo && i.ProcessType === processType && isDateBefore(goodsReceiveDateForDate, new Date(i.GoodsReceiveDate))));
                 
                 const isLengthZero: boolean = (items.value.length as number) > 0? true : false;
 
-                const tempItems = items.value.filter(item => {
-                    //console.log("2222.-----goodsReceiveDate" + new Date(item.GoodsReceiveDate).getTime() + "------------------------")
-                })
-                console.log("goodsReceiveDate" + tempItems);
                 return isLengthZero;
             }
             catch (error) {

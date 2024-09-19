@@ -6,6 +6,7 @@ import { IStockHistoryItem } from '../model';
 import { IItem } from '@pnp/sp/items/types';
 import { CONST } from '../config/const';
 import { computed } from 'vue';
+import { isDateBefore } from '../common/utils';
 
 export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
     state: () => ({
@@ -160,6 +161,10 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
         async getListItemsByRegisteredDate(mlnPartNo: string, processType: string): Promise<number> {
             try {
                 const items = computed(() => this.stockHistoryItems);
+                //In order to get data real time have add this, but this will make performance low
+                //await this.getListItems();
+                //items = computed(() => this.stockHistoryItems);
+
                 let tempItems = [];
                 tempItems = items.value.filter(item => {
                     let condition = true
@@ -207,18 +212,18 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
 
         async getLastMonthsLatestStockQtyByMln(mlnPartNo: string, processType: string, current: string): Promise<number> {
             try {
-                let items = computed(() => this.stockHistoryItems);
+                const items = computed(() => this.stockHistoryItems);
+                //In order to get data real time have add this, but this will make performance low
+                //await this.getListItems();
+                //items = computed(() => this.stockHistoryItems);
 
-                if(items.value.length<=0){
-                    await this.getListItems();
-                    items = computed(() => this.stockHistoryItems);
-                }
-
+                const today = new Date(current);
                 const newItems = items.value.filter(item => {
                     let condition = true;
-                    const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
+                    const tempRegistered = new Date(item.Registered);
+                    //const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
                     if (mlnPartNo) {
-                        condition = condition && mlnPartNo === item.MLNPartNo && item.ProcessType === processType && formatRegistered < current
+                        condition = condition && mlnPartNo === item.MLNPartNo && item.ProcessType === processType && isDateBefore(tempRegistered,today)
                     }
                     return condition
                 });
@@ -237,11 +242,11 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
         },
         async getCurrentMonthDefectsQtyByMlnNo(mlnPartNo: string, processType: string, current: string): Promise<number> {
             try {
-                let items = computed(() => this.stockHistoryItems);
-                if(items.value.length<=0){
-                    await this.getListItems();
-                    items = computed(() => this.stockHistoryItems);
-                }
+                const items = computed(() => this.stockHistoryItems);
+                //In order to get data real time have add this, but this will make performance low
+                //await this.getListItems();
+                //items = computed(() => this.stockHistoryItems);
+
                 const newItems = items.value.filter(item => {
                     let condition = true
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);

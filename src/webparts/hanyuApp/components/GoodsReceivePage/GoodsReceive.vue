@@ -127,7 +127,7 @@ export default {
         };
 
         //Check if user is already input goods after selected date.
-        const hasData = await shiKYUGoodsReceiveStore.checkItemsInStockHistory(
+        const hasData = await shiKYUGoodsReceiveStore.checkItemsAlreadyInGoodReceive(
           newItem.MLNPartNo,
           newItem.ProcessType,
           newItem.GoodsReceiveDate

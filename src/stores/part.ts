@@ -337,11 +337,10 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
         async getListItemsBySearchItemsForGoodsInventory(date: string, processType: string, mlnPartNo: string, udPartNo: string) {
             try {
                 let tableData = computed(() => this.partMasterItems);
-                if(tableData.value.length<=0){
-                    await this.getListItems().then(() => {
-                        tableData = computed(() => this.partMasterItems);
-                    });
-                }
+                await this.getListItems().then(() => {
+                    tableData = computed(() => this.partMasterItems);
+                });
+                
                 const items = tableData;
                 let tempItems;
                 //filter part list with process type
@@ -386,7 +385,7 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 const stockHistoryStore = useStockHistoryStore();
                 //前月末在庫
                 const listWithAllLastMonthQty = await Promise.all(tempItems.map(async item => {
-                    return await stockHistoryStore.getLastMonthsLatestStockQtyByMln(item.MLNPartNo, processType, currentMonth);
+                    return await stockHistoryStore.getLastMonthsLatestStockQtyByMln(item.MLNPartNo, processType, date);
                 }));
                 //console.log("----------" + listWithAllLastMonthQty);
                 //console.log("----------length" + listWithAllLastMonthQty.length);
