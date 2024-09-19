@@ -163,17 +163,15 @@ export default {
           .getListItems()
           .then(() => {
             this.loading = false;
-
-            this.tableData =
-              shiKYUGoodsReceiveStore.shikyuGoodsReceiveItems.filter((item) => {
-                let condition = true;
-
                 const firstDayOfMonth = new Date(
                   curentDate.getFullYear(),
                   curentDate.getMonth(),
                   1
                 );
 
+            this.tableData =
+              shiKYUGoodsReceiveStore.shikyuGoodsReceiveItems.filter((item) => {
+                let condition = true;
                 condition =
                   condition &&
                   new Date(firstDayOfMonth) <=
@@ -182,6 +180,28 @@ export default {
                     new Date(curentDate.toISOString());
                 return condition;
               });
+              debugger
+              if(this.tableData.length===0){
+                const firstDayOfLastMonth = new Date(
+                  curentDate.getFullYear(),
+                  curentDate.getMonth()-1,
+                  1
+                );
+                let tempFirstDate = firstDayOfMonth;
+                tempFirstDate.setDate(tempFirstDate.getDate()-1);
+                const lastDayOfLastMonth = tempFirstDate;
+                this.tableData =
+                  shiKYUGoodsReceiveStore.shikyuGoodsReceiveItems.filter((item) => {
+                    let condition = true;
+                    condition =
+                      condition &&
+                      new Date(firstDayOfLastMonth) <=
+                        new Date(item.GoodsReceiveDate) &&
+                      new Date(item.GoodsReceiveDate) <=
+                        new Date(lastDayOfLastMonth.toISOString());
+                    return condition;
+                  });
+                }
           })
           .catch((error) => {
             this.loading = false;
