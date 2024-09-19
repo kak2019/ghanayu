@@ -133,7 +133,7 @@ export default {
           newItem.GoodsReceiveDate
         );
         if (isNaN(hasData) || hasData > 0) {
-          this.$message.error('用户已输入过数据，请重新输入数据');
+          this.$message.error('検収実績日エラー');
           return;
         }
         //Get UD part number in the part master table that corresponds to the entered MLN part number
