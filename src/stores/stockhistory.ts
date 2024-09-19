@@ -160,10 +160,10 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
         },
         async getListItemsByRegisteredDate(mlnPartNo: string, processType: string): Promise<number> {
             try {
-                const items = computed(() => this.stockHistoryItems);
-                //In order to get data real time have add this, but this will make performance low
-                //await this.getListItems();
-                //items = computed(() => this.stockHistoryItems);
+                let items = computed(() => this.stockHistoryItems);
+                //Have to use 
+                await this.getListItems();
+                items = computed(() => this.stockHistoryItems);
 
                 let tempItems = [];
                 tempItems = items.value.filter(item => {
@@ -218,12 +218,17 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 //items = computed(() => this.stockHistoryItems);
 
                 const today = new Date(current);
+                const firstDayOfMonth = new Date(
+                    today.getFullYear(),
+                    today.getMonth(),
+                    1
+                );
                 const newItems = items.value.filter(item => {
                     let condition = true;
                     const tempRegistered = new Date(item.Registered);
                     //const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
                     if (mlnPartNo) {
-                        condition = condition && mlnPartNo === item.MLNPartNo && item.ProcessType === processType && isDateBefore(tempRegistered,today)
+                        condition = condition && mlnPartNo === item.MLNPartNo && item.ProcessType === processType && isDateBefore(tempRegistered,firstDayOfMonth)
                     }
                     return condition
                 });

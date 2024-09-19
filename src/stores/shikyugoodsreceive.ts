@@ -69,11 +69,10 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
         },
         async addListItem(item: ISHIKYUGoodsReceiveItem): Promise<string> {
             try {
-
                 const billOfMaterialsStore = useBillOfMaterialsStore();
 
                 const isMlnNumInBom = await billOfMaterialsStore.getItemCountByMLNPartNoProcessType(item.MLNPartNo, item.ProcessType);
-                if (isMlnNumInBom>0) {
+                if (isMlnNumInBom > 0) {
                     //Add shikyyuan to good receive table
                     const sp = spfi(getSP());
                     const web = await sp.web();
