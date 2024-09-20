@@ -212,10 +212,10 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
 
         async getLastMonthsLatestStockQtyByMln(mlnPartNo: string, processType: string, current: string): Promise<number> {
             try {
-                const items = computed(() => this.stockHistoryItems);
+                let items = computed(() => this.stockHistoryItems);
                 //In order to get data real time have add this, but this will make performance low
-                //await this.getListItems();
-                //items = computed(() => this.stockHistoryItems);
+                await this.getListItems();
+                items = computed(() => this.stockHistoryItems);
 
                 const today = new Date(current);
                 const firstDayOfMonth = new Date(
