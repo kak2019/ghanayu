@@ -112,7 +112,7 @@ export default {
         }
 
         const goodsReceiveQty = Number(this.form.count);
-        const isInteger = !Number.isInteger(parseInt(this.form.count));
+        const isInteger = !Number.isInteger(goodsReceiveQty);
         if (isNaN(goodsReceiveQty) || goodsReceiveQty <= 0 || isInteger) {
           this.$message.error('请输入有效的受入数');
           return;
