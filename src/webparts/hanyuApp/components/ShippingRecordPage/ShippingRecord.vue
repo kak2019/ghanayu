@@ -8,10 +8,10 @@
         <Selecter v-model="form.select" label="出荷先"></Selecter>
       </div>
       <div class="background-layer">
-        <Input v-model="form.id" label="Call off id" labelColor="#92cddc"></Input>
+        <Input v-model="form.id" label="Call off id" :max-length="10" labelColor="#92cddc"></Input>
       </div>
       <div class="background-layer">
-        <Input v-model="form.note" label="Despatch note" labelColor="#92cddc"></Input>
+        <Input v-model="form.note" label="Despatch note" :max-length="17" labelColor="#92cddc"></Input>
       </div>
       <div class="background-layer">
         <InputRemoteData v-model="form.num" label="MLN部品番号" labelColor="#fabf8f"/>
@@ -88,7 +88,7 @@ export default {
     async submitForm() {
       try {
         // "Call of id" is max 10 digit and "despatch note" is max 17 digit.
-        if (this.form.id.length > 10) {
+        /*if (this.form.id.length > 10) {
           this.$message.error('请输入有效的Call of id');
           return;
         }
@@ -96,14 +96,16 @@ export default {
         if (this.form.note.length > 17) {
           this.$message.error('请输入有效的despatch note');
           return;
-        }
+        }*/
 
         if (!this.form.num) {
           this.$message.error('MLNPartNo不能为空');
           return;
         }
 
-        if (Number(this.form.count) < 0) {
+        const shipQty = Number(this.form.count);
+        const isShipQtyInteger = !Number.isInteger(shipQty);
+        if (isNaN(shipQty) || Number(this.form.count) < 0 || isShipQtyInteger) {
           this.$message.error('请输入有效的出荷数');
           return;
         }

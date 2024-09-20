@@ -100,13 +100,14 @@ export default {
 
         const defectQty = Number(this.form.AbnormalNumber);
         const completionQty = Number(this.form.FinishedNumber);
-
-        if (isNaN(defectQty) || defectQty < 0) {
+        const isDefectQtyInteger = !Number.isInteger(defectQty);
+        const isCompletionQtyInteger = !Number.isInteger(completionQty);
+        if (isNaN(defectQty) || defectQty < 0 || isDefectQtyInteger) {
           this.$message.error('请输入有效的不良数');
           return;
         }
 
-        if (isNaN(completionQty) || completionQty < 0) {
+        if (isNaN(completionQty) || completionQty < 0 || isCompletionQtyInteger) {
           this.$message.error('请输入有效的完成数');
           return;
         }

@@ -13,6 +13,7 @@
         placeholder="Please Input"
         @input="handleChange"
         size="small"
+        :maxlength="maxLength"
     />
   </div>
 </template>
@@ -32,6 +33,10 @@ export default {
     labelColor: {
       type: String,
       default: 'orange' // 设置默认颜色
+    },
+    maxLength:{
+      type: Number,
+      default : 10
     }
   },
   data() {
