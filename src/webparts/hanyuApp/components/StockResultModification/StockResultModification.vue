@@ -51,6 +51,7 @@
       type="primary"
       style="width: 100px;"
       @click="submitForm"
+      v-loading.fullscreen.lock="fullscreenLoading"
     >
       登録
     </el-button>
@@ -109,6 +110,7 @@ export default {
   },
   data() {
     return {
+      fullscreenLoading: false,
       tableData: [],
       tableRrocess: [],
       tableFunctions: [],
@@ -218,7 +220,7 @@ export default {
           );
           return;
         }
-
+        this.fullscreenLoading = true;
         // if all the validation has been passed, need to add several mandatory fields to newItem, then do some caculation for stock history
         //Get UD part number in the part master table that corresponds to the entered MLN part number
         const udPartNo = await partMasterStore.getListItemByMLNPartNo(
@@ -277,7 +279,7 @@ export default {
 
         this.$message.success(message);
         await this.fetchTableData();
-
+        this.fullscreenLoading = false;
         this.resetForm(); // 调用 reset 方法重置表单
       } catch (error) {
         this.$message.error("登録に失敗しました: " + error.message);
