@@ -160,8 +160,8 @@ export default {
           const stockQty = await stockHistoryStore.getLatestStockQtyByMLNPartNoProcessTypeDesc(ChildPartNo, ChildProcessType);
           const childUDPartNo = await partMasterStore.getListItemByMLNPartNo(ChildPartNo);
           this.form.UDPartNo = curUDPartNo;
-          const childFinalFinishedQty = Number(this.form.FinishedNumber) * StructureQty;
-          const childFinalAbnormalQty = Number(this.form.AbnormalNumber) * StructureQty;
+          const childFinalFinishedQty = Number(this.form.FinishedNumber) * StructureQty * -1;
+          const childFinalAbnormalQty = Number(this.form.AbnormalNumber) * StructureQty * -1;
           const childPartFinished = {
             MLNPartNo: ChildPartNo,
             ProcessType: ChildProcessType,
