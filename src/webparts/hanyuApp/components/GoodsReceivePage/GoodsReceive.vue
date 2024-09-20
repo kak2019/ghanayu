@@ -67,6 +67,7 @@ import * as XLSX from "xlsx";
 import { ElMessage } from "element-plus"; // 更新为你的实际路径
 import { usePartMasterStore } from "../../../../stores/part";
 import { useFileName } from '../../../../stores/usefilename';
+import { convertToUTC } from '../../../../common/utils';
 // 获取 Pinia store 实例
 const shiKYUGoodsReceiveStore = useSHIKYUGoodsReceiveStore();
 const defaultShikyufrom = "2922";
@@ -126,7 +127,7 @@ export default {
           GoodsReceiveQty: parseInt(this.form.count, 10),
           Calloffid: this.form.id,
           Despatchnote: this.form.note,
-          GoodsReceiveDate: this.form.date,
+          GoodsReceiveDate: convertToUTC(this.form.date),
         };
         
         this.fullscreenLoading = true;
@@ -139,6 +140,7 @@ export default {
         );
         if (isNaN(hasData) || hasData > 0) {
           this.$message.error('検収実績日エラー');
+          this.fullscreenLoading = false;
           return;
         }
         //Get UD part number in the part master table that corresponds to the entered MLN part number
@@ -154,11 +156,14 @@ export default {
         await this.fetchTableData();
         this.resetForm(); // 调用 reset 方法重置表单
       } catch (error) {
+        this.fullscreenLoading = false
         if(error.message==="部品表なしエラー"){
           this.$message.error(error.message);
         }else{
           this.$message.error("登録に失敗しました: " + error.message);
         }
+      } finally{
+        this.fullscreenLoading = false
       }
     },
     async fetchTableData() {

@@ -125,7 +125,7 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
                 
                 const goodsReceiveDateForDate = new Date(goodsReceiveDate);
                 await this.getListItems();
-                const items = computed(() => this.shikyuGoodsReceiveItems.filter(i => i.MLNPartNo === mlnPartNo && i.ProcessType === processType && isDateBefore(goodsReceiveDateForDate, new Date(i.GoodsReceiveDate))));
+                const items = computed(() => this.shikyuGoodsReceiveItems.filter(i => i.MLNPartNo === mlnPartNo && i.ProcessType === processType && isDateBefore(new Date(goodsReceiveDateForDate), new Date(i.GoodsReceiveDate))));
                 
                 const isLengthZero: boolean = (items.value.length as number) > 0? true : false;
 
