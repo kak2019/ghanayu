@@ -144,17 +144,16 @@ export default {
           return;
         }
 
+        const modifiedQtyPattern = /^(-?[1-9]\\d*)$/
         const modifiedQty = this.form.count;
 
-        /*if (isNaN(modifiedQty)) {
-          this.$message.error('请输入有效的值');
+        if (isNaN(modifiedQty) || !modifiedQtyPattern.test(modifiedQty)) {          
+          this.$message.error('请输入有效的修正数');
           return;
         }
 
-        if (Number(modifiedQty) === 0) {
-          this.$message.error('0は不可としマイナス数値は可とする.');
-          return;
-        }*/
+
+
        if(this.form.selectedProcess === "CH" && Number(modifiedQty) <= 0){
           this.$message.error('0は不可としマイナス数値は可とする.');
           return;

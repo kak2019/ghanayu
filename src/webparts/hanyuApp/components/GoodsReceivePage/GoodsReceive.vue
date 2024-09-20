@@ -128,7 +128,9 @@ export default {
           Despatchnote: this.form.note,
           GoodsReceiveDate: this.form.date,
         };
-
+        
+        this.fullscreenLoading = true;
+        //
         //Check if user is already input goods after selected date.
         const hasData = await shiKYUGoodsReceiveStore.checkItemsAlreadyInGoodReceive(
           newItem.MLNPartNo,
@@ -145,13 +147,12 @@ export default {
           newItem.MLNPartNo
         );
         newItem.UDPartNo = udPartNo;
-        this.fullscreenLoading = true;
-        //Add record to good receive table
+        //Add record to good receive table 
         const message = await shiKYUGoodsReceiveStore.addListItem(newItem);
+        this.fullscreenLoading = false
         this.$message.success(message);
         await this.fetchTableData();
-        this.fullscreenLoading = false
-        this.resetForm(); // 调用 reset 方法重置表单        
+        this.resetForm(); // 调用 reset 方法重置表单
       } catch (error) {
         if(error.message==="部品表なしエラー"){
           this.$message.error(error.message);

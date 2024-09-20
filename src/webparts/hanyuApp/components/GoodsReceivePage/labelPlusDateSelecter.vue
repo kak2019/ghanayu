@@ -17,6 +17,8 @@
 </template>
 
 <script>
+import { CONST } from '../../../../config/const';
+//使用方法：console.log(`${CONST.beginOperationDate} - ${CONST.endOperationDate}`);
 export default {
   name: 'DatePickerWithLabel',
   props: {
@@ -47,7 +49,8 @@ export default {
       this.$emit('update:modelValue', value);
     },
     disabledDate(date) {
-      const start = new Date('2023-12-31'); // need to change to 2025-01-01
+      const start = new Date(`${CONST.beginOperationDate}`); // need to change to 2025-01-01
+      //const end = new Date(`${CONST.endOperationDate}`); // need to confirm the actual setting for this time.
       const end = new Date();
       return date < start || date > end;
     }
