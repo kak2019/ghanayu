@@ -40,6 +40,7 @@
           @click="submitForm"
           type="primary"
           style="width: 100px"
+          v-loading.fullscreen.lock="fullscreenLoading"
         >
           登録
         </el-button>
@@ -80,6 +81,7 @@ export default {
   },
   data() {
     return {
+      fullscreenLoading: false,
       tableData: [],
       loading: true,
       form: {
@@ -96,6 +98,7 @@ export default {
   methods: {
     async submitForm() {
       try {
+        this.fullscreenLoading = true;
         //Add new record to good receive page
         if (!this.form.num) {
           this.$message.error('MLNPartNo不能为空');
@@ -147,8 +150,8 @@ export default {
         const message = await shiKYUGoodsReceiveStore.addListItem(newItem);
         this.$message.success(message);
         await this.fetchTableData();
-
-        this.resetForm(); // 调用 reset 方法重置表单
+        this.fullscreenLoading = false
+        this.resetForm(); // 调用 reset 方法重置表单        
       } catch (error) {
         if(error.message==="部品表なしエラー"){
           this.$message.error(error.message);
