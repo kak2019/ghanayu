@@ -2,14 +2,14 @@
   <div class="date-picker-with-label">
     <label
         class="custom-label"
-        :style="{ backgroundColor: labelColor }"
+        :style="{ backgroundColor: labelColor, width: inputWidth + 'px' }"
     >
       {{ label }}
     </label>
     <el-input
         v-model="innerValue"
         clearable
-        style="width: 125px;"
+        :style="{ width: inputWidth + 'px' }"
         placeholder="Please Input"
         @input="handleChange"
         size="small"
@@ -37,6 +37,10 @@ export default {
     maxLength:{
       type: Number,
       default : 10
+    },
+    inputWidth: {
+      type: Number,
+      default: 100
     }
   },
   data() {

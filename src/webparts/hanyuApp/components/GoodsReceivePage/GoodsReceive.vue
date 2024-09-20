@@ -15,6 +15,7 @@
           v-model="form.id"
           label="Call off id"
           labelColor="#92cddc"
+          :inputWidth="110"
           :max-length="10"
         ></Input>
       </div>
@@ -23,6 +24,7 @@
           v-model="form.note"
           label="Despatch note"
           labelColor="#92cddc"
+          :inputWidth="150"
           :max-length="17"
         ></Input>
       </div>
@@ -30,7 +32,7 @@
         <InputRemoteData v-model="form.num" label="MLN部品番号" />
       </div>
       <div class="background-layer">
-        <Input v-model="form.count" label="受入数" />
+        <Input v-model="form.count" label="受入数" :inputWidth="125" />
       </div>
     </div>
       <div style="text-align: right; flex-shrink: 0;">
