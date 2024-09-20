@@ -21,7 +21,7 @@
       </div>
     </div>
     <div style="text-align: right; flex-shrink: 0;">
-      <el-button type="primary" plain size="large" style="width: 100px;" @click="submitForm" :disabled="isBusinessControler">登録</el-button>
+      <el-button type="primary" plain size="large" style="width: 100px;" v-loading.fullscreen.lock="fullscreenLoading" @click="submitForm" :disabled="isBusinessControler">登録</el-button>
       <el-button plain size="large" style="width: 100px;" @click="cancel" :disabled="isBusinessControler">キャンセル</el-button>
       <el-button plain size="large" style="width: 100px;"
       @click="downloadExcel"
@@ -72,6 +72,7 @@ export default {
 
   data() {
     return {
+      fullscreenLoading: false,
       form: {
         date: new Date().toISOString(),
         select: '2922',
@@ -117,7 +118,7 @@ export default {
 
         // If the "出荷実績日" is smaller than the latest record date in system, show error message.
         const latestResultDate = await shippingResultStore.getLatestShippingResultDateByMLNPartNoDesc(this.form.num)
-        console.log('================')
+
         if (latestResultDate.length > 0) {
           const compareDateResult = this.compareDates(latestResultDate,this.form.date)
           if (compareDateResult === 1) {
@@ -144,6 +145,7 @@ export default {
         //Register an out stock record to the StockHistory table.InOutQty=negative value of (出荷数),FunctionID=04
         const latestStockQty = await stockHistoryStore.getLatestStockQtyByMLNPartNoProcessTypeDesc(this.form.num, 'C');
         const curUDPartNo = await partMasterStore.getListItemByMLNPartNo(this.form.num);
+        this.fullscreenLoading = true;
         const newOutStockItem = {
           MLNPartNo: this.form.num,
           ProcessType: 'C',
@@ -155,7 +157,7 @@ export default {
 
         const addFinishedStockMsg = await stockHistoryStore.addListItem(newOutStockItem);
         this.$message.success(addFinishedStockMsg);
-
+        this.fullscreenLoading = false;
         this.cancel(); // 调用 cancel 方法重置表单
       } catch (error) {
         this.$message.error('登録に失敗しました: ' + error.message);

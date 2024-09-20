@@ -98,7 +98,6 @@ export default {
   methods: {
     async submitForm() {
       try {
-        this.fullscreenLoading = true;
         //Add new record to good receive page
         if (!this.form.num) {
           this.$message.error('MLNPartNo不能为空');
@@ -145,7 +144,7 @@ export default {
           newItem.MLNPartNo
         );
         newItem.UDPartNo = udPartNo;
-
+        this.fullscreenLoading = true;
         //Add record to good receive table
         const message = await shiKYUGoodsReceiveStore.addListItem(newItem);
         this.$message.success(message);

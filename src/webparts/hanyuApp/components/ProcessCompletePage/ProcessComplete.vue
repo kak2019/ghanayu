@@ -18,7 +18,7 @@
       </div>
     </div>
     <div style="text-align: right; flex-shrink: 0;">
-      <el-button type="primary" plain size="large" style="width: 100px;" @click="submitForm" >登録</el-button>
+      <el-button type="primary" plain size="large" style="width: 100px;" v-loading.fullscreen.lock="fullscreenLoading" @click="submitForm" >登録</el-button>
       <el-button plain size="large" style="width: 100px;" @click="resetForm" >キャンセル</el-button>
       <el-button plain size="large" style="width: 100px;" @click="downloadTable">ダウンロード</el-button>
     </div>
@@ -67,6 +67,7 @@ export default {
 
   data() {
     return {
+      fullscreenLoading: false,
       processOptions: [],
       tableData: [],
       needToSyncItems: [],
@@ -84,7 +85,6 @@ export default {
 
   methods: {
     async submitForm() {
-      debugger
       try {
         if (!this.form.MLNPartNo) {
           this.$message.error('MLNPartNo不能为空');
@@ -123,7 +123,6 @@ export default {
           this.$message.error('Part不存在');
           return;
         }
-
         const curUDPartNo = await partMasterStore.getListItemByMLNPartNo(this.form.MLNPartNo);
         this.form.UDPartNo = curUDPartNo
 
@@ -131,8 +130,7 @@ export default {
         
           const processCompletionResultStore = useProcessCompletionResultStore();
           const curPartRecords = await processCompletionResultStore.getItemsByMLNPartNoProcessType(this.form.MLNPartNo, this.form.selectProcessType);
-          console.log('=========+++++++++');
-          console.log(curPartRecords);
+
           if (curPartRecords.length > 0) {
             const latestRecord = curPartRecords[0];
             if (!this.isToday(Date(latestRecord.ProcessCompletion))) { 
@@ -196,6 +194,7 @@ export default {
           return;
         }
   
+        this.fullscreenLoading = true;
         const latestStockQty = await stockHistoryStore.getLatestStockQtyByMLNPartNoProcessTypeDesc(this.form.MLNPartNo, this.form.selectProcessType);
 
         const newItem = {
@@ -235,7 +234,7 @@ export default {
         const syncStockMsg = await stockHistoryStore.addListItems(this.needToSyncItems);
         this.$message.success(syncStockMsg);
         this.needToSyncItems = [];
-
+        this.fullscreenLoading = false
         this.resetForm(); // 调用 resetForm 方法重置表单
       } catch (error) {
         this.$message.error('登録に失敗しました: ' + error.message);
