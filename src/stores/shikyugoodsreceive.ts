@@ -91,7 +91,7 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
                     //Add record to StockHistory table.
                     const stockHistoryStore = useStockHistoryStore();
                     const latestStockQty = await stockHistoryStore.getListItemsByRegisteredDate(item.MLNPartNo, item.ProcessType);
-                    const stockQty = latestStockQty + item.GoodsReceiveQty;
+                    const stockQty = Number(latestStockQty) + Number(item.GoodsReceiveQty);
                     const billOfMaterialsItem = {
                         MLNPartNo: item.MLNPartNo,
                         ProcessType: item.ProcessType, // need to get form 工程区分，and covert to Janpnese words
