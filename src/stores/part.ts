@@ -67,34 +67,16 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 throw new Error(`データの取得中にエラーが発生しました`);
             }
         },
+        
         async getItemCountByMLNPartNoProcessType(mlnPartNo: string, processType: string): Promise<number> {
-            const camlQuery = {
-                ViewXml: `
-                <View>
-                  <Query>
-                    <Where>
-                      <And>
-                        <Eq>
-                          <FieldRef Name='MLNPartNo' />
-                          <Value Type='Text'>${mlnPartNo}</Value>
-                        </Eq>
-                        <Contains>
-                          <FieldRef Name='ProcessType' />
-                          <Value Type='Text'>${processType}</Value>
-                        </Contains>
-                      </And>                     
-                    </Where>
-                  </Query>
-                  <RowLimit>1</RowLimit>
-                </View>`
-            };
             try {
-                const sp = spfi(getSP());
-                const web = await sp.web();
-                const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNamePARTMASTER}`).getItemsByCAMLQuery(camlQuery);
-                return items.length;
-            } catch (error) {
-                console.error(error);
+                let count = 0
+                await this.getListItems().then(() => {
+                    const items = computed(() => this.partMasterItems).value.filter(i => (i.MLNPartNo === mlnPartNo && i.ProcessType.indexOf(processType)>=0));
+                    count = items.length; 
+                });
+                return count
+            }catch(error){
                 throw new Error(`データの取得中にエラーが発生しました`);
             }
         },

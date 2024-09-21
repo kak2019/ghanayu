@@ -47,7 +47,6 @@ const ProcessMasterStore = useProcessMasterStore();
 const ProcessCompletionResultStore = useProcessCompletionResultStore();
 const BillOfMaterialsStore = useBillOfMaterialsStore();
 
-
 export default {
   components: {
     TableShipping,
@@ -122,7 +121,7 @@ export default {
         const partMasterStore = usePartMasterStore();
         const curPartCount = await partMasterStore.getItemCountByMLNPartNoProcessType(this.form.MLNPartNo,this.form.selectProcessType);
         if (curPartCount <= 0) {
-          this.$message.error('Part不存在');
+          this.$message.error('部品表なしエラー');
           return;
         }
         const curUDPartNo = await partMasterStore.getListItemByMLNPartNo(this.form.MLNPartNo);

@@ -140,7 +140,6 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
                 return isLengthZero;
             }
             catch (error) {
-                console.error(error);
                 throw new Error(`データの取得中にエラーが発生しました`);
             }
         },
