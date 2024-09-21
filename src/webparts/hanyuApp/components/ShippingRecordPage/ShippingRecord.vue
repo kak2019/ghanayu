@@ -47,7 +47,7 @@ import {ElMessage} from "element-plus"; // 更新为你的实际路径
 import { usePartMasterStore } from '../../../../stores/part';
 import { useStockHistoryStore } from "../../../../stores/stockhistory"
 import { useUserStore } from '../../../../stores/user';
-
+import { convertToUTC } from '../../../../common/utils';
 
 // 获取 Pinia store 实例
 const shippingResultStore = useShippingResultStore();
@@ -137,7 +137,7 @@ export default {
           ShipQty: parseInt(this.form.count, 10),
           Calloffid: this.form.id,
           Despatchnote: this.form.note,
-          ShippingResultDate: this.form.date,
+          ShippingResultDate: convertToUTC(this.form.date)
         };
 
         const message = await shippingResultStore.addListItem(newItem);
@@ -154,7 +154,8 @@ export default {
           UDPartNo: curUDPartNo,
           Qty: (0 - Number(this.form.count)),
           FunctionID: '04',
-          StockQty:(latestStockQty - Number(this.form.count)).toString() //获取最新库存
+          StockQty:(latestStockQty - Number(this.form.count)).toString(), //获取最新库存
+          Registered:newItem.ShippingResultDate
         };
 
         const addFinishedStockMsg = await stockHistoryStore.addListItem(newOutStockItem);
