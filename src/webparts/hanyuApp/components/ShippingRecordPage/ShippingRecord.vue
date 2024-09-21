@@ -106,10 +106,9 @@ export default {
           this.$message.error('MLNPartNo不能为空');
           return;
         }
-
-        const shipQty = Number(this.form.count);
+        const shipQty = Number(this.form.count.toString().trim());
         const isShipQtyInteger = !Number.isInteger(shipQty);
-        if (isNaN(shipQty) || Number(this.form.count) < 0 || isShipQtyInteger) {
+        if (isNaN(shipQty) || Number(this.form.count) <= 0 || isShipQtyInteger) {
           this.$message.error('请输入有效的出荷数');
           return;
         }
