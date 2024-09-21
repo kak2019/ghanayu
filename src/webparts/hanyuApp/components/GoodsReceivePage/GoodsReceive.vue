@@ -154,7 +154,9 @@ export default {
         //Add record to good receive table 
         const message = await shiKYUGoodsReceiveStore.addListItem(newItem);
         this.fullscreenLoading = false
-        this.$message.success(message);
+        if(message!=""){
+          this.$message.success(message);
+        }
         await this.fetchTableData();
         this.resetForm(); // 调用 reset 方法重置表单
       } catch (error) {

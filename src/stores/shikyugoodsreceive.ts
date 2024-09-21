@@ -70,7 +70,7 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
         async addListItem(item: ISHIKYUGoodsReceiveItem): Promise<string> {
             try {
                 const billOfMaterialsStore = useBillOfMaterialsStore();
-
+                let message = "データの登録中にエラーが発生しました";
                 const isMlnNumInBom = await billOfMaterialsStore.getItemCountByMLNPartNoProcessType(item.MLNPartNo, item.ProcessType);
                 if (isMlnNumInBom > 0) {
                     //Add shikyyuan to good receive table
@@ -90,24 +90,32 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
 
                     //Add record to StockHistory table.
                     const stockHistoryStore = useStockHistoryStore();
-                    const latestStockQty = await stockHistoryStore.getListItemsByRegisteredDate(item.MLNPartNo, item.ProcessType);
-                    const stockQty = Number(latestStockQty) + Number(item.GoodsReceiveQty);
-                    const billOfMaterialsItem = {
-                        MLNPartNo: item.MLNPartNo,
-                        ProcessType: item.ProcessType, // need to get form 工程区分，and covert to Janpnese words
-                        UDPartNo: item.UDPartNo,
-                        Qty: item.GoodsReceiveQty,
-                        FunctionID: "01", // it's only "01" in this process.
-                        StockQty: stockQty, //Latest QTY  +  受入数, need to caculate
-                        Registered: item.GoodsReceiveDate || ""
-                    } as IStockHistoryItem;
-                    await stockHistoryStore.addListItem(billOfMaterialsItem);
-
-                    return '登録完了。';
+                    let latestStockQty;
+                    await stockHistoryStore.getListItemsByRegisteredDate(item.MLNPartNo, item.ProcessType).then(async (res) => {
+                        latestStockQty = res;
+                        const stockQty = Number(latestStockQty) + Number(item.GoodsReceiveQty);
+                        const billOfMaterialsItem = {
+                            MLNPartNo: item.MLNPartNo,
+                            ProcessType: item.ProcessType, // need to get form 工程区分，and covert to Janpnese words
+                            UDPartNo: item.UDPartNo,
+                            Qty: item.GoodsReceiveQty,
+                            FunctionID: "01", // it's only "01" in this process.
+                            StockQty: stockQty, //Latest QTY  +  受入数, need to caculate
+                            Registered: item.GoodsReceiveDate || ""
+                        } as IStockHistoryItem;
+                        await stockHistoryStore.addListItem(billOfMaterialsItem).then((res) => {
+                            message = '登録完了。';
+                        }).catch((error) => {
+                            message = error.message;
+                        })
+                        return message;
+                    }).catch((error) => {
+                        return error.message;
+                    });
                 } else {
-                    //return '部品表なしラエー';
                     throw new Error(`部品表なしエラー`);
                 }
+                return message;
             }
             catch (error) {
                 console.error(error);

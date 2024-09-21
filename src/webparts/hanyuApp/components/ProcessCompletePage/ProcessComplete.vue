@@ -117,6 +117,7 @@ export default {
           return;
         }
 
+        this.fullscreenLoading = true;
         //The BOM table is searched using the entered MLN part number + process category as a key.If a corresponding record exists, it is registered in the ProcessCompletionResult table.
         const partMasterStore = usePartMasterStore();
         const curPartCount = await partMasterStore.getItemCountByMLNPartNoProcessType(this.form.MLNPartNo,this.form.selectProcessType);
@@ -195,7 +196,6 @@ export default {
           return;
         }
   
-        this.fullscreenLoading = true;
         const latestStockQty = await stockHistoryStore.getLatestStockQtyByMLNPartNoProcessTypeDesc(this.form.MLNPartNo, this.form.selectProcessType);
 
         const newItem = {
@@ -239,6 +239,8 @@ export default {
         this.resetForm(); // 调用 resetForm 方法重置表单
       } catch (error) {
         this.$message.error('登録に失敗しました: ' + error.message);
+      }finally{
+        this.fullscreenLoading = false
       }
     },
 

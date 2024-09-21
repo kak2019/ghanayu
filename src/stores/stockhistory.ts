@@ -160,13 +160,13 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
         },
         async getListItemsByRegisteredDate(mlnPartNo: string, processType: string): Promise<number> {
             try {
-                let items = computed(() => this.stockHistoryItems);
+                let items = computed(() => this.stockHistoryItems).value.sort((a, b) => new Date(b.Modified).getTime() - new Date(a.Modified).getTime());
                 //Have to use 
                 await this.getListItems();
-                items = computed(() => this.stockHistoryItems);
-
+                items = computed(() => this.stockHistoryItems).value.sort((a, b) => new Date(b.Modified).getTime() - new Date(a.Modified).getTime());
+            
                 let tempItems = [];
-                tempItems = items.value.filter(item => {
+                tempItems = items.filter(item => {
                     let condition = true
                     if (mlnPartNo) {
                         condition = condition && mlnPartNo === item.MLNPartNo && processType === item.ProcessType
@@ -401,8 +401,8 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
         },
         async getCurentMonthStockQtyByMlnNo(mlnPartNo: string, processType: string, current: string): Promise<number> {
             try {
-                const items = computed(() => this.stockHistoryItems);
-                const newItems = items.value.filter(item => {
+                const items = computed(() => this.stockHistoryItems).value.sort((a, b) => new Date(b.Modified).getTime() - new Date(a.Modified).getTime());
+                const newItems = items.filter(item => {
                     let condition = true;
                     const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
                     if (mlnPartNo) {

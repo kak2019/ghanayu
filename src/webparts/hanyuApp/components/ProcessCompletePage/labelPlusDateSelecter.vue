@@ -17,6 +17,7 @@
 
 <script>
 import { CONST } from '../../../../config/const';
+import { getCurrentTime } from '../../../../common/utils';
 export default {
   name: 'DatePickerWithLabel',
   props: {
@@ -45,14 +46,15 @@ export default {
   methods: {
     handleChange(value) {
       if (value) { 
+        const newValue = getCurrentTime(value);
         this.$emit('update:modelValue', value);
       }
     },
 
     disabledDate(date) {
-      
       const start = new Date(`${CONST.beginOperationDate}`); // need to change to 2025-01-01
-      const end = new Date(`${CONST.endOperationDate}`);
+      //const end = new Date(`${CONST.endOperationDate}`);
+      const end = new Date();
       return date < start || date > end;
     },
 
