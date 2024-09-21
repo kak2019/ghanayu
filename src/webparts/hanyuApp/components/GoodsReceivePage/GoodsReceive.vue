@@ -43,10 +43,11 @@
           type="primary"
           style="width: 100px"
           v-loading.fullscreen.lock="fullscreenLoading"
+          :disabled="isBusinessControler"
         >
           登録
         </el-button>
-        <el-button plain size="large" style="width: 100px" @click="resetForm" 
+        <el-button plain size="large" style="width: 100px" @click="resetForm" :disabled="isBusinessControler"
           >キャンセル
         </el-button>
         <el-button plain size="large" style="width: 100px" @click="downloadExcel">
@@ -70,9 +71,14 @@ import { ElMessage } from "element-plus"; // 更新为你的实际路径
 import { usePartMasterStore } from "../../../../stores/part";
 import { useFileName } from '../../../../stores/usefilename';
 import { convertToUTC } from '../../../../common/utils';
+import { useUserStore } from '../../../../stores/user';
+import { computed} from 'vue';
+
 // 获取 Pinia store 实例
 const shiKYUGoodsReceiveStore = useSHIKYUGoodsReceiveStore();
 const defaultShikyufrom = "2922";
+const userStore = new useUserStore();
+const isBusinessControler = computed(() => userStore.groupInfo.indexOf('Business Controler') >= 0);
 let curentDate = new Date();
 export default {
   components: {
@@ -84,6 +90,7 @@ export default {
   },
   data() {
     return {
+      isBusinessControler: isBusinessControler,
       fullscreenLoading: false,
       tableData: [],
       loading: true,

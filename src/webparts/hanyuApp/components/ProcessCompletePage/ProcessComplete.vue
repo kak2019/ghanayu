@@ -18,8 +18,8 @@
       </div>
     </div>
     <div style="text-align: right; flex-shrink: 0;">
-      <el-button type="primary" plain size="large" style="width: 100px;" v-loading.fullscreen.lock="fullscreenLoading" @click="submitForm" >登録</el-button>
-      <el-button plain size="large" style="width: 100px;" @click="resetForm" >キャンセル</el-button>
+      <el-button type="primary" plain size="large" style="width: 100px;" v-loading.fullscreen.lock="fullscreenLoading" @click="submitForm" :disabled="isBusinessControler">登録</el-button>
+      <el-button plain size="large" style="width: 100px;" @click="resetForm" :disabled="isBusinessControler">キャンセル</el-button>
       <el-button plain size="large" style="width: 100px;" @click="downloadTable">ダウンロード</el-button>
     </div>
   </el-row>
@@ -42,11 +42,13 @@ import { usePartMasterStore } from '../../../../stores/part';
 import { useBillOfMaterialsStore } from '../../../../stores/billofmaterials';
 import { useStockHistoryStore } from "../../../../stores/stockhistory"
 import { useUserStore } from '../../../../stores/user';
-import { isDateBefore } from '../../../../common/utils';
+import { isDateBefore, convertToUTC } from '../../../../common/utils';
 
 const ProcessMasterStore = useProcessMasterStore();
 const ProcessCompletionResultStore = useProcessCompletionResultStore();
 const BillOfMaterialsStore = useBillOfMaterialsStore();
+const userStore = new useUserStore();
+const isBusinessControler = computed(() => userStore.groupInfo.indexOf('Business Controler') >= 0);
 
 export default {
   components: {
@@ -67,12 +69,13 @@ export default {
 
   data() {
     return {
+      isBusinessControler: isBusinessControler,
       fullscreenLoading: false,
       processOptions: [],
       tableData: [],
       needToSyncItems: [],
       form: {
-        ProcessCompletion: new Date().toISOString(),
+        ProcessCompletion: new Date(),
         selectProcessName: '生加工',
         selectProcessType: 'M',
         MLNPartNo: '',
@@ -144,8 +147,6 @@ export default {
             }
           }
         
-        
-
         //If the entered completed quantity is greater than the stock quantity of the previous process, an error message "完成数が前工程の在庫数より多くなっています" will be displayed and the item will not be registered in the in-house process completion results table.
         //根据MLN编号和工程区分获得部品列表
         const billOfMaterialsStore = useBillOfMaterialsStore();
@@ -154,6 +155,7 @@ export default {
         //遍历partRecords,获取所有前置部品中的最小库存数，然后用完成数与之比较做判断
         const date = new Date();
         const year = date.getFullYear();
+        const utcProcessCompletion = convertToUTC(this.form.ProcessCompletion) 
         // const month = (date.getMonth() + 1).toString.padStart(2, '0');
         let minimumCount = Infinity;
         for (const record of partRecords) { 
@@ -170,7 +172,8 @@ export default {
             UDPartNo: childUDPartNo,
             Qty: childFinalFinishedQty,
             FunctionID: '02',
-            StockQty:(childFinalFinishedQty + stockQty).toString() //获取最新库存
+            StockQty:(childFinalFinishedQty + childFinalAbnormalQty + stockQty).toString(), //获取最新库存,
+            Registered: utcProcessCompletion
           };
 
           const childPartAbnormal = {
@@ -179,12 +182,13 @@ export default {
             UDPartNo: childUDPartNo,
             Qty: childFinalAbnormalQty,
             FunctionID: '03',
-            StockQty: (childFinalFinishedQty + stockQty).toString() //获取最新库存
+            StockQty: (childFinalAbnormalQty + stockQty).toString(),//获取最新库存
+            Registered: utcProcessCompletion
           };
 
+      
           this.needToSyncItems.push(childPartFinished);
           this.needToSyncItems.push(childPartAbnormal);
-
           if (stockQty < minimumCount) {
               minimumCount = stockQty;
           }
@@ -204,7 +208,7 @@ export default {
           UDPartNo: this.form.UDPartNo,
           DefectQty: this.form.AbnormalNumber,
           CompletionQty: this.form.FinishedNumber,
-          ProcessCompletion: new Date(this.form.ProcessCompletion)
+          ProcessCompletion: utcProcessCompletion
         };
 
         const message = await ProcessCompletionResultStore.addListItem(newItem);
@@ -217,7 +221,8 @@ export default {
           UDPartNo: this.form.UDPartNo,
           Qty: this.form.FinishedNumber,
           FunctionID: '02',
-          StockQty:(Number(this.form.FinishedNumber) + latestStockQty).toString() //获取最新库存
+          StockQty:(Number(this.form.FinishedNumber) + latestStockQty).toString(), //获取最新库存
+          Registered: utcProcessCompletion
         };
 
         const newStockItemAbnormal = {
@@ -226,13 +231,17 @@ export default {
           UDPartNo: this.form.UDPartNo,
           Qty: this.form.AbnormalNumber,
           FunctionID: '03',
-          StockQty: (Number(this.form.FinishedNumber) + latestStockQty).toString() //获取最新库存
+          StockQty: (Number(this.form.FinishedNumber) + latestStockQty).toString(), //获取最新库存
+          Registered: utcProcessCompletion
         };
-
+        
         this.needToSyncItems.push(newStockItemAbnormal);
         this.needToSyncItems.push(newStockItemFinished);
-
+        
         const syncStockMsg = await stockHistoryStore.addListItems(this.needToSyncItems);
+        /*const syncStockMsg = await Promise.all(this.needToSyncItems.map(async item => {
+          return await stockHistoryStore.addListItem(item);
+        }));*/
         this.$message.success(syncStockMsg);
         this.needToSyncItems = [];
         this.fullscreenLoading = false

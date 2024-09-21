@@ -52,6 +52,7 @@
       style="width: 100px;"
       @click="submitForm"
       v-loading.fullscreen.lock="fullscreenLoading"
+      :disabled="isHanyuType1 || isBusinessControler"
     >
       登録
     </el-button>
@@ -59,6 +60,7 @@
       plain size="large"
       style="width: 100px;"
       @click="resetForm"
+      :disabled="isHanyuType1 || isBusinessControler"
       >キャンセル
     </el-button>
     <el-button
@@ -98,6 +100,9 @@ const modifiedReasonMasterStore = useModifiedReasonMasterStore();
 const functionsMasterStore = useFunctionsMasterStore();
 const processMasterStore = useProcessMasterStore();
 const userStore = useUserStore();
+const isInventoryManager = computed(() => userStore.groupInfo.indexOf('Inventory Manager') >= 0);
+const isBusinessControler = computed(() => userStore.groupInfo.indexOf('Business Controler') >= 0);
+const isHanyuType1 = computed(() => userStore.groupInfo.indexOf('Hanyu type 1') >= 0);
 
 let curentDate = new Date();
 export default {
@@ -110,6 +115,9 @@ export default {
   },
   data() {
     return {
+      isHanyuType1: isHanyuType1,
+      isBusinessControler:isBusinessControler,
+      isInventoryManager:isInventoryManager,
       fullscreenLoading: false,
       tableData: [],
       tableRrocess: [],
@@ -543,6 +551,16 @@ export default {
     },
   },
   async mounted() {
+    /*const userStore = useUserStore();
+    //const isInventoryManager = computed(() => userStore.groupInfo.indexOf('Inventory Manager') >= 0);
+    const isBusinessControler = computed(() => userStore.groupInfo.indexOf('Business Controler') >= 0);
+    const isHanyuType1 = computed(() => userStore.groupInfo.indexOf('Hanyu type 1') >= 0);
+    if(isHanyuType1 || isBusinessControler){
+      this.disabled = true;
+    }else{
+      this.disabled = false;
+    }*/
+
     this.refreshFunctionName();
 
     const processMasterItems = computed(

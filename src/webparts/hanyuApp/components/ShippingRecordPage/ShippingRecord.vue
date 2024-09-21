@@ -49,6 +49,8 @@ import { useStockHistoryStore } from "../../../../stores/stockhistory"
 import { useUserStore } from '../../../../stores/user';
 import { convertToUTC } from '../../../../common/utils';
 
+const userStore = new useUserStore();
+const isBusinessControler = computed(() => userStore.groupInfo.indexOf('Business Controler') >= 0);
 // 获取 Pinia store 实例
 const shippingResultStore = useShippingResultStore();
 const stockHistoryStore = useStockHistoryStore();
@@ -72,6 +74,7 @@ export default {
 
   data() {
     return {
+      isBusinessControler: isBusinessControler,
       fullscreenLoading: false,
       form: {
         date: new Date().toISOString(),
