@@ -65,7 +65,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
             const uniqueItems = Array.from(new Set(allItems.map(item => item.ID)))
                 .map(id => allItems.find(item => item.ID === id));
             //orderBy Registered false
-            uniqueItems.sort((a, b) => new Date(b.Registered).getTime() - new Date(a.Registered).getTime());
+            uniqueItems.sort((a, b) => new Date(b.Registered).getTime() - new Date(a.Registered).getTime()).sort((a, b) => new Date(b.Modified).getTime() - new Date(a.Modified).getTime());
             this.stockHistories = uniqueItems;
         },
         async getCurrentMonthListItems() {
@@ -404,9 +404,10 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 const items = computed(() => this.stockHistoryItems).value.sort((a, b) => new Date(b.Modified).getTime() - new Date(a.Modified).getTime());
                 const newItems = items.filter(item => {
                     let condition = true;
-                    const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
+                    const today = new Date(current);
+                     const lastDayOfCurrentMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0)
                     if (mlnPartNo) {
-                        condition = condition && mlnPartNo === item.MLNPartNo && item.ProcessType === processType && formatRegistered === current
+                        condition = condition && mlnPartNo === item.MLNPartNo && item.ProcessType === processType && isDateBefore(new Date(item.Registered),lastDayOfCurrentMonth)
                     }
                     return condition
                 });
@@ -424,3 +425,4 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
         }
     }
 });
+
