@@ -48,6 +48,7 @@ import { usePartMasterStore } from '../../../../stores/part';
 import { useStockHistoryStore } from "../../../../stores/stockhistory"
 import { useUserStore } from '../../../../stores/user';
 import { convertToUTC } from '../../../../common/utils';
+import { useFileName } from '../../../../stores/usefilename';
 
 const userStore = new useUserStore();
 const isBusinessControler = computed(() => userStore.groupInfo.indexOf('Business Controler') >= 0);
@@ -183,21 +184,26 @@ export default {
 
     downloadExcel() {
       const data = shippingResultStore.shippingResultItems.map(item => ({
-        '出荷実績日': item.ShippingResultDate,
+        '出荷実績日': this.formatDate(
+          { ShippingResultDate: item.ShippingResultDate },
+          { property: "ShippingResultDate" }
+        ) ,
         '出荷先': item.ShipTo,
         'Call off id': item.Calloffid,
         'Despatch note': item.Despatchnote,
         'MLN部品番号': item.MLNPartNo,
         'UD部品番号': item.UDPartNo,
         '出荷数': item.ShipQty,
-        '実績登録日': this.formatDate({ Created: item.Created }, { property: 'Created' }),
+        '実績登録日': this.formatDate({ Registered: item.Registered }, { property: 'Registered' }),
       }));
 
       const worksheet = XLSX.utils.json_to_sheet(data);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Shipping Results');
 
-      XLSX.writeFile(workbook, 'shipping_results.xlsx');
+      const { fileName, generateFileName } = useFileName();
+      generateFileName('出荷実績入力');
+      XLSX.writeFile(workbook, fileName.value);
     },
 
     formatDate(row, column) {
