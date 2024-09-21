@@ -42,6 +42,7 @@ import { usePartMasterStore } from '../../../../stores/part';
 import { useBillOfMaterialsStore } from '../../../../stores/billofmaterials';
 import { useStockHistoryStore } from "../../../../stores/stockhistory"
 import { useUserStore } from '../../../../stores/user';
+import { isDateBefore } from '../../../../common/utils';
 
 const ProcessMasterStore = useProcessMasterStore();
 const ProcessCompletionResultStore = useProcessCompletionResultStore();
@@ -134,9 +135,9 @@ export default {
 
           if (curPartRecords.length > 0) {
             const latestRecord = curPartRecords[0];
-            if (!this.isToday(Date(latestRecord.ProcessCompletion))) { 
-              const compareDateResult = this.compareDates(latestRecord.ProcessCompletion,this.form.ProcessCompletion)
-              if (compareDateResult === 1) {
+            if (!this.isToday(this.form.ProcessCompletion)) { 
+              const compareDateResult = isDateBefore(new Date(this.form.ProcessCompletion), new Date(latestRecord.ProcessCompletion))
+              if (compareDateResult) {
                 this.$message.error('工程完了日エラー');
                 return;
               }
