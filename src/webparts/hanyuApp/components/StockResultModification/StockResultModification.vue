@@ -144,13 +144,13 @@ export default {
           return;
         }
 
-        const modifiedQtyPattern = /^(-?[1-9]\\d*)$/
+        /*const modifiedQtyPattern = /^(-?[1-9]\\d*)$/
         const modifiedQty = this.form.count;
 
         if (isNaN(modifiedQty) || !modifiedQtyPattern.test(modifiedQty)) {          
           this.$message.error('请输入有效的修正数');
           return;
-        }
+        }*/
 
 
 
