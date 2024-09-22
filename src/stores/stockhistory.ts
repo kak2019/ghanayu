@@ -380,7 +380,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                                 sumInOutQty += i.Qty;
                             }
                         });
-                        return sumInOutQty
+                        return sumInOutQty * -1;
                     } else {
                         newItems.forEach(i => {
                             if ((i.FunctionID === "04" && i.Qty < 0) || i.FunctionID === "08") {

@@ -151,70 +151,25 @@ export default {
      
       const formatQueryDate = query.date.getFullYear() + '-' + (query.date.getMonth()+1);
 
-    try {
-      this.loading = true;
-      const date = this.form.date;
-      const processType = this.form.select;
-      const mlnPartNo = this.form.MLNPartNo;
-      const udPartNo = this.form.UDPartNo;
-      await partMasterStore.getListItemsBySearchItems(date, processType, mlnPartNo, udPartNo).then(() => {
-                this.loading = false;
-                // 对数据进行处理以匹配表格字段
-                this.tableData = partMasterStore.filteredParts;
-                this.summaries = this.getSummaries();
-            }).catch(error => {
-                this.loading = false;
-                ElMessage.error(error.message);
-            });
-      console.log("Processed table data:", this.tableData);
-    } catch (error) {
-      console.error('Error fetching stock history:', error);
-    }
-
-      /*const filterTable = partMasterStore.partMasterItems
-          .filter(item => {
-            //console.log("item.Registered ------"+  item.Registered);
-            let condition = true
-            if(query.date){
-              let formatRegisteredDate = item.Registered !=null? new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth()+1): ""
-              //console.log("formatRegisteredDate+-------" + formatRegisteredDate);
-              condition = condition && formatQueryDate === formatRegisteredDate
-            }
-            return condition;
-          }).filter(item => {
-              let condition = true;
-               //console.log(item.ID + "item.ProcessType-----------" + item.ProcessType);
-              if(query.select){
-                  const isProcessTypeIn = item.ProcessType != null && item.ProcessType.indexOf(query.select)>=0
-                  if(isProcessTypeIn){
-                    //item.ProcessType = query.select;
-                    condition = condition && isProcessTypeIn
-                  }else{
-                    condition = false;
-                  }
-              }
-              return condition;
-          }).filter(item => {
-            let condition = true;
-            const MLNPartNoValue = query.MLNPartNo.trim();
-            const UDPartNoValue = query.UDPartNo.trim();
-            const isEmpty1 = MLNPartNoValue === "";
-            const isEmpty2 = UDPartNoValue === "";
-            const filterByMLNPartNo = !isEmpty1 && item.MLNPartNo.indexOf(MLNPartNoValue) >= 0;
-            const filterByUDPartNo = !isEmpty2 && item.UDPartNo.indexOf(UDPartNoValue) >= 0;
-            if(isEmpty1 && isEmpty2){
-              condition = condition;
-            }else {
-                if(!isEmpty1 && !isEmpty2) {
-                  condition = condition && filterByMLNPartNo
-                }else{
-                  condition = condition && (filterByMLNPartNo|| filterByUDPartNo)
-                }
-            }
-            return condition; 
-          });
-
-        return filterTable;*/
+      try {
+        this.loading = true;
+        const date = this.form.date;
+        const processType = this.form.select;
+        const mlnPartNo = this.form.MLNPartNo;
+        const udPartNo = this.form.UDPartNo;
+        await partMasterStore.getListItemsBySearchItems(date, processType, mlnPartNo, udPartNo).then(() => {
+                  this.loading = false;
+                  // 对数据进行处理以匹配表格字段
+                  this.tableData = partMasterStore.filteredParts;
+                  this.summaries = this.getSummaries();
+              }).catch(error => {
+                  this.loading = false;
+                  ElMessage.error(error.message);
+              });
+        console.log("Processed table data:", this.tableData);
+      } catch (error) {
+        console.error('Error fetching stock history:', error);
+      }
     },
     getSummaries() {
       const summaries = [];
