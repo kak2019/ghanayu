@@ -172,7 +172,7 @@ export default {
             UDPartNo: childUDPartNo,
             Qty: childFinalFinishedQty,
             FunctionID: '02',
-            StockQty:(childFinalFinishedQty + childFinalAbnormalQty + stockQty).toString(), //获取最新库存,
+            StockQty:(childFinalFinishedQty  + stockQty).toString(), //获取最新库存,
             Registered: utcProcessCompletion
           };
 
@@ -182,13 +182,16 @@ export default {
             UDPartNo: childUDPartNo,
             Qty: childFinalAbnormalQty,
             FunctionID: '03',
-            StockQty: (childFinalAbnormalQty + stockQty).toString(),//获取最新库存
+            StockQty: (childFinalFinishedQty + childFinalAbnormalQty + stockQty).toString(),//获取最新库存
             Registered: utcProcessCompletion
           };
 
       
-          this.needToSyncItems.push(childPartFinished);
-          this.needToSyncItems.push(childPartAbnormal);
+          //this.needToSyncItems.push(childPartFinished);
+          //this.needToSyncItems.push(childPartAbnormal);
+          this.needToSyncItems.push(await stockHistoryStore.addListItem(childPartFinished));
+          this.needToSyncItems.push(await stockHistoryStore.addListItem(childPartAbnormal));
+
           if (stockQty < minimumCount) {
               minimumCount = stockQty;
           }
@@ -235,13 +238,25 @@ export default {
           Registered: utcProcessCompletion
         };
         
-        this.needToSyncItems.push(newStockItemAbnormal);
-        this.needToSyncItems.push(newStockItemFinished);
+        //this.needToSyncItems.push(newStockItemAbnormal);
+        //this.needToSyncItems.push(newStockItemFinished);
         
-        const syncStockMsg = await stockHistoryStore.addListItems(this.needToSyncItems);
+        this.needToSyncItems.push(await stockHistoryStore.addListItem(newStockItemFinished));
+        this.needToSyncItems.push(await stockHistoryStore.addListItem(newStockItemAbnormal));
+        let syncStockMsg = ""
+        //const syncStockMsg = await stockHistoryStore.addListItems(this.needToSyncItems);
         /*const syncStockMsg = await Promise.all(this.needToSyncItems.map(async item => {
           return await stockHistoryStore.addListItem(item);
         }));*/
+          const sequentialExecution = this.needToSyncItems.reduce((promise, next) => {
+              return promise.then(() => next);
+          }, Promise.resolve());
+
+          sequentialExecution.then((res) => {
+            // 所有Promise都按顺序执行完成后的操作
+            syncStockMsg = res.meesage;
+          });
+
         this.$message.success(syncStockMsg);
         this.needToSyncItems = [];
         this.fullscreenLoading = false

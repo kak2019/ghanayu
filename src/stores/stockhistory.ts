@@ -193,10 +193,10 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 const web = await sp.web();
                 const list = sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`);
 
-                const items = await list.items
+                let items = await list.items
                     .filter(`MLNPartNo eq '${mlnPartNo}' and ProcessType eq '${processType}'`)
                     .orderBy("Registered", false)();
-
+                    items= items.sort((a, b) => new Date(b.Modified).getTime() - new Date(a.Modified).getTime())
                 if (items.length > 0) {
                     console.log(`Found item: ${JSON.stringify(items[0])}`);
                     return items[0].StockQty;
