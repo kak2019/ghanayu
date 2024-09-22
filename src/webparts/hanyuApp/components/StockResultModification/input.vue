@@ -6,7 +6,7 @@
     >
       {{ label }}
     </label>
-    <el-input type="number"
+    <el-input
         v-model="innerValue"
         clearable
         style="width: 118px;"

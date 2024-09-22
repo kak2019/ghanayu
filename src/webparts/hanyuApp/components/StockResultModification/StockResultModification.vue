@@ -39,11 +39,11 @@
       ></Input>
     </div>
     <div class="background-layer">
-      <InputRemoteData
+      <Input
         v-model="form.comment"
         label="コメント"
         labelColor="#92cddc"
-      ></InputRemoteData>
+      ></Input>
     </div>
 
     <el-button
@@ -152,15 +152,13 @@ export default {
           return;
         }
 
-        /*const modifiedQtyPattern = /^(-?[1-9]\\d*)$/
+        const integerRegex = /^-?\d+$/;
         const modifiedQty = this.form.count;
 
-        if (isNaN(modifiedQty) || !modifiedQtyPattern.test(modifiedQty)) {          
+        if (!integerRegex.test(modifiedQty)) {          
           this.$message.error('请输入有效的修正数');
           return;
-        }*/
-
-
+        }
 
        if(this.form.selectedProcess === "CH" && Number(modifiedQty) <= 0){
           this.$message.error('0は不可としマイナス数値は可とする.');
