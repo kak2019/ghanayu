@@ -99,15 +99,8 @@ export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESUL
         async addListItem(item: IStockResultModificationItem, LatestStockQty:number,childProcessNItemToStock:[]): Promise<string> {
             //let ModifiedById = "";
             const Comment = item.Comment || "";
-            // if (item.ModifiedBy?.length > 0) {
-            //     try {
-            //         ModifiedById = JSON.parse(item.ModifiedBy).Id;
-            //     } catch (e) { console.log(e) }
-            // }
-            // const itemForAdd = { ...item, ModifiedById, Comment };
+
             const itemForAdd = { ...item, Comment };
-            //delete itemForAdd.ModifiedBy;
-            //if (itemForAdd.ModifiedById === "") delete itemForAdd.ModifiedById;
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
@@ -132,7 +125,9 @@ export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESUL
                     UDPartNo: itemForAdd.UDPartNo,
                     Qty: itemForAdd.ModifiedQty,
                     FunctionID: itemForAdd.FunctionID,
+                    Registered:itemForAdd.Registered,
                     StockQty: stockQty,
+                    Comment: item.Comment || "",
                 } as IStockHistoryItem;
                 await stockHistoryStore.addListItem(billOfMaterialsItem);
 

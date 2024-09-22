@@ -94,6 +94,7 @@ import { useProcessMasterStore } from "../../../../stores/process";
 import { useBillOfMaterialsStore } from "../../../../stores/billofmaterials";
 import { useStockHistoryStore } from "../../../../stores/stockhistory";
 import { useFileName } from '../../../../stores/usefilename';
+import { convertToUTC } from '../../../../common/utils';
 // 获取 Pinia store 实例
 const stockResultModificationStore = useStockResultModificationStore();
 const modifiedReasonMasterStore = useModifiedReasonMasterStore();
@@ -155,7 +156,7 @@ export default {
         const integerRegex = /^-?\d+$/;
         const modifiedQty = this.form.count;
 
-        if (!integerRegex.test(modifiedQty)) {          
+        if (!integerRegex.test(modifiedQty) || Number(modifiedQty)===0) {          
           this.$message.error('请输入有效的修正数');
           return;
         }
@@ -175,49 +176,54 @@ export default {
           //People: this.form.modifiedUser,
           ModifiedReason: this.form.modifiedReason,
           Despatchnote: this.form.note,
+          Registered:convertToUTC(new Date()),
           Comment: this.form.comment,
           //ModifiedBy: JSON.stringify(userStore.hanyutype1s[0]),
         };
+        debugger
         const partMasterStore = usePartMasterStore();
         const billOfMaterialsStore = useBillOfMaterialsStore();
         //The BOM table is searched using the entered MLN part number + process category as a key.If a corresponding record exists, it is registered in the ProcessCompletionResult table.
-        let partRecords;
-        if (newItem.ProcessType !== "Z" && newItem.ProcessType !== "CH") {
-          const curPartCount =
-            await partMasterStore.getItemCountByMLNPartNoProcessType(
-              newItem.MLNPartNo,
-              newItem.ProcessType
-            ); // Need to change to bom table
-          partRecords =
-            await billOfMaterialsStore.getItemsByMLNPartNoProcessType(
-              newItem.MLNPartNo,
-              newItem.ProcessType
-            );
-          if (curPartCount <= 0 || partRecords.length <= 0) {
-            this.$message.error("部品表なしエラー.");
-            return;
-          }
+        let curPartCount;
+        let processType = newItem.ProcessType==="Z"? "F":newItem.ProcessType==="CH"? "C" : newItem.ProcessType;
+        //if (newItem.ProcessType !== "Z" && newItem.ProcessType !== "CH") {
+        curPartCount =
+        await partMasterStore.getItemCountByMLNPartNoProcessType(
+          newItem.MLNPartNo,
+          processType
+        ); // Need to change to bom table
+
+        if (curPartCount <= 0) {
+          this.$message.error("部品表なしエラー.");
+          return;
         }
 
         //Current process. - Validate If the entered correction amount is a negative value, or if the entered correction amount x -1 > the stock amount for this process (if the stock amount becomes negative), an error message will be displayed and the data will be added to the Inventory & Results Correction Table.
         const stockHistoryStore = useStockHistoryStore();
         let latestStockQty = 0;
-        if (newItem.ProcessType !== "CH") {
+        if (newItem.ProcessType === "Z") {
           latestStockQty =
             await stockHistoryStore.getListItemsByRegisteredDate(
               newItem.MLNPartNo,
-              newItem.ProcessType
+              "F"
             );
         }
-        else {
+        else if(newItem.ProcessType ==="CH") {
             latestStockQty =
             await stockHistoryStore.getListItemsByRegisteredDate(
               newItem.MLNPartNo,
               "C"
             );
+        }else{
+            latestStockQty =
+            await stockHistoryStore.getListItemsByRegisteredDate(
+              newItem.MLNPartNo,
+              newItem.ProcessType
+            );
         }
+
         if (
-          Number(newItem.ModifiedQty) < 0 &&
+          Number(newItem.ModifiedQty) <= 0 &&
           Number(newItem.ModifiedQty) * -1 > Number(latestStockQty)
         ) {
           this.$message.error(
@@ -239,7 +245,13 @@ export default {
         let childProcessType = "";
         let childProcessStockQty = 0;
         let childProcessNItemToStock = [];
+        let partRecords;
         if (newItem.ProcessType !== "Z" && newItem.ProcessType !== "CH") {
+          partRecords =
+          await billOfMaterialsStore.getItemsByMLNPartNoProcessType(
+            newItem.MLNPartNo,
+            processType
+          )
           let minimumCount = Infinity;
           for (const record of partRecords) { 
             const { ChildPartNo, ChildProcessType, StructureQty} = record;
