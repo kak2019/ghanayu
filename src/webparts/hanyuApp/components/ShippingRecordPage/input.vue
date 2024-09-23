@@ -2,7 +2,7 @@
   <div class="date-picker-with-label">
     <label
         class="custom-label"
-        :style="{ backgroundColor: labelColor }"
+        :style="{ backgroundColor: labelColor, width: inputWidth + 'px' }"
     >
       {{ label }}
     </label>
@@ -13,6 +13,7 @@
         placeholder="Please Input"
         @input="handleChange"
         size="small"
+        :style="{ width: inputWidth + 'px' }"
         :maxlength="maxLength"
     />
   </div>
@@ -37,6 +38,10 @@ export default {
     maxLength:{
       type: Number,
       default : 10
+    },
+    inputWidth: {
+      type: Number,
+      default: 100
     }
   },
   data() {

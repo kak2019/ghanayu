@@ -15,6 +15,7 @@
 </template>
 
 <script>
+import { CONST } from '../../../../config/const';
 export default {
   name: 'DatePickerWithLabel',
   props: {
@@ -42,11 +43,12 @@ export default {
   },
   methods: {
     handleChange(value) {
+      const newValue = getCurrentTime(value);
       this.$emit('update:modelValue', value);
     },
 
     disabledDate(date) {
-      const start = new Date('2023-12-31'); // need to change to 2025-01-01
+      const start = new Date(`${CONST.beginOperationDate}`); 
       const end = new Date();
       return date < start || date > end;
     }

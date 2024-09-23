@@ -8,10 +8,10 @@
         <Selecter v-model="form.select" label="出荷先"></Selecter>
       </div>
       <div class="background-layer">
-        <Input v-model="form.id" label="Call off id" :max-length="10" labelColor="#92cddc"></Input>
+        <Input v-model="form.id" label="Call off id" :inputWidth="110" :max-length="10" labelColor="#92cddc"></Input>
       </div>
       <div class="background-layer">
-        <Input v-model="form.note" label="Despatch note" :max-length="17" labelColor="#92cddc"></Input>
+        <Input v-model="form.note" label="Despatch note" :inputWidth="150" :max-length="17" labelColor="#92cddc"></Input>
       </div>
       <div class="background-layer">
         <InputRemoteData v-model="form.num" label="MLN部品番号" labelColor="#fabf8f"/>
@@ -30,7 +30,7 @@
       </el-button>
     </div>
   </el-row>
-  <TableShipping></TableShipping>
+  <TableShipping :tableData="tableData" :loading="loading"></TableShipping>
 </template>
 
 <script>
@@ -55,6 +55,7 @@ const isBusinessControler = computed(() => userStore.groupInfo.indexOf('Business
 // 获取 Pinia store 实例
 const shippingResultStore = useShippingResultStore();
 const stockHistoryStore = useStockHistoryStore();
+let curentDate = new Date();
 
 export default {
   components: {
@@ -75,10 +76,11 @@ export default {
 
   data() {
     return {
+      tableData:[],
       isBusinessControler: isBusinessControler,
       fullscreenLoading: false,
       form: {
-        date: new Date().toISOString(),
+        date: curentDate,
         select: '2922',
         id: '',
         note: '',
@@ -91,16 +93,7 @@ export default {
   methods: {
     async submitForm() {
       try {
-        // "Call of id" is max 10 digit and "despatch note" is max 17 digit.
-        /*if (this.form.id.length > 10) {
-          this.$message.error('请输入有效的Call of id');
-          return;
-        }
-
-        if (this.form.note.length > 17) {
-          this.$message.error('请输入有效的despatch note');
-          return;
-        }*/
+        this.fullscreenLoading = true;
 
         if (!this.form.num) {
           this.$message.error('MLNPartNo不能为空');
@@ -150,7 +143,7 @@ export default {
         //Register an out stock record to the StockHistory table.InOutQty=negative value of (出荷数),FunctionID=04
         const latestStockQty = await stockHistoryStore.getLatestStockQtyByMLNPartNoProcessTypeDesc(this.form.num, 'C');
         const curUDPartNo = await partMasterStore.getListItemByMLNPartNo(this.form.num);
-        this.fullscreenLoading = true;
+
         const newOutStockItem = {
           MLNPartNo: this.form.num,
           ProcessType: 'C',
@@ -182,7 +175,7 @@ export default {
     },
 
     downloadExcel() {
-      const data = shippingResultStore.shippingResultItems.map(item => ({
+      const data = this.tableData.map(item => ({
         '出荷実績日': this.formatDate(
           { ShippingResultDate: item.ShippingResultDate },
           { property: "ShippingResultDate" }
@@ -210,7 +203,7 @@ export default {
       const month = String(date.getMonth() + 1).padStart(2, '0');
       const day = String(date.getDate()).padStart(2, '0');
       const year = date.getFullYear();
-      return `${month}/${day}/${year}`;
+      return `${year}/${month}/${day}`;
     },
 
     compareDates(date1, date2) {
@@ -223,8 +216,66 @@ export default {
       } else {
         return 0;
       }
+    },
+    async fetchTableData() {
+      try {
+        const shippingResultStore = useShippingResultStore();
+          await shippingResultStore.getListItems().then(() => {
+            const firstDayOfMonth = new Date(
+              curentDate.getFullYear(),
+              curentDate.getMonth(),
+              1
+            );
+            this.tableData = shippingResultStore.shippingResultItems
+              .sort(
+                (a, b) =>
+                  new Date(b.Registered).getTime() - new Date(a.Registered).getTime()
+              )
+              .filter((item) => {
+                let condition = true;
+                condition =
+                  condition &&
+                  new Date(firstDayOfMonth) <= new Date(item.ShippingResultDate) &&
+                  new Date(item.ShippingResultDate) <=
+                    new Date(curentDate);
+                return condition;
+              });
+            if (this.tableData.length === 0) {
+              const firstDayOfLastMonth = new Date(
+                curentDate.getFullYear(),
+                curentDate.getMonth() - 1,
+                1
+              );
+              let tempFirstDate = firstDayOfMonth;
+              tempFirstDate.setDate(tempFirstDate.getDate() - 1);
+              const lastDayOfLastMonth = tempFirstDate;
+              this.tableData = shippingResultStore.shippingResultItems
+                .sort(
+                  (a, b) =>
+                    new Date(b.Registered).getTime() -
+                    new Date(a.Registered).getTime()
+                )
+                .filter((item) => {
+                  let condition = true;
+                  condition =
+                    condition &&
+                    new Date(firstDayOfLastMonth) <=
+                      new Date(item.ShippingResultDate) &&
+                    new Date(item.ShippingResultDate) <=
+                      new Date(lastDayOfLastMonth);
+                  return condition;
+                });
+            }
+          });
+        } catch (error) {
+          console.error("Error fetching shipping results:", error);
+        }
     }
-  }
+  },
+  async mounted() {
+    await this.fetchTableData();
+  },
+  
 };
 </script>
 <style scoped>
