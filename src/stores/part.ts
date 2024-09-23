@@ -73,11 +73,11 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
             try {
                 let count = 0
                 await this.getListItems().then(() => {
-                    const items = computed(() => this.partMasterItems).value.filter(i => (i.MLNPartNo === mlnPartNo && i.ProcessType.indexOf(processType)>=0));
+                    const items = computed(() => this.partMasterItems).value.filter(i => (i.MLNPartNo === mlnPartNo && (i.ProcessType!==null && i.ProcessType.indexOf(processType)>=0)));
                     console.log("items:" + items);
                     count = items.length; 
                 });
-                console.log("count:" + count);
+                console.log("count:---" + count);
                 return count
             }catch(error){
                 throw new Error(`データの取得中にエラーが発生しました`);
