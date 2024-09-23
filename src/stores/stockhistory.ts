@@ -405,7 +405,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 const newItems = items.filter(item => {
                     let condition = true;
                     const today = new Date(current);
-                     const lastDayOfCurrentMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+                    const lastDayOfCurrentMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0)
                     if (mlnPartNo) {
                         condition = condition && mlnPartNo === item.MLNPartNo && item.ProcessType === processType && isDateBefore(new Date(item.Registered),lastDayOfCurrentMonth)
                     }

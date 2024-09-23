@@ -220,7 +220,7 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
             try {
                 //let items = [];
                 let tableData = computed(() => this.partMasterItems);
-                if(tableData.value.length<=0){
+                if(tableData.value.length <=0){
                     await this.getListItems().then(() => {
                         tableData = computed(() => this.partMasterItems);
                     });
@@ -272,29 +272,23 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 const listWithAllLastMonthQty = await Promise.all(tempItems.map(async item => {
                     return await stockHistoryStore.getLastMonthsLatestStockQtyByMln(item.MLNPartNo, processType, currentMonth);
                 }));
-                //console.log("----------" + listWithAllLastMonthQty);
-                //console.log("----------length" + listWithAllLastMonthQty.length);
 
                 //当月実績 - 不良
                 const listWithCurrentMonthDefectsQty = await Promise.all(tempItems.map(async item => {
                     return await stockHistoryStore.getCurrentMonthDefectsQtyByMlnNo(item.MLNPartNo, processType, currentMonth);
                 }));
-                //console.log("----------" + listWithCurrentMonthDefectsQty);
-                //console.log("----------length" + listWithCurrentMonthDefectsQty.length);
 
                 //当月実績 - 完成
                 const listWithCurrentMonthCompletionQty = await Promise.all(tempItems.map(async item => {
                     return await stockHistoryStore.getCurrentMonthCompletionQtyByMlnNo(item.MLNPartNo, processType, currentMonth);
                 }));
-                //console.log("----------" + listWithCurrentMonthCompletionQty);
-                //console.log("----------length" + listWithCurrentMonthCompletionQty.length);
+
 
                 //当月実績 - 振替
                 const listWithCurrentMonthShippingQty = await Promise.all(tempItems.map(async item => {
                     return await stockHistoryStore.getCurrentMonthShippingQtyByMlnNo(item.MLNPartNo, processType, currentMonth);
                 }));
-                //console.log("----------" + listWithCurrentMonthShippingQty);
-                //console.log("----------length" + listWithCurrentMonthShippingQty.length);
+
 
                 //当月末在庫
                 const listWithCurentMonthStockQtyByMlnNo = await Promise.all(tempItems.map(async item => {
@@ -308,7 +302,7 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                     tempItems[i].currentMonthShippingQty = listWithCurrentMonthShippingQty[i].toString();
                     tempItems[i].curentMonthStockQty = listWithCurentMonthStockQtyByMlnNo[i].toString();
                 }
-                console.log("========" + tempItems);
+
                 this.filteredParts = tempItems;
             }
             catch (error) {

@@ -108,6 +108,7 @@ export default {
   methods: {
     async submitForm() {
       try {
+        this.fullscreenLoading = true;
         //Add new record to good receive page
         if (!this.form.num) {
           this.$message.error('MLNPartNo不能为空');
@@ -139,7 +140,6 @@ export default {
           GoodsReceiveDate: convertToUTC(this.form.date),
         };
         
-        this.fullscreenLoading = true;
         //
         //Check if user is already input goods after selected date.
         const hasData = await shiKYUGoodsReceiveStore.checkItemsAlreadyInGoodReceive(
