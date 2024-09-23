@@ -79,6 +79,7 @@ export default {
       tableData:[],
       isBusinessControler: isBusinessControler,
       fullscreenLoading: false,
+      loading: true,
       form: {
         date: curentDate,
         select: '2922',
@@ -219,6 +220,7 @@ export default {
     },
     async fetchTableData() {
       try {
+        this.loading = false;
         const shippingResultStore = useShippingResultStore();
           await shippingResultStore.getListItems().then(() => {
             const firstDayOfMonth = new Date(
@@ -266,7 +268,11 @@ export default {
                   return condition;
                 });
             }
-          });
+          })
+          .catch((error) => {
+            this.loading = false;
+            ElMessage.error(error.message);
+          });          ;
         } catch (error) {
           console.error("Error fetching shipping results:", error);
         }
