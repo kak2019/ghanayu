@@ -73,6 +73,7 @@ import { useFileName } from '../../../../stores/usefilename';
 import { convertToUTC } from '../../../../common/utils';
 import { useUserStore } from '../../../../stores/user';
 import { computed} from 'vue';
+import { getCurrentTime } from '../../../../common/utils';
 
 // 获取 Pinia store 实例
 const shiKYUGoodsReceiveStore = useSHIKYUGoodsReceiveStore();
@@ -137,7 +138,7 @@ export default {
           GoodsReceiveQty: parseInt(this.form.count, 10),
           Calloffid: this.form.id,
           Despatchnote: this.form.note,
-          GoodsReceiveDate: convertToUTC(this.form.date),
+          GoodsReceiveDate: convertToUTC(getCurrentTime(this.form.date)),
         };
         
         //

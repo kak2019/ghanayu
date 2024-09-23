@@ -52,7 +52,8 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                         Comment: item.Comment,
                         Registered: item.Registered,
                         Modified: item.Modified,
-                        SourceItemID: item.SourceItemID
+                        SourceItemID: item.SourceItemID,
+                        Child:item.Child
                     }))
                     allItems = allItems.concat(selectedItems);
                     skip += pageSize;
@@ -135,7 +136,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
 
                 const res: IItem[] = [];
                 const errors: Error[] = [];
-                items.forEach(item =>
+                items.forEach((item) =>
                     list.items.add({
                         MLNPartNo: item.MLNPartNo,
                         ProcessType: item.ProcessType,

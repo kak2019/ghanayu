@@ -11,4 +11,5 @@ export interface IStockResultModificationItem {
     Editor?: string;
     Registered?: string;
     Modified?: string;
+    Child?: string;
 }

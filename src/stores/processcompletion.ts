@@ -4,6 +4,8 @@ import { getSP } from '../pnpjsConfig';
 import { FeatureKey } from '../config/keystrs';
 import { IProcessCompletionResultItem } from '../model';
 import { CONST } from '../config/const';
+import { computed } from 'vue';
+import { isDateBefore } from '../common/utils';
 
 export const useProcessCompletionResultStore = defineStore(FeatureKey.PROCESSCOMPLETIONRESULT, {
   state: () => ({
@@ -122,7 +124,36 @@ export const useProcessCompletionResultStore = defineStore(FeatureKey.PROCESSCOM
       }
 
     },
+        async checkItemsAlreadyInGoodReceive(mlnPartNo: string, processType: string, ProcessCompletion:string): Promise<boolean> {
+            try {
+                
+                const processCompletionForDate = new Date(ProcessCompletion);
+                await this.getListItems();
+                const items = computed(() => this.processCompletionResultItems.filter(i => i.MLNPartNo === mlnPartNo && i.ProcessType === processType && isDateBefore(new Date(processCompletionForDate), new Date(i.ProcessCompletion))));
+                
+                const isLengthZero: boolean = (items.value.length as number) > 0? true : false;
 
+                return isLengthZero;
+            }
+            catch (error) {
+                throw new Error(`データの取得中にエラーが発生しました`);
+            }
+        },
+        async checkItemsAlreadyInProcessCompletetion(mlnPartNo: string, processType: string, goodsReceiveDate:string): Promise<boolean> {
+          try {
+              
+              const goodsReceiveDateForDate = new Date(goodsReceiveDate);
+              await this.getListItems();
+              const items = computed(() => this.processCompletionResultItems.filter(i => i.MLNPartNo === mlnPartNo && i.ProcessType === processType && isDateBefore(new Date(goodsReceiveDateForDate), new Date(i.ProcessCompletion))));
+              
+              const isLengthZero: boolean = (items.value.length as number) > 0? true : false;
+
+              return isLengthZero;
+          }
+          catch (error) {
+              throw new Error(`データの取得中にエラーが発生しました`);
+          }
+      },
     async addListItem(item: IProcessCompletionResultItem): Promise<string> {
       try {
         const sp = spfi(getSP());
@@ -133,7 +164,7 @@ export const useProcessCompletionResultStore = defineStore(FeatureKey.PROCESSCOM
           UDPartNo: item.UDPartNo || "",
           DefectQty: item.DefectQty,
           CompletionQty: item.CompletionQty,
-          ProcessCompletion: item.ProcessCompletion,
+          ProcessCompletion: item.ProcessCompletion || "",
           Registered: new Date(),
         });
         return '登録完了。';

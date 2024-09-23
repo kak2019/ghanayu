@@ -43,13 +43,14 @@ import { useBillOfMaterialsStore } from '../../../../stores/billofmaterials';
 import { useStockHistoryStore } from "../../../../stores/stockhistory"
 import { useUserStore } from '../../../../stores/user';
 import { isDateBefore, convertToUTC } from '../../../../common/utils';
+import { getCurrentTime } from '../../../../common/utils';
 
 const ProcessMasterStore = useProcessMasterStore();
 const ProcessCompletionResultStore = useProcessCompletionResultStore();
 const BillOfMaterialsStore = useBillOfMaterialsStore();
 const userStore = new useUserStore();
 const isBusinessControler = computed(() => userStore.groupInfo.indexOf('Business Controler') >= 0);
-
+let curentDate = new Date();
 export default {
   components: {
     TableShipping,
@@ -75,7 +76,7 @@ export default {
       tableData: [],
       needToSyncItems: [],
       form: {
-        ProcessCompletion: new Date(),
+        ProcessCompletion: curentDate,
         selectProcessName: '生加工',
         selectProcessType: 'M',
         MLNPartNo: '',
@@ -132,19 +133,20 @@ export default {
         this.form.UDPartNo = curUDPartNo
 
         //If the input "工程完了日" is smaller than the latest record date of this part, show error meesage "工程完了日エラー"
-        
+        //const utcProcessCompletion1 = this.form.ProcessCompletion) 
+        const utcProcessCompletion = convertToUTC(getCurrentTime(this.form.ProcessCompletion)) 
           const processCompletionResultStore = useProcessCompletionResultStore();
-          const curPartRecords = await processCompletionResultStore.getItemsByMLNPartNoProcessType(this.form.MLNPartNo, this.form.selectProcessType);
+          const hasData = await processCompletionResultStore.checkItemsAlreadyInProcessCompletetion(this.form.MLNPartNo, this.form.selectProcessType, utcProcessCompletion);
 
-          if (curPartRecords.length > 0) {
-            const latestRecord = curPartRecords[0];
-            if (!this.isToday(this.form.ProcessCompletion)) { 
-              const compareDateResult = isDateBefore(new Date(this.form.ProcessCompletion), new Date(latestRecord.ProcessCompletion))
-              if (compareDateResult) {
+          if (isNaN(hasData) || hasData > 0) {
+            //const latestRecord = curPartRecords[0];
+            //if (!this.isToday(this.form.ProcessCompletion)) { 
+              //const compareDateResult = isDateBefore(new Date(utcProcessCompletion), new Date(latestRecord.ProcessCompletion))
+              //if (compareDateResult) {
                 this.$message.error('工程完了日エラー');
                 return;
-              }
-            }
+              //}
+            //}
           }
         
         //If the entered completed quantity is greater than the stock quantity of the previous process, an error message "完成数が前工程の在庫数より多くなっています" will be displayed and the item will not be registered in the in-house process completion results table.
@@ -155,7 +157,6 @@ export default {
         //遍历partRecords,获取所有前置部品中的最小库存数，然后用完成数与之比较做判断
         const date = new Date();
         const year = date.getFullYear();
-        const utcProcessCompletion = convertToUTC(this.form.ProcessCompletion) 
         // const month = (date.getMonth() + 1).toString.padStart(2, '0');
         let minimumCount = Infinity;
         for (const record of partRecords) { 
@@ -167,6 +168,7 @@ export default {
           const childFinalFinishedQty = Number(this.form.FinishedNumber) * StructureQty * -1;
           const childFinalAbnormalQty = Number(this.form.AbnormalNumber) * StructureQty * -1;
           const childPartFinished = {
+            Child: "Child",
             MLNPartNo: ChildPartNo,
             ProcessType: ChildProcessType,
             UDPartNo: childUDPartNo,
@@ -177,20 +179,20 @@ export default {
           };
 
           const childPartAbnormal = {
+            Child: "Child",
             MLNPartNo: ChildPartNo,
             ProcessType: ChildProcessType,
             UDPartNo: childUDPartNo,
             Qty: childFinalAbnormalQty,
             FunctionID: '03',
-            StockQty: (childFinalFinishedQty + childFinalAbnormalQty + stockQty).toString(),//获取最新库存
+            StockQty: (childFinalAbnormalQty + stockQty).toString(),//获取最新库存
             Registered: utcProcessCompletion
           };
 
-      
-          //this.needToSyncItems.push(childPartFinished);
-          //this.needToSyncItems.push(childPartAbnormal);
-          this.needToSyncItems.push(await stockHistoryStore.addListItem(childPartFinished));
-          this.needToSyncItems.push(await stockHistoryStore.addListItem(childPartAbnormal));
+          this.needToSyncItems.push(childPartFinished);
+          this.needToSyncItems.push(childPartAbnormal);
+          //this.needToSyncItems.push(await stockHistoryStore.addListItem(childPartFinished));
+          //this.needToSyncItems.push(await stockHistoryStore.addListItem(childPartAbnormal));
 
           if (stockQty < minimumCount) {
               minimumCount = stockQty;
@@ -219,6 +221,7 @@ export default {
         await this.fetchTableData();
 
         const newStockItemFinished = {
+          Child: "Parent",
           MLNPartNo: this.form.MLNPartNo,
           ProcessType: this.form.selectProcessType,
           UDPartNo: this.form.UDPartNo,
@@ -229,6 +232,7 @@ export default {
         };
 
         const newStockItemAbnormal = {
+          Child: "Parent",
           MLNPartNo: this.form.MLNPartNo,
           ProcessType: this.form.selectProcessType,
           UDPartNo: this.form.UDPartNo,
@@ -238,24 +242,24 @@ export default {
           Registered: utcProcessCompletion
         };
         
-        //this.needToSyncItems.push(newStockItemAbnormal);
-        //this.needToSyncItems.push(newStockItemFinished);
+        this.needToSyncItems.push(newStockItemAbnormal);
+        this.needToSyncItems.push(newStockItemFinished);
         
-        this.needToSyncItems.push(await stockHistoryStore.addListItem(newStockItemFinished));
-        this.needToSyncItems.push(await stockHistoryStore.addListItem(newStockItemAbnormal));
-        let syncStockMsg = ""
-        //const syncStockMsg = await stockHistoryStore.addListItems(this.needToSyncItems);
+        //this.needToSyncItems.push(await stockHistoryStore.addListItem(newStockItemFinished));
+        //this.needToSyncItems.push(await stockHistoryStore.addListItem(newStockItemAbnormal));
+        //let syncStockMsg = ""
+        const syncStockMsg = await stockHistoryStore.addListItems(this.needToSyncItems);
         /*const syncStockMsg = await Promise.all(this.needToSyncItems.map(async item => {
           return await stockHistoryStore.addListItem(item);
         }));*/
-          const sequentialExecution = this.needToSyncItems.reduce((promise, next) => {
+          /*const sequentialExecution = this.needToSyncItems.reduce((promise, next) => {
               return promise.then(() => next);
           }, Promise.resolve());
 
           sequentialExecution.then((res) => {
             // 所有Promise都按顺序执行完成后的操作
             syncStockMsg = res.meesage;
-          });
+          });*/
 
         this.$message.success(syncStockMsg);
         this.needToSyncItems = [];
@@ -297,7 +301,7 @@ export default {
 
     resetForm() {
       this.form = {
-        ProcessCompletion: new Date().toISOString(),
+        ProcessCompletion: new Date(),
         selectProcessName: '生加工',
         selectProcessType: 'M',
         MLNPartNo: '',

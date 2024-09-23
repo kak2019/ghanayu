@@ -145,6 +145,7 @@ export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESUL
                         }
                         // Get item information for front process
                         const bomItemLastProcess = {
+                            Child:"",
                             MLNPartNo: ChildPartNo,
                             ProcessType: ChildProcessType,
                             UDPartNo: UdPartNo,

@@ -44,7 +44,7 @@ export default {
   methods: {
     handleChange(value) {
       const newValue = getCurrentTime(value);
-      this.$emit('update:modelValue', value);
+      this.$emit('update:modelValue', newValue);
     },
 
     disabledDate(date) {

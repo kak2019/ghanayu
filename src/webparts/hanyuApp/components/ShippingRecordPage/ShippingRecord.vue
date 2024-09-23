@@ -49,6 +49,7 @@ import { useStockHistoryStore } from "../../../../stores/stockhistory"
 import { useUserStore } from '../../../../stores/user';
 import { convertToUTC } from '../../../../common/utils';
 import { useFileName } from '../../../../stores/usefilename';
+import { getCurrentTime } from '../../../../common/utils';
 
 const userStore = new useUserStore();
 const isBusinessControler = computed(() => userStore.groupInfo.indexOf('Business Controler') >= 0);
@@ -134,7 +135,7 @@ export default {
           ShipQty: parseInt(this.form.count, 10),
           Calloffid: this.form.id,
           Despatchnote: this.form.note,
-          ShippingResultDate: convertToUTC(this.form.date)
+          ShippingResultDate: convertToUTC(getCurrentTime(this.form.date))
         };
         //Register an out stock record to the StockHistory table.InOutQty=negative value of (出荷数),FunctionID=04
         const latestStockQty = await stockHistoryStore.getLatestStockQtyByMLNPartNoProcessTypeDesc(this.form.num, 'C');

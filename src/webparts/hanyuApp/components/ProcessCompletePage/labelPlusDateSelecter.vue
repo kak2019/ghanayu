@@ -8,6 +8,7 @@
         class="custom-date-picker"
         @change="handleChange"
         :disabled-date="disabledDate"
+        :editable="false"
         :clearable="false"
         style="max-width: 127px ;"
         size="small"
@@ -47,7 +48,7 @@ export default {
     handleChange(value) {
       if (value) { 
         const newValue = getCurrentTime(value);
-        this.$emit('update:modelValue', value);
+        this.$emit('update:modelValue', newValue);
       }
     },
 
