@@ -50,6 +50,7 @@ import { ref } from 'vue';
 import {useSHIKYUGoodsReceiveStore} from "../../../../stores/shikyugoodsreceive";
 import { usePartMasterStore } from "../../../../stores/part"
 import { useStockHistoryStore } from "../../../../stores/stockhistory"
+import { ElMessage } from "element-plus";
 // 获取 Pinia store 实例
 
 const { fileName, generateFileName } = useFileName();
