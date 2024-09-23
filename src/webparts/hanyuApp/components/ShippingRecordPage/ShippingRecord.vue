@@ -136,12 +136,16 @@ export default {
           Despatchnote: this.form.note,
           ShippingResultDate: convertToUTC(this.form.date)
         };
-
+        //Register an out stock record to the StockHistory table.InOutQty=negative value of (出荷数),FunctionID=04
+        const latestStockQty = await stockHistoryStore.getLatestStockQtyByMLNPartNoProcessTypeDesc(this.form.num, 'C');
+        if(newItem.ShipQty > parseInt(latestStockQty)){
+            this.$message.error('完成数が前工程の在庫数より多くなっています.');
+            this.fullscreenLoading = false;
+            return;
+        }
         const message = await shippingResultStore.addListItem(newItem).then(async res => {
             await shippingResultStore.getListItems();
 
-            //Register an out stock record to the StockHistory table.InOutQty=negative value of (出荷数),FunctionID=04
-            const latestStockQty = await stockHistoryStore.getLatestStockQtyByMLNPartNoProcessTypeDesc(this.form.num, 'C');
             const curUDPartNo = await partMasterStore.getListItemByMLNPartNo(this.form.num);
 
             const newOutStockItem = {
@@ -157,6 +161,7 @@ export default {
             const addFinishedStockMsg = await stockHistoryStore.addListItem(newOutStockItem);
             this.$message.success(addFinishedStockMsg);
             this.fullscreenLoading = false;
+            await this.fetchTableData();
             this.cancel(); 
         })
         .catch((error) => {
