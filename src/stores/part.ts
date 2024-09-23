@@ -69,6 +69,7 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
         },
         
         async getItemCountByMLNPartNoProcessType(mlnPartNo: string, processType: string): Promise<number> {
+            debugger
             try {
                 let count = 0
                 await this.getListItems().then(() => {
