@@ -69,13 +69,15 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
         },
         
         async getItemCountByMLNPartNoProcessType(mlnPartNo: string, processType: string): Promise<number> {
-            debugger
+            console.log("start");
             try {
                 let count = 0
                 await this.getListItems().then(() => {
                     const items = computed(() => this.partMasterItems).value.filter(i => (i.MLNPartNo === mlnPartNo && i.ProcessType.indexOf(processType)>=0));
+                    console.log("items:" + items);
                     count = items.length; 
                 });
+                console.log("count:" + count);
                 return count
             }catch(error){
                 throw new Error(`データの取得中にエラーが発生しました`);
