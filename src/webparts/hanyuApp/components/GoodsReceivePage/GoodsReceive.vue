@@ -190,7 +190,9 @@ export default {
                 );
 
             this.tableData =
-              shiKYUGoodsReceiveStore.shikyuGoodsReceiveItems.filter((item) => {
+              shiKYUGoodsReceiveStore.shikyuGoodsReceiveItems
+              .sort((a, b) => new Date(b.Registered).getTime() - new Date(a.Registered).getTime())
+              .filter((item) => {
                 let condition = true;
                 condition =
                   condition &&
@@ -200,7 +202,6 @@ export default {
                     new Date(curentDate.toISOString());
                 return condition;
               });
-              debugger
               if(this.tableData.length===0){
                 const firstDayOfLastMonth = new Date(
                   curentDate.getFullYear(),
@@ -211,7 +212,9 @@ export default {
                 tempFirstDate.setDate(tempFirstDate.getDate()-1);
                 const lastDayOfLastMonth = tempFirstDate;
                 this.tableData =
-                  shiKYUGoodsReceiveStore.shikyuGoodsReceiveItems.filter((item) => {
+                  shiKYUGoodsReceiveStore.shikyuGoodsReceiveItems
+                  .sort((a, b) => new Date(b.Registered).getTime() - new Date(a.Registered).getTime())
+                  .filter((item) => {
                     let condition = true;
                     condition =
                       condition &&
