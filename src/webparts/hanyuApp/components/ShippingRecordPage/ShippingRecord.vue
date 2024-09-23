@@ -137,28 +137,33 @@ export default {
           ShippingResultDate: convertToUTC(this.form.date)
         };
 
-        const message = await shippingResultStore.addListItem(newItem);
-        this.$message.success(message);
-        await shippingResultStore.getListItems();
+        const message = await shippingResultStore.addListItem(newItem).then(async res => {
+            await shippingResultStore.getListItems();
 
-        //Register an out stock record to the StockHistory table.InOutQty=negative value of (出荷数),FunctionID=04
-        const latestStockQty = await stockHistoryStore.getLatestStockQtyByMLNPartNoProcessTypeDesc(this.form.num, 'C');
-        const curUDPartNo = await partMasterStore.getListItemByMLNPartNo(this.form.num);
+            //Register an out stock record to the StockHistory table.InOutQty=negative value of (出荷数),FunctionID=04
+            const latestStockQty = await stockHistoryStore.getLatestStockQtyByMLNPartNoProcessTypeDesc(this.form.num, 'C');
+            const curUDPartNo = await partMasterStore.getListItemByMLNPartNo(this.form.num);
 
-        const newOutStockItem = {
-          MLNPartNo: this.form.num,
-          ProcessType: 'C',
-          UDPartNo: curUDPartNo,
-          Qty: (0 - Number(this.form.count)),
-          FunctionID: '04',
-          StockQty:(latestStockQty - Number(this.form.count)).toString(), //获取最新库存
-          Registered:newItem.ShippingResultDate
-        };
+            const newOutStockItem = {
+              MLNPartNo: this.form.num,
+              ProcessType: 'C',
+              UDPartNo: curUDPartNo,
+              Qty: (0 - Number(this.form.count)),
+              FunctionID: '04',
+              StockQty:(latestStockQty - Number(this.form.count)).toString(), //获取最新库存
+              Registered:newItem.ShippingResultDate
+            };
 
-        const addFinishedStockMsg = await stockHistoryStore.addListItem(newOutStockItem);
-        this.$message.success(addFinishedStockMsg);
-        this.fullscreenLoading = false;
-        this.cancel(); // 调用 cancel 方法重置表单
+            const addFinishedStockMsg = await stockHistoryStore.addListItem(newOutStockItem);
+            this.$message.success(addFinishedStockMsg);
+            this.fullscreenLoading = false;
+            this.cancel(); 
+        })
+        .catch((error) => {
+            this.fullscreenLoading = false;
+            ElMessage.error(error.message);
+        });
+
       } catch (error) {
         this.$message.error('登録に失敗しました: ' + error.message);
       }
