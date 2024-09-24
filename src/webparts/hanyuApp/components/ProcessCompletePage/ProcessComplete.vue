@@ -135,8 +135,8 @@ export default {
         //If the input "工程完了日" is smaller than the latest record date of this part, show error meesage "工程完了日エラー"
         //const utcProcessCompletion1 = this.form.ProcessCompletion) 
         const utcProcessCompletion = convertToUTC(getCurrentTime(this.form.ProcessCompletion)) 
-          const processCompletionResultStore = useProcessCompletionResultStore();
-          const hasData = await processCompletionResultStore.checkItemsAlreadyInProcessCompletetion(this.form.MLNPartNo, this.form.selectProcessType, utcProcessCompletion);
+        const processCompletionResultStore = useProcessCompletionResultStore();
+        const hasData = await processCompletionResultStore.checkItemsAlreadyInProcessCompletetion(this.form.MLNPartNo, this.form.selectProcessType, utcProcessCompletion);
 
           if (isNaN(hasData) || hasData > 0) {
             //const latestRecord = curPartRecords[0];
@@ -174,7 +174,7 @@ export default {
             UDPartNo: childUDPartNo,
             Qty: childFinalFinishedQty,
             FunctionID: '02',
-            StockQty:(childFinalFinishedQty  + stockQty).toString(), //获取最新库存,
+            StockQty:(childFinalAbnormalQty + childFinalFinishedQty  + stockQty).toString(), //获取最新库存,
             Registered: utcProcessCompletion
           };
 
@@ -189,10 +189,10 @@ export default {
             Registered: utcProcessCompletion
           };
 
-          this.needToSyncItems.push(childPartFinished);
-          this.needToSyncItems.push(childPartAbnormal);
-          //this.needToSyncItems.push(await stockHistoryStore.addListItem(childPartFinished));
-          //this.needToSyncItems.push(await stockHistoryStore.addListItem(childPartAbnormal));
+          //this.needToSyncItems.push(childPartFinished);
+          //this.needToSyncItems.push(childPartAbnormal);
+          this.needToSyncItems.push(await stockHistoryStore.addListItem(childPartFinished));
+          this.needToSyncItems.push(await stockHistoryStore.addListItem(childPartAbnormal));
 
           if (stockQty < minimumCount) {
               minimumCount = stockQty;
@@ -242,24 +242,24 @@ export default {
           Registered: utcProcessCompletion
         };
         
-        this.needToSyncItems.push(newStockItemAbnormal);
-        this.needToSyncItems.push(newStockItemFinished);
+        //this.needToSyncItems.push(newStockItemAbnormal);
+        //this.needToSyncItems.push(newStockItemFinished);
         
-        //this.needToSyncItems.push(await stockHistoryStore.addListItem(newStockItemFinished));
-        //this.needToSyncItems.push(await stockHistoryStore.addListItem(newStockItemAbnormal));
-        //let syncStockMsg = ""
-        const syncStockMsg = await stockHistoryStore.addListItems(this.needToSyncItems);
+        this.needToSyncItems.push(await stockHistoryStore.addListItem(newStockItemFinished));
+        this.needToSyncItems.push(await stockHistoryStore.addListItem(newStockItemAbnormal));
+        let syncStockMsg = ""
+        //const syncStockMsg = await stockHistoryStore.addListItems(this.needToSyncItems);
         /*const syncStockMsg = await Promise.all(this.needToSyncItems.map(async item => {
           return await stockHistoryStore.addListItem(item);
         }));*/
-          /*const sequentialExecution = this.needToSyncItems.reduce((promise, next) => {
+          const sequentialExecution = this.needToSyncItems.reduce((promise, next) => {
               return promise.then(() => next);
           }, Promise.resolve());
 
           sequentialExecution.then((res) => {
             // 所有Promise都按顺序执行完成后的操作
             syncStockMsg = res.meesage;
-          });*/
+          });
 
         this.$message.success(syncStockMsg);
         this.needToSyncItems = [];
@@ -337,7 +337,6 @@ export default {
     },
 
     confirmMethod({ value, relatedText }) {
-      console.log('============');
       console.log('Received value:', value);
       console.log('Received relatedText:', relatedText);
     // 在这里进一步处理接收到的值

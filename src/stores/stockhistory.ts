@@ -130,9 +130,9 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
         async addListItems(items: IStockHistoryItem[]): Promise<string> {
             try {
                 const sp = spfi(getSP());
-                const [batchedSP, execute] = sp.batched();
+                //const [batchedSP, execute] = sp.batched();
                 const web = await sp.web();
-                const list = batchedSP.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`)
+                const list = sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`)
 
                 const res: IItem[] = [];
                 const errors: Error[] = [];
@@ -149,7 +149,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                         SourceItemID: item.SourceItemID || "",
                     }).then(r => res.push(r)).catch(e => errors.push(e))
                 );
-                await execute();
+                //await execute();
                 if (res.length) console.log(res);
                 if (errors.length) console.error(errors);
                 return '登録完了。';

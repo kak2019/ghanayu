@@ -99,12 +99,14 @@ export default {
 
         if (!this.form.num) {
           this.$message.error('MLNPartNo不能为空');
+          this.fullscreenLoading = false;
           return;
         }
         const shipQty = Number(this.form.count.toString().trim());
         const isShipQtyInteger = !Number.isInteger(shipQty);
         if (isNaN(shipQty) || Number(this.form.count) <= 0 || isShipQtyInteger) {
           this.$message.error('请输入有效的出荷数');
+          this.fullscreenLoading = false;
           return;
         }
 
@@ -113,6 +115,7 @@ export default {
         const curPartCount = await partMasterStore.getItemCountByMLNPartNoProcessType(this.form.num,'C');
         if (curPartCount <= 0) {
           this.$message.error('部品表なしエラー');
+          this.fullscreenLoading = false;
           return;
         }
 
@@ -123,6 +126,7 @@ export default {
           const compareDateResult = this.compareDates(latestResultDate,this.form.date)
           if (compareDateResult === 1) {
             this.$message.error('出荷実績日エラー');
+            this.fullscreenLoading = false;
             return;
           }
         }
