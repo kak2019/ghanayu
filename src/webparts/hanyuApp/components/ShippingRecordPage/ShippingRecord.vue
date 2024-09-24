@@ -102,6 +102,14 @@ export default {
           this.fullscreenLoading = false;
           return;
         }
+
+        const mlnPartNoPattern = /^[a-zA-Z0-9]{10}$/;
+        if (!mlnPartNoPattern.test(this.form.num)) {
+          this.$message.error('请输入有效的MLNPartNo');
+          this.fullscreenLoading = false;
+          return;
+        }
+
         const shipQty = Number(this.form.count.toString().trim());
         const isShipQtyInteger = !Number.isInteger(shipQty);
         if (isNaN(shipQty) || Number(this.form.count) <= 0 || isShipQtyInteger) {
@@ -119,6 +127,7 @@ export default {
           return;
         }
 
+        const curUDPartNo = await partMasterStore.getListItemByMLNPartNo(this.form.num);
         // If the "出荷実績日" is smaller than the latest record date in system, show error message.
         const latestResultDate = await shippingResultStore.getLatestShippingResultDateByMLNPartNoDesc(this.form.num)
 
@@ -131,10 +140,11 @@ export default {
           }
         }
 
+        //const curUDPartNo = await partMasterStore.getListItemByMLNPartNo(this.form.num);
         //Register a record in the ShippingResult table.
         const newItem = {
           MLNPartNo: this.form.num,
-          UDPartNo: this.form.count,
+          UDPartNo: curUDPartNo,
           ShipTo: this.form.select,
           ShipQty: parseInt(this.form.count, 10),
           Calloffid: this.form.id,
@@ -150,8 +160,6 @@ export default {
         }
         const message = await shippingResultStore.addListItem(newItem).then(async res => {
             await shippingResultStore.getListItems();
-
-            const curUDPartNo = await partMasterStore.getListItemByMLNPartNo(this.form.num);
 
             const newOutStockItem = {
               MLNPartNo: this.form.num,
