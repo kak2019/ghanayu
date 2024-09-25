@@ -36,6 +36,8 @@
         v-model="form.note"
         label="Despatch note"
         labelColor="#92cddc"
+        :inputWidth="150"
+        :max-length="17"        
       ></Input>
     </div>
     <div class="background-layer">

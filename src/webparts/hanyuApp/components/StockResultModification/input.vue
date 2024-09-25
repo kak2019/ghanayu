@@ -2,7 +2,7 @@
   <div class="date-picker-with-label">
     <label
         class="custom-label"
-        :style="{ backgroundColor: labelColor }"
+        :style="{ backgroundColor: labelColor,width: inputWidth + 'px' }"
     >
       {{ label }}
     </label>
@@ -17,6 +17,8 @@
         @onafterpaste="handleChange"
         @oninput="handleChange"
         size="small"
+        :style="{ width: inputWidth + 'px' }"
+        :maxlength="maxLength"
     />
   </div>
 </template>
@@ -36,6 +38,14 @@ export default {
     labelColor: {
       type: String,
       default: '#fabf8f' // 设置默认颜色
+    },
+    maxLength:{
+      type: Number,
+      default : 10
+    },
+    inputWidth: {
+      type: Number,
+      default: 100
     }
   },
   data() {
