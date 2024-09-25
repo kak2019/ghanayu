@@ -24,7 +24,7 @@
     </div>
   </el-row>
 
-  <TableShipping :tableData="tableData" :loading="loading"></TableShipping>
+  <TableShipping :tableData="tableData"></TableShipping>
 </template>
 
 <script>
@@ -71,7 +71,6 @@ export default {
   data() {
     return {
       isBusinessControler: isBusinessControler,
-      loading: true,
       fullscreenLoading: false,
       processOptions: [],
       tableData: [],
@@ -218,7 +217,7 @@ export default {
         };
 
         const message = await ProcessCompletionResultStore.addListItem(newItem);
-        this.$message.success(message);
+        //this.$message.success(message);
         await this.fetchTableData();
 
         const newStockItemFinished = {
@@ -262,7 +261,7 @@ export default {
             syncStockMsg = res.meesage;
           });
 
-        this.$message.success(syncStockMsg);
+        this.$message.success(message);
         this.needToSyncItems = [];
         this.fullscreenLoading = false
         this.resetForm(); // 调用 resetForm 方法重置表单
@@ -292,9 +291,8 @@ export default {
 
     async fetchTableData() {
       try {
-        await ProcessCompletionResultStore.getLisItemsByDate(curentDate);
+        await ProcessCompletionResultStore.getListItems();
         this.tableData = ProcessCompletionResultStore.processCompletionResultItems;
-        this.loading = false;
         console.log("Processed table data:", this.tableData);
       } catch (error) {
         console.error('Error fetching data:', error);

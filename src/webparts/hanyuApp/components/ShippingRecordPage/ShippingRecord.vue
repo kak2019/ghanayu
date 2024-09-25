@@ -170,8 +170,19 @@ export default {
               StockQty:(latestStockQty - Number(this.form.count)).toString(), //获取最新库存
               Registered:newItem.ShippingResultDate
             };
+            
+            const newOutStockItemDuplicate = {
+              MLNPartNo: this.form.num,
+              ProcessType: '',
+              UDPartNo: curUDPartNo,
+              Qty: (0 - Number(this.form.count)) * -1,
+              FunctionID: '04',
+              StockQty: 0, //获取最新库存
+              Registered:newItem.ShippingResultDate
+            };
 
             const addFinishedStockMsg = await stockHistoryStore.addListItem(newOutStockItem);
+            const addFinishedStockMsgDuplicate = await stockHistoryStore.addListItem(newOutStockItemDuplicate);
             this.$message.success(addFinishedStockMsg);
             this.fullscreenLoading = false;
             await this.fetchTableData();
