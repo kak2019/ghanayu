@@ -142,8 +142,11 @@ export default {
   },
   methods: {
     async submitForm() {
-      try {
+      try 
+      {
+        this.fullscreenLoading = true;
         if (!this.form.num) {
+          this.fullscreenLoading = false;
           this.$message.error("MLNPartNo不能为空");
           return;
         }
@@ -151,6 +154,7 @@ export default {
         // 校验 MLNPartNo 的格式（10 位，由数字和英文组成）
         const mlnPartNoPattern = /^[a-zA-Z0-9]{10}$/;
         if (!mlnPartNoPattern.test(this.form.num)) {
+          this.fullscreenLoading = false;
           this.$message.error("请输入有效的MLNPartNo");
           return;
         }
@@ -158,12 +162,14 @@ export default {
         const integerRegex = /^-?\d+$/;
         const modifiedQty = this.form.count;
 
-        if (!integerRegex.test(modifiedQty) || Number(modifiedQty)===0) {          
+        if (!integerRegex.test(modifiedQty) || Number(modifiedQty)===0) {   
+          this.fullscreenLoading = false;       
           this.$message.error('请输入有效的修正数');
           return;
         }
 
        if(this.form.selectedProcess === "CH" && Number(modifiedQty) <= 0){
+          this.fullscreenLoading = false;
           this.$message.error('0は不可としマイナス数値は可とする.');
           return;
        }
@@ -182,7 +188,7 @@ export default {
           Comment: this.form.comment,
           //ModifiedBy: JSON.stringify(userStore.hanyutype1s[0]),
         };
-        debugger
+
         const partMasterStore = usePartMasterStore();
         const billOfMaterialsStore = useBillOfMaterialsStore();
         //The BOM table is searched using the entered MLN part number + process category as a key.If a corresponding record exists, it is registered in the ProcessCompletionResult table.
@@ -196,6 +202,7 @@ export default {
         ); // Need to change to bom table
 
         if (curPartCount <= 0) {
+          this.fullscreenLoading = false;
           this.$message.error("部品表なしエラー.");
           return;
         }
@@ -228,12 +235,12 @@ export default {
           Number(newItem.ModifiedQty) <= 0 &&
           Number(newItem.ModifiedQty) * -1 > Number(latestStockQty)
         ) {
+          this.fullscreenLoading = false;
           this.$message.error(
             "修正数が当工程または前工程の在庫数より多くなっています."
           );
           return;
         }
-        this.fullscreenLoading = true;
         // if all the validation has been passed, need to add several mandatory fields to newItem, then do some caculation for stock history
         //Get UD part number in the part master table that corresponds to the entered MLN part number
         const udPartNo = await partMasterStore.getListItemByMLNPartNo(
@@ -278,6 +285,7 @@ export default {
             Number(newItem.ModifiedQty > 0) &&
             Number(newItem.ModifiedQty) > Number(minimumCount)
           ) {
+            this.fullscreenLoading = false;
             this.$message.error(
               "修正数が当工程または前工程の在庫数より多くなっています."
             );
@@ -301,6 +309,7 @@ export default {
         this.fullscreenLoading = false;
         this.resetForm(); // 调用 reset 方法重置表单
       } catch (error) {
+        this.fullscreenLoading = false;
         this.$message.error("登録に失敗しました: " + error.message);
       }
     },
