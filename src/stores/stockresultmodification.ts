@@ -131,7 +131,7 @@ export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESUL
                 } as IStockHistoryItem;
                 await stockHistoryStore.addListItem(billOfMaterialsItem);
 
-                if ((itemForAdd.FunctionID === "06" && itemForAdd.ProcessType !=="Z") || itemForAdd.FunctionID === "07") {
+                if ((itemForAdd.FunctionID === "06" && itemForAdd.ProcessType !=="F") || itemForAdd.FunctionID === "07") {
                     
                     let lastProcessStockQty;
                     childProcessNItemToStock.forEach(async (item) => {

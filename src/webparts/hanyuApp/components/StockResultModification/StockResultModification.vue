@@ -194,6 +194,7 @@ export default {
         //The BOM table is searched using the entered MLN part number + process category as a key.If a corresponding record exists, it is registered in the ProcessCompletionResult table.
         let curPartCount;
         let processType = newItem.ProcessType==="Z"? "F":newItem.ProcessType==="CH"? "C" : newItem.ProcessType;
+        newItem.ProcessType = processType
         //if (newItem.ProcessType !== "Z" && newItem.ProcessType !== "CH") {
         curPartCount =
         await partMasterStore.getItemCountByMLNPartNoProcessType(
@@ -302,7 +303,7 @@ export default {
         }
 
         //Add record to good receive table
-        let message = await stockResultModificationStore.addListItem(newItem, latestStockQty,childProcessNItemToStock);
+        let message = await stockResultModificationStore.addListItem(newItem, latestStockQty, childProcessNItemToStock);
 
         this.$message.success(message);
         await this.fetchTableData();
