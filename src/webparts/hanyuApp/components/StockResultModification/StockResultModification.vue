@@ -476,7 +476,7 @@ export default {
           { Registered: item.Registered },
           { property: "Registered" }
         ),
-        修正領域: item.ModifiedReasonName,
+        修正領域: item.FunctionName,
         工程区分: item.ProcessName,
         MLN部品番号: item.MLNPartNo,
         UD部品番号: item.UDPartNo,
