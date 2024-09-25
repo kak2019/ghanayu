@@ -581,7 +581,10 @@ export default {
     }else{
       this.disabled = false;
     }*/
-
+    await processMasterStore.getListItems();
+    await functionsMasterStore.getListItems();
+    await modifiedReasonMasterStore.getListItems();
+    
     this.refreshFunctionName();
 
     const processMasterItems = computed(
