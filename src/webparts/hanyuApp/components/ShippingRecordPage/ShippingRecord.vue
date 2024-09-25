@@ -245,7 +245,7 @@ export default {
       try {
         this.loading = false;
         await shippingResultStore.getLisItemsByDate(curentDate);
-        this.tableData = shippingResultStore.shippingResultItems;
+        this.tableData = shippingResultStore.shippingresult;
         } catch (error) {
           console.error("Error fetching shipping results:", error);
         }

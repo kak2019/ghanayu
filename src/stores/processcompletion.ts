@@ -63,6 +63,52 @@ export const useProcessCompletionResultStore = defineStore(FeatureKey.PROCESSCOM
 
     },
 
+    async getLisItemsByDate(curentDate:Date){
+      await this.getListItems();
+          const firstDayOfMonth = new Date(
+              curentDate.getFullYear(),
+              curentDate.getMonth(),
+              1
+          );
+          let items = this.processCompletionResults.sort((a, b) => new Date(b.Registered).getTime() - new Date(a.Registered).getTime())
+          .filter((item) => {
+            let condition = true;
+            condition =
+                condition &&
+                new Date(firstDayOfMonth) <=
+                new Date(item.ProcessCompletion) &&
+                new Date(item.ProcessCompletion) <=
+                new Date();
+            return condition;
+          });
+
+          if(items.length ===0){
+              const firstDayOfLastMonth = new Date(
+              curentDate.getFullYear(),
+              curentDate.getMonth()-1,
+              1
+              );
+              let lastDayOfMonthBeforeLast= firstDayOfLastMonth.setDate(firstDayOfLastMonth.getDate()-1);
+              /*let tempFirstDate = firstDayOfMonth;
+              tempFirstDate.setDate(tempFirstDate.getDate()-1);
+              const lastDayOfLastMonth = tempFirstDate;*/
+          
+              items = this.processCompletionResults
+              .sort((a, b) => new Date(b.Registered).getTime() - new Date(a.Registered).getTime())
+              .filter((item) => {
+                  let condition = true;
+                  condition =
+                  condition &&
+                  new Date(lastDayOfMonthBeforeLast) <
+                      new Date(item.ProcessCompletion) &&
+                  new Date(item.ProcessCompletion) <
+                      new Date(firstDayOfMonth);
+                  return condition;
+              });
+          }
+          this.processCompletionResults = items;
+    },
+
     async getListItemsByMLNPartNo(mlnPartNo: string) {
       try {
         const sp = spfi(getSP());

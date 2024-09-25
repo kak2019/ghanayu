@@ -181,64 +181,8 @@ export default {
     },
     async fetchTableData() {
       try {
-
-        await shiKYUGoodsReceiveStore.getLisItemsByDate(curentDate);
-        /*await shiKYUGoodsReceiveStore
-          .getListItems()
-          .then(() => {
-            this.loading = false;
-                const firstDayOfMonth = new Date(
-                  curentDate.getFullYear(),
-                  curentDate.getMonth(),
-                  1
-                );
-            let shikyuGoodsReceiveItemsTable = [];
-            shikyuGoodsReceiveItemsTable =
-              shiKYUGoodsReceiveStore.shikyuGoodsReceiveItems
-              .sort((a, b) => new Date(b.Registered).getTime() - new Date(a.Registered).getTime())
-              .filter((item) => {
-                let condition = true;
-                condition =
-                  condition &&
-                  new Date(firstDayOfMonth) <=
-                    new Date(item.GoodsReceiveDate) &&
-                  new Date(item.GoodsReceiveDate) <=
-                    new Date(curentDate.toISOString());
-                return condition;
-              });
-              if(shikyuGoodsReceiveItemsTable===0){
-                const firstDayOfLastMonth = new Date(
-                  curentDate.getFullYear(),
-                  curentDate.getMonth()-1,
-                  1
-                );
-                let tempFirstDate = firstDayOfMonth;
-                tempFirstDate.setDate(tempFirstDate.getDate()-1);
-                const lastDayOfLastMonth = tempFirstDate;
-                this.tableData =
-                  shiKYUGoodsReceiveStore.shikyuGoodsReceiveItems
-                  .sort((a, b) => new Date(b.Registered).getTime() - new Date(a.Registered).getTime())
-                  .filter((item) => {
-                    let condition = true;
-                    condition =
-                      condition &&
-                      new Date(firstDayOfLastMonth) <=
-                        new Date(item.GoodsReceiveDate) &&
-                      new Date(item.GoodsReceiveDate) <=
-                        new Date(lastDayOfLastMonth.toISOString());
-                    return condition;
-                  });
-                }
-                this.tableData = shikyuGoodsReceiveItemsTable;
-          })
-          .catch((error) => {
-            this.loading = false;
-            ElMessage.error(error.message);
-          });*/
           await shiKYUGoodsReceiveStore.getLisItemsByDate(curentDate);
-          //await shiKYUGoodsReceiveStore.getListItems();
-          
-          this.tableData = shiKYUGoodsReceiveStore.shikyuGoodsReceiveItems;
+          this.tableData = shiKYUGoodsReceiveStore.shikyuGoodsReceives;
           this.loading = false;
       } catch (error) {
         console.error("Error fetching data:", error);

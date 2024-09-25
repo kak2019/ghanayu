@@ -291,8 +291,8 @@ export default {
 
     async fetchTableData() {
       try {
-        await ProcessCompletionResultStore.getListItems();
-        this.tableData = ProcessCompletionResultStore.processCompletionResultItems;
+        await ProcessCompletionResultStore.getLisItemsByDate(curentDate);
+        this.tableData = ProcessCompletionResultStore.processCompletionResults;
         console.log("Processed table data:", this.tableData);
       } catch (error) {
         console.error('Error fetching data:', error);
