@@ -244,58 +244,8 @@ export default {
     async fetchTableData() {
       try {
         this.loading = false;
-        const shippingResultStore = useShippingResultStore();
-          await shippingResultStore.getListItems().then(() => {
-            const firstDayOfMonth = new Date(
-              curentDate.getFullYear(),
-              curentDate.getMonth(),
-              1
-            );
-            this.tableData = shippingResultStore.shippingResultItems
-              .sort(
-                (a, b) =>
-                  new Date(b.Registered).getTime() - new Date(a.Registered).getTime()
-              )
-              .filter((item) => {
-                let condition = true;
-                condition =
-                  condition &&
-                  new Date(firstDayOfMonth) <= new Date(item.ShippingResultDate) &&
-                  new Date(item.ShippingResultDate) <=
-                    new Date(curentDate);
-                return condition;
-              });
-            if (this.tableData.length === 0) {
-              const firstDayOfLastMonth = new Date(
-                curentDate.getFullYear(),
-                curentDate.getMonth() - 1,
-                1
-              );
-              let tempFirstDate = firstDayOfMonth;
-              tempFirstDate.setDate(tempFirstDate.getDate() - 1);
-              const lastDayOfLastMonth = tempFirstDate;
-              this.tableData = shippingResultStore.shippingResultItems
-                .sort(
-                  (a, b) =>
-                    new Date(b.Registered).getTime() -
-                    new Date(a.Registered).getTime()
-                )
-                .filter((item) => {
-                  let condition = true;
-                  condition =
-                    condition &&
-                    new Date(firstDayOfLastMonth) <=
-                      new Date(item.ShippingResultDate) &&
-                    new Date(item.ShippingResultDate) <=
-                      new Date(lastDayOfLastMonth);
-                  return condition;
-                });
-            }
-          })
-          .catch((error) => {
-            this.loading = false;
-            ElMessage.error(error.message);
-          });          ;
+        await shippingResultStore.getLisItemsByDate(curentDate);
+        this.tableData = shippingResultStore.shippingResultItems;
         } catch (error) {
           console.error("Error fetching shipping results:", error);
         }

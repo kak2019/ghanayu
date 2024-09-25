@@ -67,6 +67,50 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
             uniqueItems.sort((a, b) => new Date(b.GoodsReceiveDate).getTime() - new Date(a.GoodsReceiveDate).getTime());
             this.shikyuGoodsReceives = uniqueItems;
         },
+        async getLisItemsByDate(curentDate:Date){
+            const shiKYUGoodsReceiveStore = useSHIKYUGoodsReceiveStore();
+            await this.getListItems();
+                const firstDayOfMonth = new Date(
+                    curentDate.getFullYear(),
+                    curentDate.getMonth(),
+                    1
+                );
+                let items = shiKYUGoodsReceiveStore.shikyuGoodsReceives.sort((a, b) => new Date(b.Registered).getTime() - new Date(a.Registered).getTime())
+                .filter((item) => {
+                let condition = true;
+                condition =
+                    condition &&
+                    new Date(firstDayOfMonth) <=
+                    new Date(item.GoodsReceiveDate) &&
+                    new Date(item.GoodsReceiveDate) <=
+                    new Date();
+                return condition;
+                });
+
+                if(items.length ===0){
+                    const firstDayOfLastMonth = new Date(
+                    curentDate.getFullYear(),
+                    curentDate.getMonth()-1,
+                    1
+                    );
+                    let lastDayOfMonthBeforeLast= firstDayOfLastMonth.setDate(firstDayOfLastMonth.getDate()-1);
+                
+                    items = shiKYUGoodsReceiveStore.shikyuGoodsReceives
+                    .sort((a, b) => new Date(b.Registered).getTime() - new Date(a.Registered).getTime())
+                    .filter((item) => {
+                        let condition = true;
+                        condition =
+                        condition &&
+                        new Date(lastDayOfMonthBeforeLast) <
+                            new Date(item.GoodsReceiveDate) &&
+                        new Date(item.GoodsReceiveDate) <
+                            new Date(firstDayOfMonth);
+                        return condition;
+                    });
+                }
+                this.shikyuGoodsReceives = items;
+            
+        },
         async addListItem(item: ISHIKYUGoodsReceiveItem): Promise<string> {
             try {
                 const billOfMaterialsStore = useBillOfMaterialsStore();
@@ -142,15 +186,6 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
             catch (error) {
                 throw new Error(`データの取得中にエラーが発生しました`);
             }
-        },
-        getCurrentTimeStampMillis(date:string): string {
-            /*const now = new Date();
-            // 将毫秒转换为毫秒和毫秒的格式
-            const millis = now.getMilliseconds().toString().padStart(3, '0');
-            // 将Date对象转换为ISO字符串并截取毫秒部分
-            const isoString = now.toISOString();
-            return isoString.substring(0, isoString.length - 1) + '.' + millis + 'Z';*/
-            return "0";
         }
     },
 });

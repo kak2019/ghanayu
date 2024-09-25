@@ -95,6 +95,7 @@ export default {
       fullscreenLoading: false,
       tableData: [],
       loading: true,
+      itemKey: 0,
       form: {
         date: curentDate,
         select: defaultShikyufrom,
@@ -161,11 +162,11 @@ export default {
         newItem.UDPartNo = udPartNo;
         //Add record to good receive table 
         const message = await shiKYUGoodsReceiveStore.addListItem(newItem);
-        this.fullscreenLoading = false
         if(message!=""){
           this.$message.success(message);
         }
         await this.fetchTableData();
+        this.fullscreenLoading = false
         this.resetForm(); // 调用 reset 方法重置表单
       } catch (error) {
         this.fullscreenLoading = false
@@ -180,7 +181,9 @@ export default {
     },
     async fetchTableData() {
       try {
-        await shiKYUGoodsReceiveStore
+
+        await shiKYUGoodsReceiveStore.getLisItemsByDate(curentDate);
+        /*await shiKYUGoodsReceiveStore
           .getListItems()
           .then(() => {
             this.loading = false;
@@ -189,8 +192,8 @@ export default {
                   curentDate.getMonth(),
                   1
                 );
-
-            this.tableData =
+            let shikyuGoodsReceiveItemsTable = [];
+            shikyuGoodsReceiveItemsTable =
               shiKYUGoodsReceiveStore.shikyuGoodsReceiveItems
               .sort((a, b) => new Date(b.Registered).getTime() - new Date(a.Registered).getTime())
               .filter((item) => {
@@ -203,7 +206,7 @@ export default {
                     new Date(curentDate.toISOString());
                 return condition;
               });
-              if(this.tableData.length===0){
+              if(shikyuGoodsReceiveItemsTable===0){
                 const firstDayOfLastMonth = new Date(
                   curentDate.getFullYear(),
                   curentDate.getMonth()-1,
@@ -226,11 +229,17 @@ export default {
                     return condition;
                   });
                 }
+                this.tableData = shikyuGoodsReceiveItemsTable;
           })
           .catch((error) => {
             this.loading = false;
             ElMessage.error(error.message);
-          });
+          });*/
+          await shiKYUGoodsReceiveStore.getLisItemsByDate(curentDate);
+          //await shiKYUGoodsReceiveStore.getListItems();
+          
+          this.tableData = shiKYUGoodsReceiveStore.shikyuGoodsReceiveItems;
+          this.loading = false;
       } catch (error) {
         console.error("Error fetching data:", error);
       }

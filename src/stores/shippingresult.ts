@@ -63,7 +63,51 @@ export const useShippingResultStore = defineStore(FeatureKey.SHIPPINGRESULT, {
             uniqueItems.sort((a, b) => new Date(b.Registered).getTime() - new Date(a.Registered).getTime());
             this.shippingResults = uniqueItems;
         },
+        async getLisItemsByDate(curentDate:Date){
+            await this.getListItems();
+                const firstDayOfMonth = new Date(
+                    curentDate.getFullYear(),
+                    curentDate.getMonth(),
+                    1
+                );
+                let items = this.shippingResults.sort((a, b) => new Date(b.Registered).getTime() - new Date(a.Registered).getTime())
+                .filter((item) => {
+                let condition = true;
+                condition =
+                    condition &&
+                    new Date(firstDayOfMonth) <=
+                    new Date(item.ShippingResultDate) &&
+                    new Date(item.ShippingResultDate) <=
+                    new Date();
+                return condition;
+                });
 
+                if(items.length ===0){
+                    const firstDayOfLastMonth = new Date(
+                    curentDate.getFullYear(),
+                    curentDate.getMonth()-1,
+                    1
+                    );
+                    let lastDayOfMonthBeforeLast= firstDayOfLastMonth.setDate(firstDayOfLastMonth.getDate()-1);
+                    /*let tempFirstDate = firstDayOfMonth;
+                    tempFirstDate.setDate(tempFirstDate.getDate()-1);
+                    const lastDayOfLastMonth = tempFirstDate;*/
+                
+                    items = this.shippingResults
+                    .sort((a, b) => new Date(b.Registered).getTime() - new Date(a.Registered).getTime())
+                    .filter((item) => {
+                        let condition = true;
+                        condition =
+                        condition &&
+                        new Date(lastDayOfMonthBeforeLast) <
+                            new Date(item.ShippingResultDate) &&
+                        new Date(item.ShippingResultDate) <
+                            new Date(firstDayOfMonth);
+                        return condition;
+                    });
+                }
+                this.shippingResults = items;
+        },
         async getLatestShippingResultDateByMLNPartNoDesc(mlnPartNo: string): Promise<string> {
             try {
                 const sp = spfi(getSP());
