@@ -182,7 +182,7 @@ export default {
     async fetchTableData() {
       try {
           await shiKYUGoodsReceiveStore.getLisItemsByDate(curentDate);
-          this.tableData = shiKYUGoodsReceiveStore.shikyuGoodsReceives;
+          this.tableData = shiKYUGoodsReceiveStore.shikyuGoodsReceiveItems;
           this.loading = false;
       } catch (error) {
         console.error("Error fetching data:", error);

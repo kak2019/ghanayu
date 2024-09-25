@@ -24,7 +24,7 @@
     </div>
   </el-row>
 
-  <TableShipping :tableData="tableData"></TableShipping>
+  <TableShipping :tableData="tableData" :loading="loading"></TableShipping>
 </template>
 
 <script>
@@ -71,6 +71,7 @@ export default {
   data() {
     return {
       isBusinessControler: isBusinessControler,
+      loading: true,
       fullscreenLoading: false,
       processOptions: [],
       tableData: [],
@@ -292,7 +293,8 @@ export default {
     async fetchTableData() {
       try {
         await ProcessCompletionResultStore.getLisItemsByDate(curentDate);
-        this.tableData = ProcessCompletionResultStore.processCompletionResults;
+        this.tableData = ProcessCompletionResultStore.processCompletionResultItems;
+        this.loading = false;
         console.log("Processed table data:", this.tableData);
       } catch (error) {
         console.error('Error fetching data:', error);

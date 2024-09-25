@@ -88,7 +88,7 @@ export const useShippingResultStore = defineStore(FeatureKey.SHIPPINGRESULT, {
                     curentDate.getMonth()-1,
                     1
                     );
-                    let lastDayOfMonthBeforeLast= firstDayOfLastMonth.setDate(firstDayOfLastMonth.getDate()-1);
+                    const lastDayOfMonthBeforeLast= firstDayOfLastMonth.setDate(firstDayOfLastMonth.getDate()-1);
                     /*let tempFirstDate = firstDayOfMonth;
                     tempFirstDate.setDate(tempFirstDate.getDate()-1);
                     const lastDayOfLastMonth = tempFirstDate;*/

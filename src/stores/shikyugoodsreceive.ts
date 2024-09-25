@@ -93,7 +93,7 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
                     curentDate.getMonth()-1,
                     1
                     );
-                    let lastDayOfMonthBeforeLast= firstDayOfLastMonth.setDate(firstDayOfLastMonth.getDate()-1);
+                    const lastDayOfMonthBeforeLast= firstDayOfLastMonth.setDate(firstDayOfLastMonth.getDate()-1);
                 
                     items = shiKYUGoodsReceiveStore.shikyuGoodsReceives
                     .sort((a, b) => new Date(b.Registered).getTime() - new Date(a.Registered).getTime())
