@@ -572,15 +572,6 @@ export default {
     },
   },
   async mounted() {
-    /*const userStore = useUserStore();
-    //const isInventoryManager = computed(() => userStore.groupInfo.indexOf('Inventory Manager') >= 0);
-    const isBusinessControler = computed(() => userStore.groupInfo.indexOf('Business Controler') >= 0);
-    const isHanyuType1 = computed(() => userStore.groupInfo.indexOf('Hanyu type 1') >= 0);
-    if(isHanyuType1 || isBusinessControler){
-      this.disabled = true;
-    }else{
-      this.disabled = false;
-    }*/
     await processMasterStore.getListItems();
     await functionsMasterStore.getListItems();
     await modifiedReasonMasterStore.getListItems();
