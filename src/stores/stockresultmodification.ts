@@ -101,10 +101,14 @@ export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESUL
             const Comment = item.Comment || "";
 
             const itemForAdd = { ...item, Comment };
+            
+            const processType = itemForAdd.ProcessType==="Z"? "F":itemForAdd.ProcessType==="CH"? "C" : itemForAdd.ProcessType;
+            const itemForAddTemp = itemForAdd;
+            itemForAddTemp.ProcessType = processType;
             try {
                 const sp = spfi(getSP());
                 const web = await sp.web();
-                await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKRESULTMODIFICATION}`).items.add(itemForAdd);
+                await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKRESULTMODIFICATION}`).items.add(itemForAddTemp);
 
                 //Add record to StockHistory table.
                 const stockHistoryStore = useStockHistoryStore();
@@ -121,7 +125,7 @@ export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESUL
 
                 const billOfMaterialsItem = {
                     MLNPartNo: itemForAdd.MLNPartNo,
-                    ProcessType: itemForAdd.ProcessType, // need to get form 工程区分，and covert to Janpnese words
+                    ProcessType: processType, // need to get form 工程区分，and covert to Janpnese words
                     UDPartNo: itemForAdd.UDPartNo,
                     Qty: itemForAdd.ModifiedQty,
                     FunctionID: itemForAdd.FunctionID,
@@ -145,16 +149,18 @@ export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESUL
                         }
                         // Get item information for front process
                         const bomItemLastProcess = {
-                            Child:"",
                             MLNPartNo: ChildPartNo,
                             ProcessType: ChildProcessType,
                             UDPartNo: UdPartNo,
                             Qty: inOutQty, 
                             FunctionID: "08", // it's only "08" in this process.
-                            StockQty: lastProcessStockQty, 																	
+                            StockQty: lastProcessStockQty, 	
+                            Registered:itemForAdd.Registered,
+                            Comment: itemForAdd.Comment || "",																
                         } as IStockHistoryItem;
                         await stockHistoryStore.addListItem(bomItemLastProcess);
                     });
+                    
                     /*for (const record of childProcessNItemToStock) { 
                         const { ChildPartNo, UdPartNo, ChildProcessType, StockQty, StructureQty} = record;
                         lastProcessStockQty = Number(StockQty) + Number(itemForAdd.ModifiedQty) * -1;//Latest stock quantity + entered correction quantity × -1

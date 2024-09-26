@@ -173,7 +173,7 @@ export default {
           this.$message.error('0は不可としマイナス数値は可とする.');
           return;
        }
-
+        debugger
         //Add new record to stock modification page
         //const regularUser = computed(() => userStore.hanyutype1s);
         const newItem = {
@@ -194,7 +194,7 @@ export default {
         //The BOM table is searched using the entered MLN part number + process category as a key.If a corresponding record exists, it is registered in the ProcessCompletionResult table.
         let curPartCount;
         let processType = newItem.ProcessType==="Z"? "F":newItem.ProcessType==="CH"? "C" : newItem.ProcessType;
-        newItem.ProcessType = processType
+        
         //if (newItem.ProcessType !== "Z" && newItem.ProcessType !== "CH") {
         curPartCount =
         await partMasterStore.getItemCountByMLNPartNoProcessType(
@@ -211,7 +211,7 @@ export default {
         //Current process. - Validate If the entered correction amount is a negative value, or if the entered correction amount x -1 > the stock amount for this process (if the stock amount becomes negative), an error message will be displayed and the data will be added to the Inventory & Results Correction Table.
         const stockHistoryStore = useStockHistoryStore();
         let latestStockQty = 0;
-        if (newItem.ProcessType === "Z") {
+        if (newItem.ProcessType === "F") {
           latestStockQty =
             await stockHistoryStore.getListItemsByRegisteredDate(
               newItem.MLNPartNo,
@@ -302,6 +302,8 @@ export default {
           childProcessNItemToStock.push(newChildItem);
         }
 
+        //newItem.ProcessType = processType
+        
         //Add record to good receive table
         let message = await stockResultModificationStore.addListItem(newItem, latestStockQty, childProcessNItemToStock);
 
@@ -557,7 +559,7 @@ export default {
         condition = condition && item.value !== "F";
         return condition;
       });
-      this.form.selectedProcess = tempTableRrocess[0].value;
+      //this.form.selectedProcess = tempTableRrocess[0].value;
       this.tableRrocess = tempTableRrocess;
     },
   },

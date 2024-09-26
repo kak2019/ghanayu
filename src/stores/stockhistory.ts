@@ -53,7 +53,6 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                         Registered: item.Registered,
                         Modified: item.Modified,
                         SourceItemID: item.SourceItemID,
-                        Child:item.Child
                     }))
                     allItems = allItems.concat(selectedItems);
                     skip += pageSize;
