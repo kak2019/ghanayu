@@ -301,8 +301,6 @@ export default {
           newChildItem.UdPartNo = udPartNo;
           childProcessNItemToStock.push(newChildItem);
         }
-
-        //newItem.ProcessType = processType
         
         //Add record to good receive table
         let message = await stockResultModificationStore.addListItem(newItem, latestStockQty, childProcessNItemToStock);
@@ -560,6 +558,10 @@ export default {
         return condition;
       });
       //this.form.selectedProcess = tempTableRrocess[0].value;
+      const selectedProcess = tempTableRrocess.find(it=>it.value === this.form.selectedProcess);
+      if(selectedProcess===undefined){
+        this.form.selectedProcess = tempTableRrocess[0].value;
+      }
       this.tableRrocess = tempTableRrocess;
     },
   },
