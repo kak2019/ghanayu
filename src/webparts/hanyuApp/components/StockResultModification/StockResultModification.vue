@@ -211,7 +211,7 @@ export default {
         //Current process. - Validate If the entered correction amount is a negative value, or if the entered correction amount x -1 > the stock amount for this process (if the stock amount becomes negative), an error message will be displayed and the data will be added to the Inventory & Results Correction Table.
         const stockHistoryStore = useStockHistoryStore();
         let latestStockQty = 0;
-        if (newItem.ProcessType === "F") {
+        if (newItem.ProcessType === "Z") {
           latestStockQty =
             await stockHistoryStore.getListItemsByRegisteredDate(
               newItem.MLNPartNo,
@@ -464,7 +464,7 @@ export default {
 
       tempTableRrocess = tempTableRrocess.filter((item) => {
         let condition = true;
-        condition = condition && item.value !== "F";
+        condition = condition && item.value !== "F";//Filter out F due to don't need to show "粗材" in dropdown list 
         return condition;
       });
 
@@ -554,7 +554,7 @@ export default {
       }
       tempTableRrocess = tempTableRrocess.filter((item) => {
         let condition = true;
-        condition = condition && item.value !== "F";
+        condition = condition && item.value !== "F";//Filter out F due to don't need to show "粗材" in dropdown list
         return condition;
       });
       //this.form.selectedProcess = tempTableRrocess[0].value;
@@ -599,7 +599,7 @@ export default {
 
     tempTableRrocess = tempTableRrocess.filter((item) => {
       let condition = true;
-      condition = condition && item.value !== "F";
+      condition = condition && item.value !== "F";//Filter out F due to don't need to show "粗材" in dropdown list
       return condition;
     });
 

@@ -139,7 +139,7 @@ export default {
         const processCompletionResultStore = useProcessCompletionResultStore();
         const hasData = await processCompletionResultStore.checkItemsAlreadyInProcessCompletetion(this.form.MLNPartNo, this.form.selectProcessType, utcProcessCompletion);
 
-          if (isNaN(hasData) || hasData > 0) {
+          if (hasData) {
             //const latestRecord = curPartRecords[0];
             //if (!this.isToday(this.form.ProcessCompletion)) { 
               //const compareDateResult = isDateBefore(new Date(utcProcessCompletion), new Date(latestRecord.ProcessCompletion))

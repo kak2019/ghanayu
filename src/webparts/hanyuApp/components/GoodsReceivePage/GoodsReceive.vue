@@ -149,7 +149,7 @@ export default {
           newItem.ProcessType,
           newItem.GoodsReceiveDate
         );
-        if (isNaN(hasData) || hasData > 0) {
+        if (hasData) {
           this.$message.error('検収実績日エラー');
           this.fullscreenLoading = false;
           return;

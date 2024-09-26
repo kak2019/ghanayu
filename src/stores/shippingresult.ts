@@ -4,6 +4,8 @@ import { getSP } from '../pnpjsConfig';
 import { FeatureKey } from '../config/keystrs';
 import { IShippingResultItem } from '../model';
 import { CONST } from '../config/const';
+import { computed } from 'vue';
+import { isDateBefore } from '../common/utils';
 
 export const useShippingResultStore = defineStore(FeatureKey.SHIPPINGRESULT, {
     state: () => ({
@@ -153,6 +155,20 @@ export const useShippingResultStore = defineStore(FeatureKey.SHIPPINGRESULT, {
                 throw new Error(`データの登録中にエラーが発生しました`);
             }
         },
-
+        async checkItemsAlreadyInShipingResultes(mlnPartNo: string, processType: string, shippingResultDate:string): Promise<boolean> {
+            try {
+                
+                const shippingResultDateForDate = new Date(shippingResultDate);
+                await this.getListItems();
+                const items = computed(() => this.shippingResultItems.filter(i => i.MLNPartNo === mlnPartNo && i.ProcessType === processType && isDateBefore(new Date(shippingResultDateForDate), new Date(i.ShippingResultDate))));
+                
+                const isLengthZero: boolean = (items.value.length as number) > 0? true : false;
+  
+                return isLengthZero;
+            }
+            catch (error) {
+                throw new Error(`データの取得中にエラーが発生しました`);
+            }
+        },
     },
 });

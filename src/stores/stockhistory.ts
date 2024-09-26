@@ -192,7 +192,8 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 const sp = spfi(getSP());
                 const web = await sp.web();
                 const list = sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`);
-
+                await this.getListItems();
+                
                 let items = await list.items
                     .filter(`MLNPartNo eq '${mlnPartNo}' and ProcessType eq '${processType}'`)
                     .orderBy("Registered", false)();

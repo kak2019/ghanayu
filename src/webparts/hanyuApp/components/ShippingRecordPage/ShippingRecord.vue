@@ -128,20 +128,6 @@ export default {
         }
 
         const curUDPartNo = await partMasterStore.getListItemByMLNPartNo(this.form.num);
-        // If the "出荷実績日" is smaller than the latest record date in system, show error message.
-        const latestResultDate = await shippingResultStore.getLatestShippingResultDateByMLNPartNoDesc(this.form.num)
-
-        if (latestResultDate.length > 0) {
-          const compareDateResult = this.compareDates(latestResultDate,this.form.date)
-          if (compareDateResult === 1) {
-            this.$message.error('出荷実績日エラー');
-            this.fullscreenLoading = false;
-            return;
-          }
-        }
-
-        //const curUDPartNo = await partMasterStore.getListItemByMLNPartNo(this.form.num);
-        //Register a record in the ShippingResult table.
         const newItem = {
           MLNPartNo: this.form.num,
           UDPartNo: curUDPartNo,
@@ -150,7 +136,23 @@ export default {
           Calloffid: this.form.id,
           Despatchnote: this.form.note,
           ShippingResultDate: convertToUTC(getCurrentTime(this.form.date))
-        };
+        };        
+        // If the "出荷実績日" is smaller than the latest record date in system, show error message.
+        //Check if user is already input goods after selected date.
+        const hasData = await shippingResultStore.checkItemsAlreadyInShipingResultes(
+          newItem.MLNPartNo,
+          "C",
+          newItem.ShippingResultDate
+        );
+        if (hasData) {
+            this.$message.error('出荷実績日エラー');
+            this.fullscreenLoading = false;
+            return;
+        }
+
+        //const curUDPartNo = await partMasterStore.getListItemByMLNPartNo(this.form.num);
+        //Register a record in the ShippingResult table.
+
         //Register an out stock record to the StockHistory table.InOutQty=negative value of (出荷数),FunctionID=04
         const latestStockQty = await stockHistoryStore.getLatestStockQtyByMLNPartNoProcessTypeDesc(this.form.num, 'C');
         if(newItem.ShipQty > parseInt(latestStockQty)){
@@ -254,9 +256,9 @@ export default {
     },
     async fetchTableData() {
       try {
-        this.loading = false;
         await shippingResultStore.getLisItemsByDate(curentDate);
         this.tableData = shippingResultStore.shippingResultItems;
+        this.loading = false;
         } catch (error) {
           console.error("Error fetching shipping results:", error);
         }

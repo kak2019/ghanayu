@@ -16,6 +16,8 @@
 
 <script>
 import { CONST } from '../../../../config/const';
+import { getCurrentTime } from '../../../../common/utils';
+
 export default {
   name: 'DatePickerWithLabel',
   props: {
