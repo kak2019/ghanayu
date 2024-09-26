@@ -295,8 +295,8 @@ export default {
         }else if(newItem.ProcessType === "CH"){
           let newChildItem = [];
           newChildItem.ChildPartNo = newItem.MLNPartNo;
-          newChildItem.ChildProcessType = "C";
-          newChildItem.StockQty = latestStockQty;
+          newChildItem.ChildProcessType = "";
+          newChildItem.StockQty = "0";
           newChildItem.StructureQty = 1;
           newChildItem.UdPartNo = udPartNo;
           childProcessNItemToStock.push(newChildItem);
