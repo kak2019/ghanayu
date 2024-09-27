@@ -295,11 +295,12 @@ export default {
         }else if(newItem.ProcessType === "CH"){
           let newChildItem = [];
           newChildItem.ChildPartNo = newItem.MLNPartNo;
-          newChildItem.ChildProcessType = "";
+          newChildItem.ChildProcessType = "C";
           newChildItem.StockQty = "0";
           newChildItem.StructureQty = 1;
           newChildItem.UdPartNo = udPartNo;
           childProcessNItemToStock.push(newChildItem);
+          newItem.ProcessType="";
         }
         
         //Add record to good receive table
@@ -350,9 +351,9 @@ export default {
       }
     },
     getProcessNameByType(ProcessType) {
-      if (ProcessType === "Z") {
+      if (ProcessType === "F") {
         return "支給";
-      } else if (ProcessType === "CH") {
+      } else if (ProcessType === null) {
         return "出荷";
       } else {
         const tableData = computed(() => processMasterStore.processMasterItems);
