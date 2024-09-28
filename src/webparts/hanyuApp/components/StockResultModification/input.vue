@@ -41,7 +41,7 @@ export default {
     },
     maxLength:{
       type: Number,
-      default : 10
+      default : 10000
     },
     inputWidth: {
       type: Number,
