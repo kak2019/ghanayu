@@ -38,13 +38,22 @@ export default class HanyuAppWebPart extends BaseClientSideWebPart<IHanyuAppWebP
     app.use(router);
     app.mount(`#app-${this.context.instanceId}`);
   }
-
+  private checkAndAddQueryString(): void {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (!urlParams.has('env') || urlParams.get('env') !== 'WebView') {
+      urlParams.set('env', 'WebView');
+      window.location.search = urlParams.toString();
+    }
+  }
   protected onInit(): Promise<void> {
     getSP(this.context);
     return this._getEnvironmentMessage().then(message => {
       this._environmentMessage = message;
+    }).then(_ => {
+      this.checkAndAddQueryString();
     });
   }
+
 
 
 

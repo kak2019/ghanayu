@@ -79,7 +79,8 @@ export default {
         }
         const windowHeight = ref(window.innerHeight);
         const tableHeight = computed(() => {
-            const spcHeight = (windowHeight.value < 640) ? 500 : 389;
+            //const spcHeight = (windowHeight.value < 640) ? (500 - 220) : (389 - 220);
+            const spcHeight = 179;
             const minHeight = (windowHeight.value < 640) ? 200 : 400;
             return windowHeight.value > minHeight + spcHeight ? windowHeight.value - spcHeight : minHeight;
         });

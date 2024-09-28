@@ -39,7 +39,9 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                             'Comment',
                             'Registered',
                             'Modified',
-                            'SourceItemID')
+                            'SourceItemID',
+                            'UniqueKey',
+                        )
                         .top(pageSize).skip(skip)();
                     const selectedItems = items.map(item => ({
                         ID: item.ID,
@@ -53,6 +55,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                         Registered: item.Registered,
                         Modified: item.Modified,
                         SourceItemID: item.SourceItemID,
+                        UniqueKey: item.UniqueKey,
                     }))
                     allItems = allItems.concat(selectedItems);
                     skip += pageSize;
@@ -110,7 +113,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 const web = await sp.web();
                 await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`).items.add({
                     MLNPartNo: item.MLNPartNo,
-                    ProcessType: item.ProcessType, 
+                    ProcessType: item.ProcessType,
                     UDPartNo: item.UDPartNo,
                     Qty: item.Qty,
                     FunctionID: item.FunctionID,
@@ -118,6 +121,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                     Comment: item.Comment || "",
                     Registered: item.Registered || "",
                     SourceItemID: item.SourceItemID || "",
+                    UniqueKey: `${item.MLNPartNo}-${item.ProcessType}`,
                 });
                 return '登録完了。';
             }
@@ -146,6 +150,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                         Comment: item.Comment || "",
                         Registered: new Date(),
                         SourceItemID: item.SourceItemID || "",
+                        UniqueKey: `${item.MLNPartNo}-${item.ProcessType}`,
                     }).then(r => res.push(r)).catch(e => errors.push(e))
                 );
                 //await execute();
@@ -164,7 +169,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 //Have to use 
                 await this.getListItems();
                 items = computed(() => this.stockHistoryItems).value.sort((a, b) => new Date(b.Modified).getTime() - new Date(a.Modified).getTime());
-            
+
                 let tempItems = [];
                 tempItems = items.filter(item => {
                     let condition = true
@@ -173,7 +178,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                     }
                     return condition
                 });
-                
+
                 if (tempItems.length > 0) {
                     return tempItems[0].StockQty
                 } else {
@@ -193,11 +198,11 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                 const web = await sp.web();
                 const list = sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameSTOCKHISTORY}`);
                 await this.getListItems();
-                
+
                 let items = await list.items
                     .filter(`MLNPartNo eq '${mlnPartNo}' and ProcessType eq '${processType}'`)
                     .orderBy("Registered", false)();
-                    items= items.sort((a, b) => new Date(b.Modified).getTime() - new Date(a.Modified).getTime())
+                items = items.sort((a, b) => new Date(b.Modified).getTime() - new Date(a.Modified).getTime())
                 if (items.length > 0) {
                     console.log(`Found item: ${JSON.stringify(items[0])}`);
                     return items[0].StockQty;
@@ -229,7 +234,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                     const tempRegistered = new Date(item.Registered);
                     //const formatRegistered = new Date(item.Registered).getFullYear() + "-" + (new Date(item.Registered).getMonth() + 1);
                     if (mlnPartNo) {
-                        condition = condition && mlnPartNo === item.MLNPartNo && item.ProcessType === processType && isDateBefore(tempRegistered,firstDayOfMonth)
+                        condition = condition && mlnPartNo === item.MLNPartNo && item.ProcessType === processType && isDateBefore(tempRegistered, firstDayOfMonth)
                     }
                     return condition
                 });
@@ -408,7 +413,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
                     const today = new Date(current);
                     const lastDayOfCurrentMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0)
                     if (mlnPartNo) {
-                        condition = condition && mlnPartNo === item.MLNPartNo && item.ProcessType === processType && isDateBefore(new Date(item.Registered),lastDayOfCurrentMonth)
+                        condition = condition && mlnPartNo === item.MLNPartNo && item.ProcessType === processType && isDateBefore(new Date(item.Registered), lastDayOfCurrentMonth)
                     }
                     return condition
                 });
