@@ -44,6 +44,7 @@ import { useStockHistoryStore } from "../../../../stores/stockhistory"
 import { useUserStore } from '../../../../stores/user';
 import { isDateBefore, convertToUTC } from '../../../../common/utils';
 import { getCurrentTime } from '../../../../common/utils';
+import { useFileName } from '../../../../stores/usefilename';
 
 const ProcessMasterStore = useProcessMasterStore();
 const ProcessCompletionResultStore = useProcessCompletionResultStore();
@@ -326,8 +327,10 @@ export default {
       const ws = XLSX.utils.json_to_sheet(data);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, 'Process Completion Results');
+      const { fileName, generateFileName } = useFileName();
 
-      XLSX.writeFile(wb, 'process_completion_results.xlsx');
+      generateFileName('内製工程完了実績入力');
+      XLSX.writeFile(wb, fileName.value);
     },
 
     formatDate(row, column) {
