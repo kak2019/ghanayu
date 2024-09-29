@@ -116,7 +116,7 @@ export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESUL
                 let stockQty;
                 if (itemForAdd.FunctionID !== "07") {
                     stockQty = Number(LatestStockQty) + Number(itemForAdd.ModifiedQty);
-                    if(itemForAdd.ProcessType === "CH"){
+                    if(itemForAdd.ProcessType === ""){
                         stockQty = 0;
                     }
                 } else {
