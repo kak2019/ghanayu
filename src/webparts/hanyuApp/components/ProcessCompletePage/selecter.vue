@@ -3,14 +3,14 @@
     <label class="custom-label">{{ label }}</label>
     <el-select
         v-model="innerValue"
-        placeholder="请选择"
+        placeholder="Please select"
         @change="handleChange"
         style="max-width: 130px;"
         size="small"
     >
       <el-option
-          v-for="item in processOptions"
-          :key="item.Id"
+          v-for="item in options"
+          :key="item.ProcessType"
           :label="item.ProcessName"
           :value="item.ProcessType"
       />
@@ -30,8 +30,9 @@ export default {
       type: [String],
       required: true
     },
-    processOptions: {
-      type:[]
+    options: {
+      type: Array,
+      default: () => []
     },
   },
   data() {
@@ -46,9 +47,9 @@ export default {
     innerValue(newValue) {
       this.$emit('update:modelValue', newValue);
     },
-    options(newValue) {
+    /*options(newValue) {
       this.$emit('update:processOptions', newValue);
-    }
+    }*/
   },
   methods: {
     handleChange(value) {

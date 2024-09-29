@@ -63,7 +63,7 @@ export const useProcessCompletionResultStore = defineStore(FeatureKey.PROCESSCOM
 
     },
 
-    async getLisItemsByDate(curentDate:Date){
+    async getLisItemsByDate(curentDate:Date, procesType:string){
       await this.getListItems();
           const firstDayOfMonth = new Date(
               curentDate.getFullYear(),
@@ -78,7 +78,8 @@ export const useProcessCompletionResultStore = defineStore(FeatureKey.PROCESSCOM
                 new Date(firstDayOfMonth) <=
                 new Date(item.ProcessCompletion) &&
                 new Date(item.ProcessCompletion) <=
-                new Date();
+                new Date() 
+                && item.ProcessType=== procesType;
             return condition;
           });
 
@@ -102,7 +103,8 @@ export const useProcessCompletionResultStore = defineStore(FeatureKey.PROCESSCOM
                   new Date(lastDayOfMonthBeforeLast) <
                       new Date(item.ProcessCompletion) &&
                   new Date(item.ProcessCompletion) <
-                      new Date(firstDayOfMonth);
+                      new Date(firstDayOfMonth)
+                      && item.ProcessType=== procesType;
                   return condition;
               });
           }

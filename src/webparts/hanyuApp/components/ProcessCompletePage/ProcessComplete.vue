@@ -5,7 +5,7 @@
         <date-picker-with-label v-model="form.ProcessCompletion" label="工程完了日"></date-picker-with-label>
       </div>
       <div class="background-layer">
-        <Selecter v-model="form.selectProcessType" label="工程区分" :processOptions="processOptions"></Selecter>
+        <Selecter v-model="form.selectProcessType" label="工程区分" :options="processOptions"></Selecter>
       </div>
       <div class="background-layer">
         <InputRemoteData v-model="form.MLNPartNo" label="MLN部品番号" searchField="MLN" @confirmMethod="confirmMethod" />
@@ -266,7 +266,12 @@ export default {
         this.$message.success(message);
         this.needToSyncItems = [];
         this.fullscreenLoading = false
-        this.resetForm(); // 调用 resetForm 方法重置表单
+        //this.resetFormWithoutProcessType(); // 调用 resetForm 方法重置表单
+        this.form.ProcessCompletion = Date();
+        this.form.MLNPartNo = "";
+        this.form.UDPartNo = "";
+        this.form.AbnormalNumber = "";
+        this.form.FinishedNumber = "";
       } catch (error) {
         this.$message.error('登録に失敗しました: ' + error.message);
       }finally{
@@ -293,7 +298,8 @@ export default {
 
     async fetchTableData() {
       try {
-        await ProcessCompletionResultStore.getListItems();
+        this.loading = true;
+        await ProcessCompletionResultStore.getLisItemsByDate(curentDate,this.form.selectProcessType);
         this.tableData = ProcessCompletionResultStore.processCompletionResultItems;
         this.loading = false;
         console.log("Processed table data:", this.tableData);
@@ -307,6 +313,17 @@ export default {
         ProcessCompletion: new Date(),
         selectProcessName: '生加工',
         selectProcessType: 'M',
+        MLNPartNo: '',
+        UDPartNo: '',
+        AbnormalNumber: '',
+        FinishedNumber: ''
+      };
+    },
+    resetFormWithoutProcessType() {
+      this.form = {
+        ProcessCompletion: new Date(),
+        //selectProcessName: '生加工',
+        selectProcessType: this.form,
         MLNPartNo: '',
         UDPartNo: '',
         AbnormalNumber: '',
@@ -370,6 +387,15 @@ export default {
       // 比较日期
       return today.getTime() === givenDate.getTime();
     }
+  },
+  watch: {
+  "form.selectProcessType": {
+    handler: async function (newVal, oldVal) {
+      await this.fetchTableData();
+    },
+    deep: true, // Open the deep monitoring
+    immediate: true
+    },
   },
   async mounted() {
     await this.fetchTableData();
