@@ -30,7 +30,7 @@
       </el-button>
     </div>
   </el-row>
-  <TableShipping :tableData="tableData" :loading="loading"></TableShipping>
+  <TableShipping :tableData="tableData" :loading="loading" :height="tableHeight"></TableShipping>
 </template>
 
 <script>
@@ -88,15 +88,19 @@ export default {
         note: '',
         num: '',
         count: ''
-      }
+      },
+      tableHeight: 300
     };
   },
-
   methods: {
+    setTableHeight() {
+      // 根据需要动态计算高度，例如：窗口高度减去其他元素高度
+      this.tableHeight = window.innerHeight - 250; // 假设其他元素高度固定为100px
+    },
     async submitForm() {
       try {
         this.fullscreenLoading = true;
-
+        debugger
         if (!this.form.num) {
           this.$message.error('MLNPartNo不能为空');
           this.fullscreenLoading = false;
@@ -262,12 +266,16 @@ export default {
         } catch (error) {
           console.error("Error fetching shipping results:", error);
         }
-    }
+    },
   },
   async mounted() {
     await this.fetchTableData();
+    this.setTableHeight(); // 设置初始高度
+    window.addEventListener('resize', this.setTableHeight); // 监听窗口大小变化
   },
-  
+  beforeDestroy() {
+    window.removeEventListener('resize', this.setTableHeight); // 移除监听器
+  },
 };
 </script>
 <style scoped>

@@ -7,6 +7,7 @@
     height="320px"
     :header-cell-style="{ backgroundColor: '#366093', color: 'white' }"
     v-loading="loading"
+    :style="{ height: tableHeight + 'px', overflow: 'auto'}"
   >
     <el-table-column
       prop="ShippingResultDate"
@@ -31,7 +32,7 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { useShippingResultStore } from "../../../../stores/shippingresult"; // 更新为你的实际路径
-const { tableData, loading } = defineProps(['tableData','loading'])
+const { tableData, loading,tableHeight  } = defineProps(['tableData','loading','tableHeight '])
 // 获取 Pinia store 实例
 const shippingResultStore = useShippingResultStore();
 
