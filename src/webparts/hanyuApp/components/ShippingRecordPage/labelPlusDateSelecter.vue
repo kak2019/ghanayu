@@ -10,6 +10,8 @@
         :disabled-date="disabledDate"
         style="max-width: 127px;"
         size="small"
+        :editable="false"
+        :clearable="false"
     ></el-date-picker>
   </div>
 </template>
