@@ -83,7 +83,8 @@ export default defineComponent({
 
         const windowHeight = ref(window.innerHeight);
         const tableHeight = computed(() => {
-            const spcHeight = (windowHeight.value < 640) ? 524 : 413;
+            //const spcHeight = (windowHeight.value < 640) ? (524 - 220) : (413 - 220);
+            const spcHeight = 193;
             const minHeight = (windowHeight.value < 640) ? 178 : 378;
             return windowHeight.value > minHeight + spcHeight ? windowHeight.value - spcHeight : minHeight;
         });
