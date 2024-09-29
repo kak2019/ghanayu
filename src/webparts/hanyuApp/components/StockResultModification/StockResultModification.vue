@@ -173,12 +173,6 @@ export default {
           return;
         }
 
-       if(this.form.selectedProcess === "CH" && Number(modifiedQty) <= 0){
-          this.fullscreenLoading = false;
-          this.$message.error('0は不可としマイナス数値は可とする.');
-          return;
-       }
-        debugger
         //Add new record to stock modification page
         //const regularUser = computed(() => userStore.hanyutype1s);
         const newItem = {
