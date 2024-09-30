@@ -11,11 +11,13 @@
         :editable="false"
         :clearable="false"
         size="small"
+        :disabled-date="disabledDate"
     ></el-date-picker>
   </div>
 </template>
 
 <script>
+import { CONST } from '../../../../config/const';
 export default {
   name: 'DatePickerWithLabel',
   props: {
@@ -44,7 +46,14 @@ export default {
   methods: {
     handleChange(value) {
       this.$emit('update:modelValue', value);
-    }
+    },
+    disabledDate(date) {
+      //const start = new Date('2024-01'); // 2024-08-01
+      const start = new Date(`${CONST.beginOperationDate}`);
+      //const end = new Date('2025-12'); // 2024-08-31
+      const end = new Date(`${CONST.endOperationDate}`);
+      return date < start || date > end;
+    },
   }
 };
 </script>
