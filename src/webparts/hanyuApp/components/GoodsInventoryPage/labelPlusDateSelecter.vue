@@ -8,6 +8,8 @@
         class="custom-date-picker"
         @change="handleChange"
         :disabled-date="disabledDate"
+        :editable="false"
+        :clearable="false"
         style="max-width: 127px;"
         size="small"
     ></el-date-picker>
