@@ -206,35 +206,36 @@ export default {
           this.$message.error("部品表なしエラー.");
           return;
         }
-
+        
         //Current process. - Validate If the entered correction amount is a negative value, or if the entered correction amount x -1 > the stock amount for this process (if the stock amount becomes negative), an error message will be displayed and the data will be added to the Inventory & Results Correction Table.
         const stockHistoryStore = useStockHistoryStore();
         let latestStockQty = 0;
-        
-        if(newItem.ProcessType!=="CH"){
-          if (newItem.ProcessType === "Z") {
-            latestStockQty =
+        if(newItem.FunctionID !=="07"){
+          if(newItem.ProcessType!=="CH"){
+            if (newItem.ProcessType === "Z") {
+              latestStockQty =
+                await stockHistoryStore.getListItemsByRegisteredDate(
+                  newItem.MLNPartNo,
+                  "F"
+                );
+            } else {
+              latestStockQty =
               await stockHistoryStore.getListItemsByRegisteredDate(
                 newItem.MLNPartNo,
-                "F"
+                newItem.ProcessType
               );
-          } else {
-            latestStockQty =
-            await stockHistoryStore.getListItemsByRegisteredDate(
-              newItem.MLNPartNo,
-              newItem.ProcessType
-            );
+            }
+            if (
+              Number(newItem.ModifiedQty) <= 0 &&
+              Number(newItem.ModifiedQty) * -1 > Number(latestStockQty)
+            ) {
+              this.fullscreenLoading = false;
+              this.$message.error(
+                "修正数が当工程または前工程の在庫数より多くなっています."
+              );
+              return;
+            } 
           }
-          if (
-            Number(newItem.ModifiedQty) <= 0 &&
-            Number(newItem.ModifiedQty) * -1 > Number(latestStockQty)
-          ) {
-            this.fullscreenLoading = false;
-            this.$message.error(
-              "修正数が当工程または前工程の在庫数より多くなっています."
-            );
-            return;
-          } 
         }
         // if all the validation has been passed, need to add several mandatory fields to newItem, then do some caculation for stock history
         //Get UD part number in the part master table that corresponds to the entered MLN part number

@@ -160,27 +160,6 @@ export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESUL
                         } as IStockHistoryItem;
                         await stockHistoryStore.addListItem(bomItemLastProcess);
                     });
-                    
-                    /*for (const record of childProcessNItemToStock) { 
-                        const { ChildPartNo, UdPartNo, ChildProcessType, StockQty, StructureQty} = record;
-                        lastProcessStockQty = Number(StockQty) + Number(itemForAdd.ModifiedQty) * -1;//Latest stock quantity + entered correction quantity × -1
-                        let inOutQty = 0;
-                        if(itemForAdd.ProcessType === "CH"){
-                            inOutQty = Number(itemForAdd.ModifiedQty) * -1;
-                        }else{
-                            inOutQty =  Number(itemForAdd.ModifiedQty) * -1 * Number(StructureQty);//Number of corrections entered × -1 * Structured Quantity in BOM table
-                        }
-                        // Get item information for front process
-                        const bomItemLastProcess = {
-                            MLNPartNo: ChildPartNo,
-                            ProcessType: ChildProcessType,
-                            UDPartNo: UdPartNo,
-                            Qty: inOutQty, 
-                            FunctionID: "08", // it's only "08" in this process.
-                            StockQty: lastProcessStockQty, 																	
-                        } as IStockHistoryItem;
-                        await stockHistoryStore.addListItem(bomItemLastProcess);
-                    }*/
                 }
                 return '登録完了。';
             }
