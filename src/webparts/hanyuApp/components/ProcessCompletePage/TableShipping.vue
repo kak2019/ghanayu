@@ -1,5 +1,5 @@
 <template>
-  <el-table :data="tableData" stripe border style="width: 100%;font-size:12px;" :header-cell-style="{backgroundColor: '#366093', color: 'white'}" height="320px" v-loading="loading">
+  <el-table :data="tableData" stripe border style="width: 100%;font-size:12px;" :header-cell-style="{backgroundColor: '#366093', color: 'white'}" :style="{ height: tableHeight + 'px', overflow: 'auto'}" v-loading="loading">
     <!-- 第一层表头 -->
     <el-table-column prop="ProcessCompletion" label="工程完了日"  :formatter="formatDate" />
     <el-table-column prop="MLNPartNo" label="MLN部品番号" rowspan="2" />

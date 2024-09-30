@@ -95,7 +95,10 @@ export default {
   methods: {
     setTableHeight() {
       // 根据需要动态计算高度，例如：窗口高度减去其他元素高度
-      this.tableHeight = window.innerHeight - 250; // 假设其他元素高度固定为100px
+      const windowHeight = ref(window.innerHeight);
+      const spcHeight = 179;
+      const minHeight = (windowHeight.value < 640) ? 200 : 400;
+      this.tableHeight = windowHeight.value > minHeight + spcHeight ? windowHeight.value - spcHeight : minHeight;
     },
     async submitForm() {
       try {

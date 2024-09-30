@@ -4,7 +4,6 @@
     stripe
     border
     style="width: 100%; font-size: 12px"
-    height="320px"
     :header-cell-style="{ backgroundColor: '#366093', color: 'white' }"
     v-loading="loading"
     :style="{ height: tableHeight + 'px', overflow: 'auto'}"

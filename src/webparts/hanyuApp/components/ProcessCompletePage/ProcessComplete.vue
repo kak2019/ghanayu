@@ -24,7 +24,7 @@
     </div>
   </el-row>
 
-  <TableShipping :tableData="tableData" :loading="loading"></TableShipping>
+  <TableShipping :tableData="tableData" :loading="loading" :height="tableHeight"></TableShipping>
 </template>
 
 <script>
@@ -86,10 +86,18 @@ export default {
         AbnormalNumber: '',
         FinishedNumber: ''
       },
+      tableHeight: 300
     };
   },
 
   methods: {
+    setTableHeight() {
+      // 根据需要动态计算高度，例如：窗口高度减去其他元素高度
+      const windowHeight = ref(window.innerHeight);
+      const spcHeight = 179;
+      const minHeight = (windowHeight.value < 640) ? 200 : 400;
+      this.tableHeight = windowHeight.value > minHeight + spcHeight ? windowHeight.value - spcHeight : minHeight;
+    },
     async submitForm() {
       try {
         if (!this.form.MLNPartNo) {
@@ -400,6 +408,11 @@ export default {
   async mounted() {
     await this.fetchTableData();
     await this.fetchProcessMasterData();
+    this.setTableHeight(); // 设置初始高度
+    window.addEventListener('resize', this.setTableHeight); // 监听窗口大小变化
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.setTableHeight); // 移除监听器
   }
 };
 </script>
