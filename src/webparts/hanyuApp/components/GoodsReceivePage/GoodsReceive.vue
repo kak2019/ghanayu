@@ -80,6 +80,7 @@ const shiKYUGoodsReceiveStore = useSHIKYUGoodsReceiveStore();
 const defaultShikyufrom = "2922";
 const userStore = new useUserStore();
 const isBusinessControler = computed(() => userStore.groupInfo.indexOf('Business Controler') >= 0);
+const eventList = true;
 let curentDate = new Date();
 export default {
   components: {
@@ -169,7 +170,7 @@ export default {
         );
         newItem.UDPartNo = udPartNo;
         //Add record to good receive table 
-        const message = await shiKYUGoodsReceiveStore.addListItem(newItem);
+        const message = await shiKYUGoodsReceiveStore.addListItem(newItem, eventList);
         if(message!=""){
           this.$message.success(message);
         }

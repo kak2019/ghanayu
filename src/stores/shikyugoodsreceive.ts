@@ -8,6 +8,7 @@ import { useBillOfMaterialsStore } from '../stores/billofmaterials';
 import { CONST } from '../config/const';
 import { computed } from 'vue';
 import { isDateBefore } from '../common/utils';
+import { useEventStore } from '../stores/event';
 
 export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECEIVE, {
     state: () => ({
@@ -111,7 +112,7 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
                 this.shikyuGoodsReceives = items;
             
         },
-        async addListItem(item: ISHIKYUGoodsReceiveItem): Promise<string> {
+        async addListItem(item: ISHIKYUGoodsReceiveItem, eventList:boolean): Promise<string> {
             try {
                 const billOfMaterialsStore = useBillOfMaterialsStore();
                 let message = "データの登録中にエラーが発生しました";
@@ -134,6 +135,7 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
 
                     //Add record to StockHistory table.
                     const stockHistoryStore = useStockHistoryStore();
+                    const eventStore = useEventStore();
                     let latestStockQty;
                     await stockHistoryStore.getListItemsByRegisteredDate(item.MLNPartNo, item.ProcessType).then(async (res) => {
                         latestStockQty = res;
@@ -147,11 +149,20 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
                             StockQty: stockQty, //Latest QTY  +  受入数, need to caculate
                             Registered: item.GoodsReceiveDate || ""
                         } as IStockHistoryItem;
-                        await stockHistoryStore.addListItem(billOfMaterialsItem).then((res) => {
-                            message = '登録完了。';
-                        }).catch((error) => {
-                            message = error.message;
-                        })
+                        //
+                        if(eventList){
+                            await eventStore.addListItem(billOfMaterialsItem).then((res) => {
+                                message = '登録完了。';
+                            }).catch((error) => {
+                                message = error.message;
+                            })
+                        }else{
+                            await stockHistoryStore.addListItem(billOfMaterialsItem).then((res) => {
+                                message = '登録完了。';
+                            }).catch((error) => {
+                                message = error.message;
+                            })
+                        }
                         return message;
                     }).catch((error) => {
                         return error.message;
