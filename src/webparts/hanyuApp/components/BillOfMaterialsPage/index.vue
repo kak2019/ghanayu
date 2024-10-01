@@ -54,7 +54,7 @@
     </el-header>
     <el-main :style="{paddingLeft:0,paddingRight:0}">
         <el-form size="small" @submit="onbomFormSubmit" :inline-message="false" :status-icon="true" :scroll-to-error="true">
-            <el-table stripe border :header-cell-style="{ backgroundColor: '#366093', color: '#fff', textAlign: 'center' }" :data="isFiltered?filteredData:tableData" :highlight-current-row="!isEditing" @current-change="handleRowClick" v-loading="loading" ref="tableRef" :height="tableHeight">
+            <el-table stripe border :header-cell-style="{ backgroundColor: '#366093', color: '#fff', textAlign: 'center' }" :data="isFiltered?filteredData:tableData" :highlight-current-row="!isEditing" @current-change="handleRowClick" v-loading="loading" ref="tableRef" :height="tableHeight" :row-class-name="tableRowClassName">
                 <el-table-column label="当工程">
                     <el-table-column fixed prop="ParentPartNo" label="MLN部品番号" width="140" align="center">
                         <template #default="scope">
@@ -110,7 +110,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="Message" label="メッセージ">
-                    <template #default="scope">
+                    <template #default="scope" >
                         <div v-if="scope.$index == currentRowIndex && Object.keys(errors).length>0">
                             <el-tag v-for="(value,key) in errors" :key="key" type="danger" closable effect="plain">{{ value }}</el-tag>
                         </div>
@@ -213,4 +213,29 @@ th {
     --el-alert-padding: 1px 8px;
     --el-alert-title-font-size: 0.8em;
 }
+
+</style>
+
+<style>
+.selected-row td{
+  background-color: #99ccff !important;
+}
+ .el-popconfirm__action {
+   /* 这里使用弹出框按钮容器的类名，确保在你的环境中它是准确的 */
+   display: flex;
+   flex-direction: row-reverse; /* 反转按钮顺序 */
+ }
+
+.el-popconfirm__action .el-button--primary {
+  background-color: #409eff; /* 蓝色 */
+  border-color: #409eff;
+  color: white;
+}
+
+.el-popconfirm__action .el-button--default {
+  background-color: #f0f0f0; /* 灰色 */
+  border-color: #dadada;
+  color: #606266;
+}
+
 </style>
