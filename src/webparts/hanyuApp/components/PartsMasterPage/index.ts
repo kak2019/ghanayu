@@ -142,7 +142,7 @@ export default {
                 refreshFilteredData();
             }).catch(error => {
                 loading.value = false;
-                ElMessage.error(error.message);
+                ElMessage.error({message:error.message,duration: 7000 });
             });
         };
 
@@ -160,16 +160,19 @@ export default {
             }
 
         };
+        const tableRowClassName = ({ rowIndex }:{rowIndex:number}):string => {
+            return currentRowIndex.value === rowIndex ? 'selected-row' : '';
+        };
         const onSubmit = queryForm.handleSubmit((_) => {
             if (isEditing.value) {
-                ElMessage.error('無効な操作です。編集モードを終了して再試行してください。');
+                ElMessage.error({message:'無効な操作です。編集モードを終了して再試行してください。',duration: 7000 });
                 return;
             }
             refreshFilteredData();
         });
         const onResetQuery = (): void => {
             if (isEditing.value) {
-                ElMessage.error('無効な操作です。編集モードを終了して再試行してください。');
+                ElMessage.error({message:'無効な操作です。編集モードを終了して再試行してください。',duration: 7000 });
                 return;
             }
             queryForm.resetForm();
@@ -215,7 +218,7 @@ export default {
             partMasterStore.deleteListItem(+data.value[currentRowIndex.value].ID).then((data) => {
                 ElMessage.success(data);
                 fetchData();
-            }).catch(error => { ElMessage.error(error.message); loading.value = false; });
+            }).catch(error => { ElMessage.error({message:error.message,duration: 7000 }); loading.value = false; });
 
         }
         const onPartFormSubmit = partForm.handleSubmit((item): void => {
@@ -227,7 +230,7 @@ export default {
                     isInserting.value = false;
                     partForm.resetForm();
                     fetchData();
-                }).catch(error => { ElMessage.error(error.message); loading.value = false; });
+                }).catch(error => { ElMessage.error({message:error.message,duration: 7000 }); loading.value = false; });
             }
             else {
                 const data = (isFiltered.value) ? filteredData : tableData;
@@ -237,7 +240,7 @@ export default {
                     isInserting.value = false;
                     partForm.resetForm();
                     fetchData();
-                }).catch(error => { ElMessage.error(error.message); loading.value = false; });
+                }).catch(error => { ElMessage.error({message:error.message,duration: 7000 }); loading.value = false; });
             }
 
         });
@@ -265,7 +268,7 @@ export default {
                     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
                     generateFileName('部品マスター');
                     XLSX.writeFile(wb, fileName.value);
-                }).catch(error => ElMessage.error(error.message));
+                }).catch(error => ElMessage.error({message:error.message,duration: 7000 }));
         }
         return {
             isFiltered,
@@ -297,6 +300,7 @@ export default {
             tableRef,
             onDownloadClick,
             isInventoryManager,
+            tableRowClassName
         }
     }
 }

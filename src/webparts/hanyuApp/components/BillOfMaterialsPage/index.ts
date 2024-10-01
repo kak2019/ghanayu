@@ -87,6 +87,7 @@ export default defineComponent({
             const spcHeight = 193;
             const minHeight = (windowHeight.value < 640) ? 178 : 378;
             return windowHeight.value > minHeight + spcHeight ? windowHeight.value - spcHeight : minHeight;
+            // return windowHeight.value - spcHeight -300
         });
 
         const handleResize = (): void => {
@@ -202,7 +203,7 @@ export default defineComponent({
                 refreshFilteredData();
             }).catch(error => {
                 loading.value = false;
-                ElMessage.error(error.message);
+                ElMessage.error({message:error.message,duration: 7000 });
             });
             // }).catch(error => ElMessage.error(error.message));
 
@@ -227,22 +228,28 @@ export default defineComponent({
         onBeforeUnmount((): void => {
             window.removeEventListener('resize', handleResize);
         });
+
         const handleRowClick = (row: IBillOfMaterialsItem | undefined): void => {
             if (!isEditing.value) {
                 currentRowIndex.value = isFiltered.value ? filteredData.value.indexOf(row) : tableData.value.indexOf(row);
+                console.log("re",currentRowIndex.value)
+
             }
 
         };
+        const tableRowClassName = ({ rowIndex }:{rowIndex:number}): string => {
+            return currentRowIndex.value === rowIndex ? 'selected-row' : '';
+        };
         const onSubmit = queryForm.handleSubmit((_) => {
             if (isEditing.value) {
-                ElMessage.error('無効な操作です。編集モードを終了して再試行してください。');
+                ElMessage.error({message:'無効な操作です。編集モードを終了して再試行してください。',duration: 7000 });
                 return;
             }
             refreshFilteredData();
         });
         const onResetQuery = (): void => {
             if (isEditing.value) {
-                ElMessage.error('無効な操作です。編集モードを終了して再試行してください。');
+                ElMessage.error({message:"無効な操作です。編集モードを終了して再試行してください。",duration: 7000 })
                 return;
             }
             queryForm.resetForm();
@@ -274,7 +281,7 @@ export default defineComponent({
                 nextTick(() => {
                     const tableElement = tableRef.value?.$el.querySelector('.el-scrollbar__wrap');
                     tableElement.scrollTop = tableElement.scrollHeight;
-                }).then(undefined).catch(error => ElMessage.error(error.message));
+                }).then(undefined).catch(error => ElMessage.error({message:error.message,duration: 7000 }));
 
             }
             else {
@@ -308,7 +315,7 @@ export default defineComponent({
                 fetchData();
             }
             catch (error) {
-                ElMessage.error(error.message);
+                ElMessage.error({message:error.message,duration: 7000 });
                 loading.value = false;
             }
         }
@@ -323,13 +330,13 @@ export default defineComponent({
                     partMasterStore.updateListItem(+partMasterStore.partMasterItems.find(i => i.MLNPartNo === item.ParentPartNo).ID, undefined, item.ParentProcessType).then(() => {
                         partMasterStore.updateListItem(+partMasterStore.partMasterItems.find(i => i.MLNPartNo === item.ChildPartNo).ID, undefined, item.ChildProcessType).then(() => {
                             //
-                        }).catch(error => ElMessage.error(error.message));
-                    }).catch(error => ElMessage.error(error.message));
+                        }).catch(error => ElMessage.error({message:error.message,duration: 7000 }));
+                    }).catch(error => ElMessage.error({message:error.message,duration: 7000 }));
 
                     ElMessage.success(data);
                     fetchData();
                 }).catch(error => {
-                    ElMessage.error(error.message);
+                    ElMessage.error({message:error.message,duration: 7000 });
                     loading.value = false;
                 });
             }
@@ -346,7 +353,7 @@ export default defineComponent({
                         bomForm.resetForm();
                         ElMessage.success(data);
                         fetchData();
-                    }).catch(error => { ElMessage.error(error.message); loading.value = false; });
+                    }).catch(error => { ElMessage.error({message:error.message,duration: 7000 }); loading.value = false; });
                 }
                 else {
                     // Child update
@@ -355,7 +362,7 @@ export default defineComponent({
                         if (d === 1) {
                             partMasterStore.updateListItem(+partMasterStore.partMasterItems.find(i => i.MLNPartNo === originalData[2]).ID, undefined, originalData[3], false).then(() => {
                                 //
-                            }).catch(error => ElMessage.error(error.message));
+                            }).catch(error => ElMessage.error({message:error.message,duration: 7000 }));
                         }
                         billOfMaterialsStore.updateListItem(+data.value[currentRowIndex.value].ID, item).then((data) => {
                             isEditing.value = false;
@@ -365,11 +372,11 @@ export default defineComponent({
                             // Insert current child
                             partMasterStore.updateListItem(+partMasterStore.partMasterItems.find(i => i.MLNPartNo === item.ChildPartNo).ID, undefined, item.ChildProcessType).then(() => {
                                 //
-                            }).catch(error => ElMessage.error(error.message));
+                            }).catch(error => ElMessage.error({message:error.message,duration: 7000 }));
                             ElMessage.success(data);
                             fetchData();
-                        }).catch(error => { ElMessage.error(error.message); loading.value = false; });
-                    }).catch(error => { ElMessage.error(error.message); loading.value = false; });
+                        }).catch(error => { ElMessage.error({message:error.message,duration: 7000 }); loading.value = false; });
+                    }).catch(error => { ElMessage.error({message:error.message,duration: 7000 }); loading.value = false; });
                 }
             }
 
@@ -405,8 +412,13 @@ export default defineComponent({
                     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
                     generateFileName('部品表');
                     XLSX.writeFile(wb, fileName.value);
-                }).catch(error => ElMessage.error(error.message));
+                }).catch(error => ElMessage.error({message:error.message,duration: 7000 }));
         }
+
+
+
+
+
         return {
             showProcessName,
             queryMLNPartNo,
@@ -447,6 +459,7 @@ export default defineComponent({
             onDownloadClick,
             isInventoryManager,
             isBusinessControler,
+            tableRowClassName
         }
     }
 });
