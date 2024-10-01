@@ -8,6 +8,7 @@ import { useStockHistoryStore } from '../stores/stockhistory';
 //import { useBillOfMaterialsStore } from './billofmaterials';
 //import { usePartMasterStore } from '../stores/part';
 import { useUserStore } from '../stores/user';
+import { useEventStore } from '../stores/event';
 
 export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESULTMODIFICATION, {
     state: () => ({
@@ -133,7 +134,12 @@ export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESUL
                     StockQty: stockQty,
                     Comment: item.Comment || "",
                 } as IStockHistoryItem;
-                await stockHistoryStore.addListItem(billOfMaterialsItem);
+                const eventStore = useEventStore();
+                if(CONST.isEventList){
+                    await eventStore.addListItem(billOfMaterialsItem);
+                }else{
+                    await stockHistoryStore.addListItem(billOfMaterialsItem);
+                }
 
                 if ((itemForAdd.FunctionID === "06" && itemForAdd.ProcessType !=="F") || itemForAdd.FunctionID === "07") {
                     
@@ -158,7 +164,11 @@ export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESUL
                             Registered:itemForAdd.Registered,
                             Comment: itemForAdd.Comment || "",																
                         } as IStockHistoryItem;
-                        await stockHistoryStore.addListItem(bomItemLastProcess);
+                        if(CONST.isEventList){
+                            await eventStore.addListItem(bomItemLastProcess);
+                        }else{
+                            await stockHistoryStore.addListItem(bomItemLastProcess);
+                        }
                     });
                 }
                 return '登録完了。';
