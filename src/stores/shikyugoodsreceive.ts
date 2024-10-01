@@ -115,7 +115,7 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
         async addListItem(item: ISHIKYUGoodsReceiveItem): Promise<string> {
             try {
                 const billOfMaterialsStore = useBillOfMaterialsStore();
-                let message = "データの登録中にエラーが発生しました";
+                let message = "MLN部品番号重複エラー";
                 const isMlnNumInBom = await billOfMaterialsStore.getItemCountByMLNPartNoProcessType(item.MLNPartNo, item.ProcessType);
                 if (isMlnNumInBom > 0) {
                     //Add shikyyuan to good receive table
@@ -177,7 +177,7 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
                 if(error.message==="部品表なしエラー"){
                     throw new Error(`部品表なしエラー`);
                 }else{
-                    throw new Error(`データの登録中にエラーが発生しました`);
+                    throw new Error(`MLN部品番号重複エラー`);
                 }
                
             }

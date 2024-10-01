@@ -136,7 +136,7 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                     throw new Error('重複値エラー');
                 } else {
                     console.error(error);
-                    throw new Error(`データの登録中にエラーが発生しました`);
+                    throw new Error(`MLN部品番号重複エラー`);
                 }
             }
         },
@@ -177,7 +177,7 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                     throw new Error('重複値エラー');
                 } else {
                     console.error(error);
-                    throw new Error(`データの登録中にエラーが発生しました`);
+                    throw new Error(`MLN部品番号重複エラー`);
                 }
             }
         },
@@ -186,7 +186,7 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                 const sp = spfi(getSP());
                 const web = await sp.web();
                 await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNamePARTMASTER}`).items.getById(itemId).delete();
-                return '消去完了。';
+                return '削除完了。';
             }
             catch (error) {
                 console.error(error);

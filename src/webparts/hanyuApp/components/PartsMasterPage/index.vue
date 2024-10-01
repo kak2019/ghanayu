@@ -39,7 +39,7 @@
                         <span v-else>{{ scope.row.UDPartNo }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="" width="108">
+                <el-table-column label="登録" width="108">
                     <template #default="scope">
                         <el-button v-if="isEditing && currentRowIndex === scope.$index" title="保存" type="primary" native-type="submit" :icon="Check" />
                         <el-button v-if="isEditing && currentRowIndex === scope.$index" @click="cancelRow" title="キャンセル" :icon="Close" />
@@ -64,7 +64,7 @@
 
             </el-col>
             <el-col :span="8">
-                <el-button plain size="large" @click="editRow" :disabled="!isInventoryManager || isEditing || currentRowIndex === -1">登録</el-button>
+                <el-button plain size="large" @click="editRow" :disabled="!isInventoryManager || isEditing || currentRowIndex === -1">変更</el-button>
                 <el-button plain size="large" @click="insertRow" :disabled="!isInventoryManager || isEditing">行追加</el-button>
                 <el-popconfirm confirm-button-text="はい" cancel-button-text="いいえ" title="これを削除してもよろしいですか?" @confirm="deleteRow">
                     <template #reference>

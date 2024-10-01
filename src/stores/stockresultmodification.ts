@@ -174,7 +174,7 @@ export const useStockResultModificationStore = defineStore(FeatureKey.STOCKRESUL
                 return '登録完了。';
             }
             catch (error) {
-                throw new Error(`データの登録中にエラーが発生しました: ${error.message}`);
+                throw new Error(`MLN部品番号重複エラー: ${error.message}`);
             }
         }
     },

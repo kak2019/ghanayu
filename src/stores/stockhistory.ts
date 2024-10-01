@@ -127,7 +127,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
             }
             catch (error) {
                 console.error(error);
-                throw new Error(`データの登録中にエラーが発生しました`);
+                throw new Error(`MLN部品番号重複エラー`);
             }
         },
         async addListItems(items: IStockHistoryItem[]): Promise<string> {
@@ -160,7 +160,7 @@ export const useStockHistoryStore = defineStore(FeatureKey.STOCKHISTORY, {
             }
             catch (error) {
                 console.error(error);
-                throw new Error(`データの登録中にエラーが発生しました`);
+                throw new Error(`MLN部品番号重複エラー`);
             }
         },
         async getListItemsByRegisteredDate(mlnPartNo: string, processType: string): Promise<number> {

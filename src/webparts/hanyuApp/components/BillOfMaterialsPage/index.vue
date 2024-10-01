@@ -128,7 +128,7 @@
 
             </el-col>
             <el-col :span="8">
-                <el-button plain size="large" @click="editRow" :disabled="(!isInventoryManager && !isBusinessControler) || isEditing || currentRowIndex === -1">登録</el-button>
+                <el-button plain size="large" @click="editRow" :disabled="(!isInventoryManager && !isBusinessControler) || isEditing || currentRowIndex === -1">変更</el-button>
                 <el-button plain size="large" @click="insertRow" :disabled="!isInventoryManager || isEditing">行追加</el-button>
                 <el-popconfirm confirm-button-text="はい" cancel-button-text="いいえ" title="これを削除してもよろしいですか?" @confirm="deleteRow">
                     <template #reference>

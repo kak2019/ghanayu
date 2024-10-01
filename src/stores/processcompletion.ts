@@ -203,7 +203,7 @@ export const useProcessCompletionResultStore = defineStore(FeatureKey.PROCESSCOM
         return '登録完了。';
       } catch (error) {
         console.error(error);
-        throw new Error(`データの登録中にエラーが発生しました`);
+        throw new Error(`MLN部品番号重複エラー`);
       }
     }
   }

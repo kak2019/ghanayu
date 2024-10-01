@@ -81,7 +81,7 @@ export const useEventStore = defineStore(FeatureKey.EVENT, {
             }
             catch (error) {
                 console.error(error);
-                throw new Error(`データの登録中にエラーが発生しました`);
+                throw new Error(`MLN部品番号重複エラー`);
             }
         },
         async addListItems(items: IEventItem[]): Promise<string> {
@@ -112,7 +112,7 @@ export const useEventStore = defineStore(FeatureKey.EVENT, {
             }
             catch (error) {
                 console.error(error);
-                throw new Error(`データの登録中にエラーが発生しました`);
+                throw new Error(`MLN部品番号重複エラー`);
             }
         }
     }
