@@ -112,7 +112,7 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
                 this.shikyuGoodsReceives = items;
             
         },
-        async addListItem(item: ISHIKYUGoodsReceiveItem, eventList:boolean): Promise<string> {
+        async addListItem(item: ISHIKYUGoodsReceiveItem): Promise<string> {
             try {
                 const billOfMaterialsStore = useBillOfMaterialsStore();
                 let message = "データの登録中にエラーが発生しました";
@@ -150,7 +150,7 @@ export const useSHIKYUGoodsReceiveStore = defineStore(FeatureKey.SHIKYUGOODSRECE
                             Registered: item.GoodsReceiveDate || ""
                         } as IStockHistoryItem;
                         //
-                        if(eventList){
+                        if(CONST.isEventList){
                             await eventStore.addListItem(billOfMaterialsItem).then((res) => {
                                 message = '登録完了。';
                             }).catch((error) => {
