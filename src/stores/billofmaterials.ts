@@ -4,6 +4,7 @@ import { getSP } from '../pnpjsConfig';
 import { FeatureKey } from '../config/keystrs';
 import { IBillOfMaterialsItem } from '../model';
 import { CONST } from '../config/const';
+import { computed } from 'vue';
 
 export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
     state: () => ({
@@ -119,7 +120,7 @@ export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
             }
         },
         async getItemsByChildMLNPartNoProcessType(mlnPartNo: string, processType: string): Promise<IBillOfMaterialsItem[]> {
-            const camlQuery = {
+            /*const camlQuery = {
                 ViewXml: `
                 <View>
                   <Query>
@@ -137,19 +138,35 @@ export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
                     </Where>
                   </Query>
                 </View>`
-            };
+            };*/
             try {
-                const sp = spfi(getSP());
+                /*const sp = spfi(getSP());
                 const web = await sp.web();
                 const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/BillOfMaterials`).getItemsByCAMLQuery(camlQuery);
-                return items;
+                return items;*/
+
+                let items = computed(() => this.billOfMaterialsItems);
+                //Have to use 
+                await this.getListItems();
+                items = computed(() => this.billOfMaterialsItems)
+
+                const newItems = items.value.filter(item => {
+                    let condition = true;
+                    if (mlnPartNo) {
+                        condition = condition && mlnPartNo === item.ChildPartNo && item.ChildProcessType === processType
+                    }
+                    return condition
+                });
+
+                return newItems;
+
             } catch (error) {
                 console.error(error);
                 throw new Error(`データの取得中にエラーが発生しました`);
             }
         },
         async getItemsByMLNPartNoProcessType(mlnPartNo: string, processType: string): Promise<IBillOfMaterialsItem[]> {
-            const camlQuery = {
+            /*const camlQuery = {
                 ViewXml: `
                 <View>
                   <Query>
@@ -167,12 +184,28 @@ export const useBillOfMaterialsStore = defineStore(FeatureKey.BILLOFMATERIALS, {
                     </Where>
                   </Query>
                 </View>`
-            };
+            };*/
             try {
-                const sp = spfi(getSP());
+                /*const sp = spfi(getSP());
                 const web = await sp.web();
                 const items = await sp.web.getList(`${web.ServerRelativeUrl}/Lists/${CONST.listNameBILLOFMATERIALS}`).getItemsByCAMLQuery(camlQuery);
-                return items;
+                return items;*/
+
+                
+                let items = computed(() => this.billOfMaterialsItems);
+                //Have to use 
+                await this.getListItems();
+                items = computed(() => this.billOfMaterialsItems)
+
+                const newItems = items.value.filter(item => {
+                    let condition = true;
+                    if (mlnPartNo) {
+                        condition = condition && mlnPartNo === item.ParentPartNo && item.ParentProcessType === processType
+                    }
+                    return condition
+                });
+
+                return newItems;
             } catch (error) {
                 console.error(error);
                 throw new Error(`データの取得中にエラーが発生しました`);
