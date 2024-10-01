@@ -24,5 +24,6 @@ const CONST = {
     listNameSTOCKRESULTMODIFICATION: "StockResultModification",
     beginOperationDate: OperationSettings.BeginDate,
     endOperationDate: OperationSettings.EndDate,
+    isEventList : true
 }
 export { CONST };

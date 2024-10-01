@@ -50,6 +50,8 @@ import { useUserStore } from '../../../../stores/user';
 import { convertToUTC } from '../../../../common/utils';
 import { useFileName } from '../../../../stores/usefilename';
 import { getCurrentTime } from '../../../../common/utils';
+import { CONST } from '../../../../config/const';
+import { useEventStore } from '../../../../stores/event';
 
 const userStore = new useUserStore();
 const isBusinessControler = computed(() => userStore.groupInfo.indexOf('Business Controler') >= 0);
@@ -189,9 +191,16 @@ export default {
               StockQty: 0, //获取最新库存
               Registered:newItem.ShippingResultDate
             };
-
-            const addFinishedStockMsg = await stockHistoryStore.addListItem(newOutStockItem);
-            const addFinishedStockMsgDuplicate = await stockHistoryStore.addListItem(newOutStockItemDuplicate);
+            let addFinishedStockMsg = "";
+            let addFinishedStockMsgDuplicate = "";
+            if(CONST.isEventList){
+              const eventStore = useEventStore();
+              eventStore.addListItem(newOutStockItem);
+              eventStore.addListItem(newOutStockItemDuplicate);
+            }else{
+              addFinishedStockMsg = await stockHistoryStore.addListItem(newOutStockItem);
+              addFinishedStockMsgDuplicate = await stockHistoryStore.addListItem(newOutStockItemDuplicate);
+            }
             this.$message.success(addFinishedStockMsg);
             this.fullscreenLoading = false;
             await this.fetchTableData();

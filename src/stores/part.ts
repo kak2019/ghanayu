@@ -244,6 +244,8 @@ export const usePartMasterStore = defineStore(FeatureKey.PARTMASTER, {
                         item.ProcessTypeName = this.getProcessNameByType(processType);
                         return condition;
                     });
+                }else{
+                    tempItems = items.value;
                 }
 
                 //filter parts list with process type
