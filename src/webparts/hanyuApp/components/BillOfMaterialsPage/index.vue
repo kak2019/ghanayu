@@ -10,7 +10,7 @@
                         <tr>
                             <td>
                                 <el-form-item label="MLN部品番号" label-position="top" :style="{ margin: 0 }" v-bind="ParentPartNoProps">
-                                    <el-autocomplete v-model="ParentPartNo" :fetch-suggestions="queryMLNPartNo" clearable />
+                                    <el-autocomplete v-model="ParentPartNo" :fetch-suggestions="queryMLNPartNo" clearable style="text-align: center;"/>
                                 </el-form-item>
                             </td>
                             <td>
